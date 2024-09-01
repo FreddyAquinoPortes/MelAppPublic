@@ -51,4 +51,4 @@ MEL es una aplicación móvil diseñada para ayudar a los usuarios a descubrir y
 ### Instrucciones de Instalación
 1. Clona este repositorio en tu máquina local:
    ```bash
-   git clone https://github.com/tuusuario/MelApp.git
+   [git clone https://github.com/tuusuario/MelApp.git](https://github.com/FreddyAquinoPortes/MelAppPublic/tree/Dev)
