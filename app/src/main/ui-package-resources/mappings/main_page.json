@@ -1,0 +1,6 @@
+{
+    "target": "MainPage",
+    "package": "com.example.melapp.mainpage",
+    "generateImplementation": true,
+    "generatePreviews": true
+}

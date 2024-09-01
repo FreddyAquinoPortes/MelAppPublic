@@ -1,0 +1,2770 @@
+{
+  "name": "event_page",
+  "version": 33,
+  "source-key": {
+    "type": "figma",
+    "file": "6dcE8i4Z9wdDQDt96Bnvf5",
+    "node": "221:622",
+    "version": "6434890764",
+    "component-id": "2cb8a44d56cf352b6dfc7f966fed6b4b1d0338a6"
+  },
+  "default": "Event_page",
+  "design": {
+    "atoms": [
+      {
+        "type": "group",
+        "id": "top_level",
+        "root": "true"
+      },
+      {
+        "type": "group",
+        "id": "Map Background"
+      },
+      {
+        "type": "vector",
+        "id": "Base"
+      },
+      {
+        "type": "vector",
+        "id": "Line"
+      },
+      {
+        "type": "group",
+        "id": "Share Your Location"
+      },
+      {
+        "type": "group",
+        "id": "Places Near You"
+      },
+      {
+        "type": "text",
+        "id": "Detalles del evento"
+      },
+      {
+        "type": "group",
+        "id": "Frame 1261152838"
+      },
+      {
+        "type": "group",
+        "id": "Frame 1261152840"
+      },
+      {
+        "type": "group",
+        "id": "Frame 1261152836"
+      },
+      {
+        "type": "group",
+        "id": "Frame 1261152837"
+      },
+      {
+        "type": "group",
+        "id": "Adress 2"
+      },
+      {
+        "type": "vector",
+        "id": "Line1"
+      },
+      {
+        "type": "vector",
+        "id": "Mask"
+      },
+      {
+        "type": "vector",
+        "id": "Mask1"
+      },
+      {
+        "type": "image",
+        "id": "Map"
+      },
+      {
+        "type": "group",
+        "id": "Header"
+      },
+      {
+        "type": "vector",
+        "id": "Base1"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/arrow-up"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/arrow-down"
+      },
+      {
+        "type": "text",
+        "id": " The Sauce Latam Tour 2023"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/close-circle"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/arrow-up1"
+      },
+      {
+        "type": "group",
+        "id": "arrow-up"
+      },
+      {
+        "type": "vector",
+        "id": "Vector"
+      },
+      {
+        "type": "vector",
+        "id": "Vector1"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/arrow-down1"
+      },
+      {
+        "type": "group",
+        "id": "arrow-down"
+      },
+      {
+        "type": "vector",
+        "id": "Vector2"
+      },
+      {
+        "type": "vector",
+        "id": "Vector3"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/close-circle1"
+      },
+      {
+        "type": "group",
+        "id": "close-circle"
+      },
+      {
+        "type": "vector",
+        "id": "Vector4"
+      },
+      {
+        "type": "vector",
+        "id": "Vector5"
+      },
+      {
+        "type": "vector",
+        "id": "Vector6"
+      },
+      {
+        "type": "vector",
+        "id": "Vector7"
+      },
+      {
+        "type": "group",
+        "id": "Icon"
+      },
+      {
+        "type": "vector",
+        "id": "Line2"
+      },
+      {
+        "type": "text",
+        "id": "Como llegar"
+      },
+      {
+        "type": "group",
+        "id": "Call Button "
+      },
+      {
+        "type": "vector",
+        "id": "Shape"
+      },
+      {
+        "type": "vector",
+        "id": "Oval"
+      },
+      {
+        "type": "vector",
+        "id": "Base2"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/ticket-star"
+      },
+      {
+        "type": "text",
+        "id": "comprar"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/ticket-star1"
+      },
+      {
+        "type": "group",
+        "id": "ticket-star"
+      },
+      {
+        "type": "vector",
+        "id": "Vector8"
+      },
+      {
+        "type": "vector",
+        "id": "Vector9"
+      },
+      {
+        "type": "vector",
+        "id": "Vector10"
+      },
+      {
+        "type": "vector",
+        "id": "Vector11"
+      },
+      {
+        "type": "vector",
+        "id": "Vector12"
+      },
+      {
+        "type": "group",
+        "id": "Adress 1"
+      },
+      {
+        "type": "vector",
+        "id": "Line3"
+      },
+      {
+        "type": "group",
+        "id": "Adress 3"
+      },
+      {
+        "type": "vector",
+        "id": "Line4"
+      },
+      {
+        "type": "group",
+        "id": "Adress 4"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/location"
+      },
+      {
+        "type": "text",
+        "id": "Palacio de los Deportes"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/location1"
+      },
+      {
+        "type": "group",
+        "id": "location"
+      },
+      {
+        "type": "vector",
+        "id": "Vector13"
+      },
+      {
+        "type": "vector",
+        "id": "Vector14"
+      },
+      {
+        "type": "vector",
+        "id": "Vector15"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/calendar"
+      },
+      {
+        "type": "text",
+        "id": "Diciembre 01, 2023 "
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/calendar1"
+      },
+      {
+        "type": "group",
+        "id": "calendar"
+      },
+      {
+        "type": "vector",
+        "id": "Vector16"
+      },
+      {
+        "type": "vector",
+        "id": "Vector17"
+      },
+      {
+        "type": "vector",
+        "id": "Vector18"
+      },
+      {
+        "type": "vector",
+        "id": "Vector19"
+      },
+      {
+        "type": "vector",
+        "id": "Vector20"
+      },
+      {
+        "type": "vector",
+        "id": "Vector21"
+      },
+      {
+        "type": "vector",
+        "id": "Vector22"
+      },
+      {
+        "type": "vector",
+        "id": "Vector23"
+      },
+      {
+        "type": "vector",
+        "id": "Vector24"
+      },
+      {
+        "type": "vector",
+        "id": "Vector25"
+      },
+      {
+        "type": "vector",
+        "id": "Vector26"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/clock"
+      },
+      {
+        "type": "text",
+        "id": "7:00 P.M - 10:00 P.M "
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/clock1"
+      },
+      {
+        "type": "group",
+        "id": "clock"
+      },
+      {
+        "type": "vector",
+        "id": "Vector27"
+      },
+      {
+        "type": "vector",
+        "id": "Vector28"
+      },
+      {
+        "type": "vector",
+        "id": "Vector29"
+      },
+      {
+        "type": "group",
+        "id": "Frame 1261152833"
+      },
+      {
+        "type": "image",
+        "id": "image 300"
+      },
+      {
+        "type": "group",
+        "id": "Frame 1261152835"
+      },
+      {
+        "type": "image",
+        "id": "image 301"
+      },
+      {
+        "type": "image",
+        "id": "image 302"
+      },
+      {
+        "type": "image",
+        "id": "image 303"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/user-tag"
+      },
+      {
+        "type": "text",
+        "id": "Presentado por: Gamal"
+      },
+      {
+        "type": "group",
+        "id": "vuesax/linear/user-tag1"
+      },
+      {
+        "type": "group",
+        "id": "user-tag"
+      },
+      {
+        "type": "vector",
+        "id": "Vector30"
+      },
+      {
+        "type": "group",
+        "id": "Group"
+      },
+      {
+        "type": "vector",
+        "id": "Vector31"
+      },
+      {
+        "type": "vector",
+        "id": "Vector32"
+      },
+      {
+        "type": "vector",
+        "id": "Vector33"
+      }
+    ],
+    "modes": {
+      "Event_page": {
+        "rules": [
+          {
+            "id": "top_level",
+            "is-structured": false,
+            "children": [
+              "Map Background",
+              "Base",
+              "Line",
+              "Share Your Location",
+              "Places Near You",
+              "Detalles del evento",
+              "Frame 1261152838",
+              "Frame 1261152840",
+              "Frame 1261152836",
+              "Frame 1261152837",
+              "Adress 2",
+              "Line1"
+            ],
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.9725490196078431
+            }
+          },
+          {
+            "id": "Map Background",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -6.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 375.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 818.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Mask",
+              "Mask1",
+              "Map",
+              "Header"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Base",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 52.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 375.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 760.0
+              }
+            },
+            "vector-content": "base.svg"
+          },
+          {
+            "id": "Line",
+            "border-radius": 7.0,
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 168.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 56.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 40.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 5.0
+              }
+            },
+            "vector-content": "line.svg"
+          },
+          {
+            "id": "Share Your Location",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 19.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 505.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 347.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 50.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Icon",
+              "Line2",
+              "Como llegar",
+              "Call Button "
+            ]
+          },
+          {
+            "id": "Places Near You",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 18.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 575.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 347.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 149.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Adress 1",
+              "Line3",
+              "Adress 3",
+              "Line4",
+              "Adress 4"
+            ]
+          },
+          {
+            "id": "Detalles del evento",
+            "margin": {
+              "left": 23.0,
+              "top": 566.0,
+              "right": 217.0,
+              "bottom": 228.0
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "font-weight": 600.0,
+            "text-content": "Detalles del evento",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 12.0,
+            "letter-spacing": 1.0,
+            "line-height": 1.5,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "Frame 1261152838",
+            "border-radius": 17.0,
+            "drop-shadow": {
+              "color": {
+                "alpha": 0.24705882352941178,
+                "hue": 0.0,
+                "saturation": 0.0,
+                "value": 0.0
+              },
+              "blur": 4.0,
+              "offset-x": 0.0,
+              "offset-y": 4.0,
+              "spread": 0.0,
+              "blend-mode": "normal"
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 19.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 81.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Frame 1261152833"
+            ],
+            "item-spacing": 4.0,
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.0
+            },
+            "clip-content": false
+          },
+          {
+            "id": "Frame 1261152840",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 193.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 81.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "shrink"
+              },
+              "height-constraints": {
+                "sizing-mode": "shrink"
+              }
+            },
+            "main-axis-align": "start",
+            "cross-axis-align": "start",
+            "children": [
+              "Frame 1261152835"
+            ],
+            "item-spacing": 4.0,
+            "clip-content": false
+          },
+          {
+            "id": "Frame 1261152836",
+            "border-radius": 16.0,
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 19.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 258.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 164.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 218.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "image 302"
+            ],
+            "background-color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 0.0
+            }
+          },
+          {
+            "id": "Frame 1261152837",
+            "border-radius": 16.0,
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 193.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 308.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 164.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 157.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "image 303"
+            ]
+          },
+          {
+            "id": "Adress 2",
+            "margin": {
+              "left": 16.0,
+              "top": 733.0,
+              "right": 159.0,
+              "bottom": 31.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/user-tag",
+              "Presentado por: Gamal"
+            ]
+          },
+          {
+            "id": "Line1",
+            "margin": {
+              "left": 18.0,
+              "top": 724.0,
+              "right": 10.0,
+              "bottom": 87.0
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "line1.svg"
+          },
+          {
+            "id": "Mask",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 6.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 375.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 812.0
+              }
+            },
+            "vector-content": "mask.svg"
+          },
+          {
+            "id": "Mask1",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 6.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 375.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 812.0
+              }
+            }
+          },
+          {
+            "id": "Map",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 6.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 627.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 896.0
+              }
+            },
+            "stroke-alignment": "center",
+            "image-content": "map.png",
+            "scale": "fill"
+          },
+          {
+            "id": "Header",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 375.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 43.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Base1",
+              "vuesax/linear/arrow-up",
+              "vuesax/linear/arrow-down",
+              " The Sauce Latam Tour 2023",
+              "vuesax/linear/close-circle"
+            ]
+          },
+          {
+            "id": "Base1",
+            "drop-shadow": {
+              "color": {
+                "alpha": 0.12941176470588237,
+                "hue": 0.0,
+                "saturation": 0.0,
+                "value": 0.0
+              },
+              "blur": 48.0,
+              "offset-x": 0.0,
+              "offset-y": 2.0,
+              "spread": 0.0,
+              "blend-mode": "normal"
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 0.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 6.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "base1.svg"
+          },
+          {
+            "id": "vuesax/linear/arrow-up",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 7.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 63.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/arrow-up1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "vuesax/linear/arrow-down",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 7.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 9.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/arrow-down1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": " The Sauce Latam Tour 2023",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 84.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 12.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            },
+            "text-content": " The Sauce Latam Tour 2023",
+            "overflow": "visible",
+            "text-align": "left",
+            "letter-spacing": 1.0,
+            "line-height": 1.5,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "vuesax/linear/close-circle",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 343.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 9.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/close-circle1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "vuesax/linear/arrow-up1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "arrow-up"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "arrow-up",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector",
+              "Vector1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector",
+            "margin": {
+              "left": 4.0799560546875,
+              "top": 7.9525146484375,
+              "right": 4.080043792724609,
+              "bottom": 8.949985027313232
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector.svg"
+          },
+          {
+            "id": "Vector1",
+            "margin": {
+              "left": 1.7763568394002505e-15
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "vuesax/linear/arrow-down1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "arrow-down"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "arrow-down",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector2",
+              "Vector3"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector2",
+            "margin": {
+              "left": 4.0799560546875,
+              "top": 8.95001220703125,
+              "right": 4.080043792724609,
+              "bottom": 7.952487468719482
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector1.svg"
+          },
+          {
+            "id": "Vector3",
+            "margin": {
+              "left": 1.7763568394002505e-15
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "vuesax/linear/close-circle1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "close-circle"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "close-circle",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector4",
+              "Vector5",
+              "Vector6",
+              "Vector7"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector4",
+            "margin": 2.0,
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector2.svg"
+          },
+          {
+            "id": "Vector5",
+            "margin": {
+              "left": 9.1700439453125,
+              "top": 9.16998291015625,
+              "right": 9.16995620727539,
+              "bottom": 9.17001724243164
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector3.svg"
+          },
+          {
+            "id": "Vector6",
+            "margin": {
+              "left": 9.1700439453125,
+              "top": 9.16998291015625,
+              "right": 9.16995620727539,
+              "bottom": 9.17001724243164
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector4.svg"
+          },
+          {
+            "id": "Vector7",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Icon",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 30.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Shape",
+              "Oval"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Line2",
+            "margin": {
+              "top": 49.0
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "line2.svg"
+          },
+          {
+            "id": "Como llegar",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 39.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 6.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 258.9677419354839,
+              "saturation": 0.7345971563981043,
+              "value": 0.8274509803921568
+            },
+            "text-content": "Como llegar",
+            "overflow": "visible",
+            "text-align": "left",
+            "letter-spacing": 1.0,
+            "line-height": 1.5,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "Call Button ",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 195.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 3.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 120.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 36.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Base2",
+              "vuesax/linear/ticket-star",
+              "comprar"
+            ]
+          },
+          {
+            "id": "Shape",
+            "margin": {
+              "left": 7.0,
+              "top": 9.0,
+              "right": 9.0,
+              "bottom": 7.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.4281005859375
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -1.000030517578125
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "shape.svg"
+          },
+          {
+            "id": "Oval",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "oval.svg"
+          },
+          {
+            "id": "Base2",
+            "border-radius": 10.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "base2.svg"
+          },
+          {
+            "id": "vuesax/linear/ticket-star",
+            "margin": {
+              "left": 8.0,
+              "top": 6.0,
+              "right": 88.0,
+              "bottom": 6.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/ticket-star1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "comprar",
+            "margin": {
+              "left": 38.0,
+              "top": 8.0,
+              "right": 13.0,
+              "bottom": 7.0
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 0.0,
+              "saturation": 0.0,
+              "value": 1.0
+            },
+            "text-content": "comprar",
+            "overflow": "visible",
+            "text-align": "left",
+            "letter-spacing": 1.0,
+            "line-height": 1.5,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "vuesax/linear/ticket-star1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "ticket-star"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "ticket-star",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector8",
+              "Vector9",
+              "Vector10",
+              "Vector11",
+              "Vector12"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector8",
+            "margin": {
+              "left": 2.0050048828125,
+              "top": 4.0,
+              "right": 2.004995346069336,
+              "bottom": 4.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector5.svg"
+          },
+          {
+            "id": "Vector9",
+            "margin": {
+              "left": 8.9932861328125,
+              "top": 4.0,
+              "right": 15.0067138671875,
+              "bottom": 16.5
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector6.svg"
+          },
+          {
+            "id": "Vector10",
+            "margin": {
+              "left": 8.9932861328125,
+              "top": 16.5,
+              "right": 15.0067138671875,
+              "bottom": 4.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector7.svg"
+          },
+          {
+            "id": "Vector11",
+            "margin": {
+              "left": 11.6376953125,
+              "top": 9.097503662109375,
+              "right": 6.307662487030029,
+              "bottom": 9.08160924911499
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.7520751953125
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.750030517578125
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector8.svg"
+          },
+          {
+            "id": "Vector12",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Adress 1",
+            "margin": {
+              "top": 30.0,
+              "right": 83.0,
+              "bottom": 71.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/location",
+              "Palacio de los Deportes"
+            ]
+          },
+          {
+            "id": "Line3",
+            "margin": {
+              "top": 63.0,
+              "bottom": 85.0
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "line3.svg"
+          },
+          {
+            "id": "Adress 3",
+            "margin": {
+              "top": 74.0,
+              "right": 147.0,
+              "bottom": 27.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/calendar",
+              "Diciembre 01, 2023 "
+            ]
+          },
+          {
+            "id": "Line4",
+            "margin": {
+              "top": 107.0,
+              "bottom": 41.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 16.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 0.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "line4.svg"
+          },
+          {
+            "id": "Adress 4",
+            "margin": {
+              "top": 116.0,
+              "right": 147.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/clock",
+              "7:00 P.M - 10:00 P.M "
+            ]
+          },
+          {
+            "id": "vuesax/linear/location",
+            "margin": {
+              "right": 241.0,
+              "bottom": 25.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/location1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Palacio de los Deportes",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 31.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 0.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 210.00000000000003,
+              "saturation": 0.16783216783216784,
+              "value": 0.5607843137254902
+            },
+            "text-content": "Palacio de los Deportes",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 12.0,
+            "letter-spacing": 1.0,
+            "line-height": 2.0,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "vuesax/linear/location1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "location"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "location",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector13",
+              "Vector14",
+              "Vector15"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector13",
+            "margin": {
+              "left": 8.8800048828125,
+              "top": 7.19000244140625,
+              "right": 8.879995346069336,
+              "bottom": 10.569997310638428
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector9.svg"
+          },
+          {
+            "id": "Vector14",
+            "margin": {
+              "left": 3.377197265625,
+              "top": 2.0,
+              "right": 3.377321243286133,
+              "bottom": 2.0049972534179688
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.7509765625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector10.svg"
+          },
+          {
+            "id": "Vector15",
+            "margin": {
+              "left": 1.7763568394002505e-15
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "vuesax/linear/calendar",
+            "margin": {
+              "right": 178.0,
+              "bottom": 25.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/calendar1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Diciembre 01, 2023 ",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 31.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 0.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 210.00000000000003,
+              "saturation": 0.16783216783216784,
+              "value": 0.5607843137254902
+            },
+            "text-content": "Diciembre 01, 2023 ",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 12.0,
+            "letter-spacing": 1.0,
+            "line-height": 2.0,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "vuesax/linear/calendar1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 24.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "calendar"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "calendar",
+            "is-structured": false,
+            "children": [
+              "Vector16",
+              "Vector17",
+              "Vector18",
+              "Vector19",
+              "Vector20",
+              "Vector21",
+              "Vector22",
+              "Vector23",
+              "Vector24",
+              "Vector25",
+              "Vector26"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector16",
+            "margin": {
+              "left": 8.0,
+              "top": 2.0,
+              "right": 16.0,
+              "bottom": 19.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector11.svg"
+          },
+          {
+            "id": "Vector17",
+            "margin": {
+              "left": 16.0,
+              "top": 2.0,
+              "right": 8.0,
+              "bottom": 19.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector12.svg"
+          },
+          {
+            "id": "Vector18",
+            "margin": {
+              "left": 3.5,
+              "top": 9.089996337890625,
+              "right": 3.5,
+              "bottom": 14.910003662109375
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector13.svg"
+          },
+          {
+            "id": "Vector19",
+            "margin": {
+              "left": 3.0,
+              "top": 3.5,
+              "right": 3.0,
+              "bottom": 2.0
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector14.svg"
+          },
+          {
+            "id": "Vector20",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Vector21",
+            "margin": {
+              "left": 15.2001953125,
+              "top": 13.20001220703125,
+              "right": 7.801808059215546,
+              "bottom": 9.79998779296875
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.5054931640625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector15.svg"
+          },
+          {
+            "id": "Vector22",
+            "margin": {
+              "left": 15.2001953125,
+              "top": 16.20001220703125,
+              "right": 7.801808059215546,
+              "bottom": 6.79998779296875
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.5054931640625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector16.svg"
+          },
+          {
+            "id": "Vector23",
+            "margin": {
+              "left": 11.5009765625,
+              "top": 13.20001220703125,
+              "right": 11.501026809215546,
+              "bottom": 9.79998779296875
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.5054931640625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector17.svg"
+          },
+          {
+            "id": "Vector24",
+            "margin": {
+              "left": 11.5009765625,
+              "top": 16.20001220703125,
+              "right": 11.501026809215546,
+              "bottom": 6.79998779296875
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.5054931640625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector18.svg"
+          },
+          {
+            "id": "Vector25",
+            "margin": {
+              "left": 7.7998046875,
+              "top": 13.20001220703125,
+              "right": 15.202198684215546,
+              "bottom": 9.79998779296875
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.5054931640625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector19.svg"
+          },
+          {
+            "id": "Vector26",
+            "margin": {
+              "left": 7.7998046875,
+              "top": 16.20001220703125,
+              "right": 15.202198684215546,
+              "bottom": 6.79998779296875
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.5054931640625
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.5
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector20.svg"
+          },
+          {
+            "id": "vuesax/linear/clock",
+            "margin": {
+              "right": 178.0,
+              "bottom": 27.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/clock1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "7:00 P.M - 10:00 P.M ",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 31.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 0.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 210.00000000000003,
+              "saturation": 0.16783216783216784,
+              "value": 0.5607843137254902
+            },
+            "text-content": "7:00 P.M - 10:00 P.M ",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 12.0,
+            "letter-spacing": 1.0,
+            "line-height": 2.0,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "vuesax/linear/clock1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 22.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 22.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "clock"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "clock",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 22.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 22.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "Vector27",
+              "Vector28",
+              "Vector29"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector27",
+            "margin": {
+              "left": 1.8333740234375,
+              "top": 1.8333282470703125,
+              "right": 1.833292007446289,
+              "bottom": 1.8333377838134766
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector21.svg"
+          },
+          {
+            "id": "Vector28",
+            "margin": {
+              "left": 10.660888671875,
+              "top": 6.8841705322265625,
+              "right": 7.599111318588257,
+              "bottom": 8.084996223449707
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector22.svg"
+          },
+          {
+            "id": "Vector29",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Frame 1261152833",
+            "border-radius": 16.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 164.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 157.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "image 300"
+            ]
+          },
+          {
+            "id": "image 300",
+            "border-radius": 17.0,
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 4.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 0.0
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 155.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 148.0
+              }
+            },
+            "image-content": "image_300.png",
+            "scale": "cover"
+          },
+          {
+            "id": "Frame 1261152835",
+            "border-radius": 16.0,
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 164.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 218.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "image 301"
+            ]
+          },
+          {
+            "id": "image 301",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 244.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 221.0
+              }
+            },
+            "image-content": "image_301.jpeg",
+            "scale": "cover"
+          },
+          {
+            "id": "image 302",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 244.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 221.0
+              }
+            },
+            "image-content": "image_302.png",
+            "scale": "cover"
+          },
+          {
+            "id": "image 303",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 260.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 163.0
+              }
+            },
+            "image-content": "image_303.jpeg",
+            "scale": "cover"
+          },
+          {
+            "id": "vuesax/linear/user-tag",
+            "margin": {
+              "left": 2.0,
+              "right": 177.0,
+              "bottom": 26.0
+            },
+            "is-structured": false,
+            "children": [
+              "vuesax/linear/user-tag1"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Presentado por: Gamal",
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": 31.0
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": 0.0
+              }
+            },
+            "font-weight": 600.0,
+            "color": {
+              "alpha": 1.0,
+              "hue": 210.00000000000003,
+              "saturation": 0.16783216783216784,
+              "value": 0.5607843137254902
+            },
+            "text-content": "Presentado por: Gamal",
+            "overflow": "visible",
+            "text-align": "left",
+            "text-size": 12.0,
+            "letter-spacing": 1.0,
+            "line-height": 2.0,
+            "typeface": "Poppins"
+          },
+          {
+            "id": "vuesax/linear/user-tag1",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "fixed",
+                "value": 21.0
+              },
+              "height-constraints": {
+                "sizing-mode": "fixed",
+                "value": 22.0
+              }
+            },
+            "is-structured": false,
+            "children": [
+              "user-tag"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "user-tag",
+            "is-structured": false,
+            "children": [
+              "Vector30",
+              "Group",
+              "Vector31"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector30",
+            "margin": {
+              "left": 2.625,
+              "top": 1.8425064086914062,
+              "right": 2.625,
+              "bottom": 1.8356437683105469
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector23.svg"
+          },
+          {
+            "id": "Group",
+            "margin": {
+              "left": 7.0,
+              "top": 4.895027160644531,
+              "right": 7.0,
+              "bottom": 7.645022392272949
+            },
+            "is-structured": false,
+            "children": [
+              "Vector32",
+              "Vector33"
+            ],
+            "clip-content": false
+          },
+          {
+            "id": "Vector31",
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            }
+          },
+          {
+            "id": "Vector32",
+            "margin": {
+              "left": 1.461181640625,
+              "right": 1.4612884521484375,
+              "bottom": 5.188308238983154
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector24.svg"
+          },
+          {
+            "id": "Vector33",
+            "margin": {
+              "top": 6.4716644287109375
+            },
+            "alignment": {
+              "horizontal": {
+                "attachment": "start",
+                "offset": -0.75
+              },
+              "vertical": {
+                "attachment": "start",
+                "offset": -0.75
+              }
+            },
+            "size-constraints": {
+              "width-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              },
+              "height-constraints": {
+                "sizing-mode": "proportional",
+                "value": 1.0
+              }
+            },
+            "vector-content": "vector25.svg"
+          }
+        ]
+      }
+    }
+  },
+  "previews": [
+    {
+      "design": "Event_page",
+      "size": {
+        "width": 375.0,
+        "height": 812.0
+      }
+    }
+  ],
+  "adin-component-search-paths": [],
+  "image-search-paths": [],
+  "vector-search-paths": []
+}
