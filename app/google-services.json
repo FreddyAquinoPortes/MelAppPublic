@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "275047331475",
+    "project_id": "melapp-ad775",
+    "storage_bucket": "melapp-ad775.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275047331475:android:375e388973c57abcb9ff66",
+        "android_client_info": {
+          "package_name": "com.example.melapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBk075wgMMdWbTKk1dyvwAJQVTdtiQRXac"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
