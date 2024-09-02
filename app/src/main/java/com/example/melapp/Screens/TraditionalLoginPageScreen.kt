@@ -17,14 +17,19 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.melapp.R
 import androidx.navigation.NavController
+import com.example.melapp.R
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 @Composable
 fun TradicionalLoginScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val auth = FirebaseAuth.getInstance()
+    val coroutineScope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
@@ -70,7 +75,7 @@ fun TradicionalLoginScreen(navController: NavController) {
 
             // Descripción
             Text(
-                text = "Por favor ingrese su corre y contraseña para iniciar sesion",
+                text = "Por favor ingrese su correo y contraseña para iniciar sesión",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
@@ -87,7 +92,8 @@ fun TradicionalLoginScreen(navController: NavController) {
                 onValueChange = { email = it },
                 label = { Text("Correo") },
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                isError = errorMessage != null && email.isEmpty()
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -99,7 +105,8 @@ fun TradicionalLoginScreen(navController: NavController) {
                 label = { Text("Contraseña") },
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
+                isError = errorMessage != null && password.isEmpty()
             )
 
             // CheckBox para mostrar/ocultar la contraseña
@@ -121,7 +128,7 @@ fun TradicionalLoginScreen(navController: NavController) {
 
             // Texto "Olvido la contraseña"
             Text(
-                text = "Olvido la contraseña",
+                text = "Olvidó la contraseña",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFF575757),
@@ -135,7 +142,27 @@ fun TradicionalLoginScreen(navController: NavController) {
 
             // Botón "Iniciar"
             Button(
-                onClick = { /* Acción al hacer clic en el botón */ },
+                onClick = {
+                    // Validation and authentication logic
+                    coroutineScope.launch {
+                        when {
+                            email.isEmpty() -> errorMessage = "El campo de correo no puede estar vacío."
+                            password.isEmpty() -> errorMessage = "El campo de contraseña no puede estar vacío."
+                            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errorMessage = "Formato de correo incorrecto."
+                            else -> {
+                                errorMessage = null
+                                auth.signInWithEmailAndPassword(email, password)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            navController.navigate("home") // Navegar a la pantalla de inicio
+                                        } else {
+                                            errorMessage = "Credenciales incorrectas."
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(46.dp),
@@ -150,9 +177,18 @@ fun TradicionalLoginScreen(navController: NavController) {
                 )
             }
 
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Texto "No tiene una contraseña? Registrarse"
+            // Texto "No tiene una cuenta? Registrarse"
             TextButton(
                 onClick = { navController.navigate("register") }, // Navega a la pantalla de registro
                 modifier = Modifier.fillMaxWidth()
