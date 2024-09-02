@@ -14,6 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.melapp.Backend.AppNavigation
 import com.example.melapp.Screens.LoginScreen
 import com.example.melapp.Screens.SignUpScreen
+import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
 import com.example.melapp.ui.theme.MelAppTheme
 
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MelAppTheme {
+
 
                 AppNavigation()
 
@@ -36,6 +38,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun GreetingPreview() {
     MelAppTheme {
+
         AppNavigation()
     }
 }

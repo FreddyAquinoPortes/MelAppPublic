@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.melapp.Screens.LoginScreen
 import com.example.melapp.Screens.SignUpScreen
+import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
 
 @Composable
@@ -16,8 +17,11 @@ fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "login"
+        startDestination = "splash_screen"
     ) {
+        composable("splash_screen"){
+            SplashScreen(navController)
+        }
         composable("login") {
             LoginScreen(navController)
         }

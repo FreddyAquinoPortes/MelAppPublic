@@ -32,11 +32,11 @@ fun LoginScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             Image(
-                painter = painterResource(id = R.drawable.mel_logo_removebg_preview__1_), // Asegúrate de tener tu logo aquí
+                painter = painterResource(id = R.drawable.mellogo), // Asegúrate de tener tu logo aquí
                 contentDescription = null,
                 modifier = Modifier
                     .size(200.dp)
-                    .padding(top = 16.dp) // Ajusta el tamaño según sea necesario
+                    .padding(top = 40.dp) // Ajusta el tamaño según sea necesario
             )
             Text(
                 text = "Mel",
