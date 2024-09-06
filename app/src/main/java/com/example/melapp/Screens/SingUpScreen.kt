@@ -62,6 +62,7 @@ fun SignUpScreen(navController: NavController) {
             val year = birthYear.toIntOrNull()
 
             when {
+                birthMonth.isEmpty() || birthDay.isEmpty() || birthYear.isEmpty() -> "Por favor completa todos los campos de la fecha"
                 month == null || month !in 1..12 -> "Mes inválido"
                 day == null || day !in 1..31 -> "Día inválido"
                 year == null || year !in 1900..(currentYear - 10) -> "Año inválido"
