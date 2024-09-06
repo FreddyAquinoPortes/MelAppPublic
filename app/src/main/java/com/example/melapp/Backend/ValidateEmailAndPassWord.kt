@@ -23,7 +23,7 @@ fun validatePassword(password: String): String? {
 
 fun validateEmailAndPassword(email: String, password: String): String? {
     if (!validateEmail(email)) {
-        return "Correo inválido"
+        return "Correo inválido: example@example.example"
     }
     return validatePassword(password)
 }

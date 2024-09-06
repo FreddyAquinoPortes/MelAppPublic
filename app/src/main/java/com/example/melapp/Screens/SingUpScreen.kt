@@ -25,10 +25,16 @@ import androidx.navigation.NavController
 import com.example.melapp.Backend.ValidatedTextField
 import com.google.firebase.auth.FirebaseAuth
 import com.example.melapp.Backend.validateEmailAndPassword
+import androidx.compose.runtime.LaunchedEffect
+import java.time.LocalDate
+import java.util.Calendar
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController) {
+    val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+
     // Variables de estado para los campos de entrada
     var nombres by remember { mutableStateOf("") }
     var apellidos by remember { mutableStateOf("") }
@@ -47,6 +53,29 @@ fun SignUpScreen(navController: NavController) {
     var municipio by remember { mutableStateOf("") }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val auth = FirebaseAuth.getInstance()
+
+    // Validación de fecha
+    val birthDateError by remember {
+        derivedStateOf {
+            val month = birthMonth.toIntOrNull()
+            val day = birthDay.toIntOrNull()
+            val year = birthYear.toIntOrNull()
+
+            when {
+                month == null || month !in 1..12 -> "Mes inválido"
+                day == null || day !in 1..31 -> "Día inválido"
+                year == null || year !in 1900..(currentYear - 10) -> "Año inválido"
+                else -> {
+                    val maxDaysInMonth = when (month) {
+                        4, 6, 9, 11 -> 30 // Abril, Junio, Septiembre, Noviembre
+                        2 -> if (isLeapYear(year)) 29 else 28 // Febrero
+                        else -> 31
+                    }
+                    if (day > maxDaysInMonth) "Fecha inválida" else null
+                }
+            }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -148,6 +177,14 @@ fun SignUpScreen(navController: NavController) {
                     onValueChange = { birthYear = it },
                     label = "Año",
                     modifier = Modifier.weight(1f)
+                )
+            }
+
+            if (birthDateError != null) {
+                Text(
+                    text = birthDateError!!,
+                    color = Color.Red,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
 
@@ -272,59 +309,15 @@ fun SignUpScreen(navController: NavController) {
                     checked = passwordVisible,
                     onCheckedChange = { passwordVisible = it }
                 )
-                Text(text = "Mostrar contraseña")
+                Text(
+                    text = "Mostrar contraseña",
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Sección Ubicación
-            Text(
-                text = "Ubicación",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Gray,
-                modifier = Modifier.align(Alignment.Start)
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Campo de Sector
-            ValidatedTextField(
-                value = sector,
-                onValueChange = { sector = it },
-                label = "Sector"
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Campo de Ciudad
-            ValidatedTextField(
-                value = ciudad,
-                onValueChange = { ciudad = it },
-                label = "Ciudad"
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Campo de Municipio
-            ValidatedTextField(
-                value = municipio,
-                onValueChange = { municipio = it },
-                label = "Municipio"
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Campo de Teléfono
-            ValidatedTextField(
-                value = telefono,
-                onValueChange = { telefono = it },
-                label = "Teléfono"
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Botón de Registrarse
+            // Botón de registro
             Button(
                 onClick = {
                     errorMessage = validateEmailAndPassword(email, password)
@@ -339,30 +332,24 @@ fun SignUpScreen(navController: NavController) {
                             }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Registrarse")
             }
 
+            // Mensaje de error
             if (errorMessage != null) {
                 Text(
                     text = errorMessage!!,
                     color = Color.Red,
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier.padding(top = 16.dp)
                 )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Botón de Login
-            TextButton(
-                onClick = { navController.navigate("login") }, // Navega a la pantalla de login
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "¿Ya tienes una cuenta? Inicia sesión", color = Color(0xFF24146C))
             }
         }
     }
+}
+
+// Función auxiliar para validar años bisiestos
+private fun isLeapYear(year: Int): Boolean {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }
