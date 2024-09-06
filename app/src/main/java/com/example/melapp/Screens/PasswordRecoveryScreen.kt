@@ -1,8 +1,8 @@
 package com.example.melapp.Screens
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -13,24 +13,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.melapp.R
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 @Composable
-fun TradicionalLoginScreen(navController: NavController) {
+fun PasswordRecoveryScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var successMessage by remember { mutableStateOf<String?>(null) }
     val auth = FirebaseAuth.getInstance()
     val coroutineScope = rememberCoroutineScope()
 
@@ -66,9 +61,9 @@ fun TradicionalLoginScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(50.dp))
 
-            // Título "Iniciar"
+            // Título "Recuperar Contraseña"
             Text(
-                text = "Iniciar",
+                text = "Recuperar Contraseña",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -78,7 +73,7 @@ fun TradicionalLoginScreen(navController: NavController) {
 
             // Descripción
             Text(
-                text = "Por favor ingrese su correo y contraseña para iniciar sesión",
+                text = "Ingrese su correo para recuperar su contraseña",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
@@ -99,73 +94,26 @@ fun TradicionalLoginScreen(navController: NavController) {
                 isError = errorMessage != null && email.isEmpty()
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Campo "Contraseña"
-            TextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                modifier = Modifier
-                    .fillMaxWidth(),
-                isError = errorMessage != null && password.isEmpty()
-            )
-
-            // CheckBox para mostrar/ocultar la contraseña
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = passwordVisible,
-                    onCheckedChange = { passwordVisible = it }
-                )
-                Text(
-                    text = "Mostrar contraseña",
-                    fontSize = 14.sp,
-                    color = Color(0xFF575757)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Texto "Olvido la contraseña"
-            Text(
-                text = "Olvidó la contraseña",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF575757),
-                textAlign = TextAlign.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp)
-                    .clickable {
-                        navController.navigate("passwordRecovery") // Navega a la pantalla de recuperación
-                    }
-            )
-
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Botón "Iniciar"
+            // Botón "Enviar"
             Button(
                 onClick = {
-                    // Validation and authentication logic
                     coroutineScope.launch {
-                        when {
-                            email.isEmpty() -> errorMessage = "El campo de correo no puede estar vacío."
-                            password.isEmpty() -> errorMessage = "El campo de contraseña no puede estar vacío."
-                            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errorMessage = "Formato de correo incorrecto."
-                            else -> {
-                                errorMessage = null
-                                auth.signInWithEmailAndPassword(email, password)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            navController.navigate("home") // Navegar a la pantalla de inicio
-                                        } else {
-                                            errorMessage = "Credenciales incorrectas."
-                                        }
+                        if (email.isEmpty()) {
+                            errorMessage = "El campo de correo no puede estar vacío."
+                        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                            errorMessage = "Formato de correo incorrecto."
+                        } else {
+                            errorMessage = null
+                            auth.sendPasswordResetEmail(email)
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        successMessage = "Correo de recuperación enviado."
+                                    } else {
+                                        errorMessage = "Error al enviar el correo de recuperación."
                                     }
-                            }
+                                }
                         }
                     }
                 },
@@ -176,17 +124,27 @@ fun TradicionalLoginScreen(navController: NavController) {
                 colors = ButtonDefaults.buttonColors(Color(0xFFA6CE39))
             ) {
                 Text(
-                    text = "Iniciar",
+                    text = "Enviar",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White
                 )
             }
 
+            // Mensajes de error o éxito
             if (errorMessage != null) {
                 Text(
                     text = errorMessage!!,
                     color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            if (successMessage != null) {
+                Text(
+                    text = successMessage!!,
+                    color = Color.Green,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -204,4 +162,3 @@ fun TradicionalLoginScreen(navController: NavController) {
         }
     }
 }
-
