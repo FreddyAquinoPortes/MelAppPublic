@@ -1,54 +1,143 @@
-# MEL (Mapas de Eventos Locales)
+CI/CD Pipeline para MEL (Mapas de Eventos Locales)
+==================================================
 
-MEL es una aplicación móvil diseñada para ayudar a los usuarios a descubrir y participar en eventos locales. La aplicación ofrece una interfaz interactiva que permite a los usuarios explorar eventos en su área, filtrarlos según sus preferencias, y participar activamente en la comunidad local.
+Este repositorio utiliza un pipeline de CI/CD configurado con GitHub Actions para automatizar la construcción, prueba y despliegue de la aplicación MEL.
 
-## Características Principales
+Descripción del Pipeline
+------------------------
 
-### Registro y Autenticación
-- **Registro de Usuarios:** Los usuarios pueden registrarse usando un correo electrónico, un nombre de usuario único, y una contraseña, o a través de servicios de terceros como Google o Apple.
-- **Verificación de Correo Electrónico:** Después de registrarse, los usuarios deben verificar su correo electrónico para confirmar su identidad.
-- **Inicio de Sesión:** Los usuarios pueden iniciar sesión utilizando sus credenciales o servicios de terceros.
-- **Recuperación de Contraseña:** Funcionalidad para recuperar y restablecer la contraseña mediante un correo electrónico seguro.
+El pipeline de CI/CD para MEL está diseñado para asegurar que el código en la rama uat sea probado, construido y desplegado automáticamente en Firebase App Distribution, garantizando que las nuevas funcionalidades y correcciones de errores sean distribuidas eficientemente para pruebas internas.
 
-### Mapa Interactivo
-- **Exploración de Eventos:** Los eventos locales se muestran en un mapa interactivo con opciones de filtrado por categoría, fecha y ubicación.
-- **Visualización Detallada:** Al hacer clic en un evento, se muestra una miniatura con una breve descripción, y los usuarios pueden acceder a detalles completos del evento, incluyendo fotos, ubicación, fecha, hora, y organizador.
+Configuración del Pipeline
+--------------------------
 
-### Publicación y Gestión de Eventos
-- **Publicación de Eventos:** Los usuarios pueden crear y publicar nuevos eventos a través de un formulario detallado.
-- **Gestión de Eventos:** Los administradores pueden editar, aprobar y eliminar eventos, mientras que los usuarios pueden gestionar sus propios eventos.
+El archivo de configuración del pipeline se encuentra en la siguiente ruta dentro del repositorio: .github/workflows/ci-cd-pipeline.yml.
 
-### Notificaciones y Recordatorios
-- **Notificaciones:** Los usuarios pueden activar notificaciones para eventos de su interés y recibir recordatorios antes de que los eventos comiencen.
-- **Calendario de Eventos:** Los usuarios pueden ver sus eventos guardados en un calendario interactivo que resalta los días con eventos programados.
+### Activadores del Pipeline
 
-### Integración de Compras de Boletos
-- **Compra de Boletos:** La aplicación proporciona enlaces directos para la compra de boletos de eventos que lo requieran.
+*   **Ramas Monitoreadas:**
+    
+    *   El pipeline se ejecuta automáticamente cuando se hace un push o se crea un pull\_request en la rama uat.
+        
+*   **Motivo:**
+    
+    *   Esto asegura que cualquier cambio en esta rama sea verificado y preparado antes de ser fusionado en la rama principal, permitiendo un flujo de trabajo ágil y seguro.
+        
 
-### Opciones de Filtrado y Búsqueda
-- **Filtros:** Filtrado avanzado de eventos por categoría, fecha y ubicación para una búsqueda más precisa.
+### Jobs del Pipeline
 
-### Gestión de Usuarios y Roles
-- **Roles de Usuario:** Distinción entre usuarios estándar y administradores, con funciones adicionales de gestión para los administradores.
-- **Gestión de Cuentas:** Funcionalidades para la eliminación de cuentas y el bloqueo o baneo de usuarios.
+#### 1\. Build
 
-### Reportes y Estadísticas
-- **Generación de Reportes:** Los administradores pueden generar reportes para monitorear el comportamiento de los usuarios y analizar el rendimiento de la aplicación.
+*   **Entorno:**
+    
+    *   runs-on: ubuntu-latest
+        
+    *   Se utiliza un entorno Ubuntu para asegurar la compatibilidad y estabilidad en el proceso de construcción.
+        
+*   **Pasos:**
+    
+    1.  **Checkout del Código:**
+        
+        *   actions/checkout@v2
+            
+        *   Clona el código del repositorio en el entorno de ejecución.
+            
+        *   **Motivo:** Permite trabajar con la última versión del código en la rama uat.
+            
+    2.  **Configuración de JDK 11:**
+        
+        *   actions/setup-java@v2
+            
+        *   Establece JDK 11 como el entorno de Java necesario para la construcción del proyecto.
+            
+        *   **Motivo:** JDK 11 es requerido para compilar y ejecutar la aplicación Android.
+            
+    3.  **Cache de Dependencias de Gradle:**
+        
+        *   actions/cache@v2
+            
+        *   Almacena en caché las dependencias de Gradle para acelerar futuras construcciones.
+            
+        *   **Motivo:** Reducir el tiempo de construcción al reutilizar dependencias previamente descargadas.
+            
+    4.  **Permisos de Ejecución para gradlew:**
+        
+        *   chmod +x gradlew
+            
+        *   Asegura que el script de Gradle tiene los permisos necesarios para ser ejecutado.
+            
+        *   **Motivo:** Evitar errores de permisos durante la construcción.
+            
+    5.  **Construcción con Gradle:**
+        
+        *   ./gradlew build
+            
+        *   Compila la aplicación utilizando Gradle.
+            
+        *   **Motivo:** Generar los artefactos de construcción necesarios para el despliegue.
+            
+    6.  **Ejecución de Pruebas Unitarias:**
+        
+        *   ./gradlew test
+            
+        *   Ejecuta las pruebas unitarias definidas en el proyecto.
+            
+        *   **Motivo:** Validar que las nuevas modificaciones no introduzcan errores en la base de código.
+            
+    7.  **Subida de Resultados de Pruebas:**
+        
+        *   actions/upload-artifact@v2
+            
+        *   Guarda los resultados de las pruebas como artefactos en GitHub Actions.
+            
+        *   **Motivo:** Facilitar la revisión de los resultados de las pruebas después de la ejecución del pipeline.
+            
 
-## Requerimientos del Sistema
-- **Compatibilidad:** La aplicación es compatible con dispositivos iOS y Android.
-- **Seguridad:** Garantiza la seguridad de los datos del usuario y la integridad de la información.
-- **Escalabilidad:** Diseñada para manejar un crecimiento significativo en el número de usuarios y eventos.
-- **Accesibilidad:** La aplicación es accesible para personas con discapacidades y admite múltiples idiomas, como inglés y español.
+#### 2\. Deploy
 
-## Instalación y Configuración
+*   **Entorno:**
+    
+    *   runs-on: ubuntu-latest
+        
+    *   Se ejecuta en un entorno Ubuntu, asegurando consistencia en el proceso de despliegue.
+        
+*   **Dependencia:**
+    
+    *   needs: build
+        
+    *   El job de despliegue depende del job de construcción exitoso.
+        
+*   **Condición:**
+    
+    *   if: github.ref == 'refs/heads/uat'
+        
+    *   Se asegura que el despliegue solo ocurra si el código proviene de la rama uat.
+        
+*   **Pasos:**
+    
+    1.  **Checkout del Código:**
+        
+        *   actions/checkout@v2
+            
+        *   Vuelve a clonar el código para asegurar que se despliega la misma versión que pasó las pruebas.
+            
+    2.  **Configuración de JDK 11:**
+        
+        *   actions/setup-java@v2
+            
+        *   Establece JDK 11 como el entorno de Java necesario para el despliegue.
+            
+    3.  **Despliegue a Firebase App Distribution:**
+        
+        *   ./gradlew appDistributionUploadRelease
+            
+        *   Despliega la aplicación a Firebase App Distribution utilizando el token de Firebase.
+            
+        *   **Motivo:** Facilitar la distribución de la aplicación a los testers internos.
+            
 
-### Prerrequisitos
-- Android Studio
-- JDK 11 o superior
-- [Node.js](https://nodejs.org/) para la gestión de paquetes (si es necesario)
+### Seguridad y Gestión de Credenciales
 
-### Instrucciones de Instalación
-1. Clona este repositorio en tu máquina local:
-   ```bash
-   https://github.com/FreddyAquinoPortes/MelAppPublic/tree/Dev
+*   **Firebase Token:**
+    
+    *   El token de Firebase utilizado para el despliegue está almacenado de forma segura en los secretos del repositorio (secrets.FIREBASE\_TOKEN), garantizando que las credenciales sensibles no sean expuestas.
