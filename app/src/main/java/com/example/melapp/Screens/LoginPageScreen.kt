@@ -36,7 +36,7 @@ fun LoginScreen(navController: NavController) {
     // Create Google SignIn options
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id)) // Your web client ID from Firebase console
+            .requestIdToken(context.getString(R.string.default_web_client_id)) // Aquí se usa el ID del cliente web
             .requestEmail()
             .build()
     }
@@ -182,15 +182,28 @@ fun LoginOption(iconResId: Int, text: String, backgroundColor: Color, onClick: (
 }
 
 // Function to authenticate Firebase with Google account
-private fun firebaseAuthWithGoogle(account: GoogleSignInAccount, auth: FirebaseAuth, navController: NavController) {
+private fun firebaseAuthWithGoogle(
+    account: GoogleSignInAccount,
+    auth: FirebaseAuth,
+    navController: NavController
+) {
     val credential = GoogleAuthProvider.getCredential(account.idToken, null)
     auth.signInWithCredential(credential)
         .addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                // Navigate to the next screen on successful sign-in
-                navController.navigate("home") // Navigate to the home screen after successful login
+                // Check if the user is signed in
+                val user = auth.currentUser
+                if (user != null) {
+                    println("Sign-in successful: ${user.email}")
+                    // Navegar a la pantalla principal
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true } // Elimina la pantalla de login del stack
+                    }
+                } else {
+                    println("Error: User is null after sign-in.")
+                }
             } else {
-                // Handle error in sign-in
+                // Log detailed error message
                 println("Firebase Google sign-in failed: ${task.exception?.message}")
             }
         }
