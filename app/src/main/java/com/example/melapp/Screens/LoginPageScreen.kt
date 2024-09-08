@@ -15,15 +15,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.melapp.R
 import androidx.navigation.NavController
+import android.content.Intent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.common.api.ApiException
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val auth = remember { FirebaseAuth.getInstance() }
+    val context = LocalContext.current
+
+    // Create Google SignIn options
+    val gso = remember {
+        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(context.getString(R.string.default_web_client_id)) // Your web client ID from Firebase console
+            .requestEmail()
+            .build()
+    }
+
+    // Create Google SignIn client
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
+
+    // Callback for Google Sign-In result
+    val signInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account?.let {
+                firebaseAuthWithGoogle(it, auth, navController)
+            }
+        } catch (e: ApiException) {
+            // Handle sign-in error
+            println("Google sign-in failed: ${e.message}")
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Logo y título en la parte superior
+        // Logo and Title
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -32,11 +74,11 @@ fun LoginScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             Image(
-                painter = painterResource(id = R.drawable.mellogo), // Asegúrate de tener tu logo aquí
+                painter = painterResource(id = R.drawable.mellogo),
                 contentDescription = null,
                 modifier = Modifier
                     .size(200.dp)
-                    .padding(top = 40.dp) // Ajusta el tamaño según sea necesario
+                    .padding(top = 40.dp)
             )
             Text(
                 text = "Mel",
@@ -46,7 +88,7 @@ fun LoginScreen(navController: NavController) {
             )
         }
 
-        // Opciones de inicio de sesión en el centro
+        // Login Options
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -54,29 +96,33 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginOption(
-                iconResId = R.drawable.vector, // Icono de Steam
-                text = "login with steam",
-                backgroundColor = Color(0xFF4C6A92) // Color personalizado
+                iconResId = R.drawable.vector1,
+                text = "Login with Google",
+                backgroundColor = Color(0xFFA4C639),
+                onClick = {
+                    val signInIntent = googleSignInClient.signInIntent
+                    signInLauncher.launch(signInIntent)
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             LoginOption(
-                iconResId = R.drawable.vector1, // Icono de Google
-                text = "login with google",
-                backgroundColor = Color(0xFFA4C639) // Color personalizado
+                iconResId = R.drawable.vector,
+                text = "Login with Steam",
+                backgroundColor = Color(0xFF4C6A92)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             LoginOption(
-                iconResId = R.drawable.vector2, // Icono de Discord
-                text = "login with discord",
-                backgroundColor = Color(0xFF7289DA) // Color personalizado
+                iconResId = R.drawable.vector2,
+                text = "Login with Discord",
+                backgroundColor = Color(0xFF7289DA)
             )
         }
 
-        // Botón de inicio de sesión o registro en el pie de página
+        // Footer buttons
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -85,7 +131,7 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Button(
-                onClick = { navController.navigate("traditional_login") }, // Navega a la pantalla de login tradicional
+                onClick = { navController.navigate("traditional_login") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -96,7 +142,7 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { navController.navigate("register") }, // Navega a la pantalla de registro
+                onClick = { navController.navigate("register") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -108,12 +154,13 @@ fun LoginScreen(navController: NavController) {
 }
 
 @Composable
-fun LoginOption(iconResId: Int, text: String, backgroundColor: Color) {
+fun LoginOption(iconResId: Int, text: String, backgroundColor: Color, onClick: () -> Unit = {}) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(backgroundColor)
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -132,4 +179,19 @@ fun LoginOption(iconResId: Int, text: String, backgroundColor: Color) {
             fontWeight = FontWeight.Bold
         )
     }
+}
+
+// Function to authenticate Firebase with Google account
+private fun firebaseAuthWithGoogle(account: GoogleSignInAccount, auth: FirebaseAuth, navController: NavController) {
+    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+    auth.signInWithCredential(credential)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                // Navigate to the next screen on successful sign-in
+                navController.navigate("home") // Navigate to the home screen after successful login
+            } else {
+                // Handle error in sign-in
+                println("Firebase Google sign-in failed: ${task.exception?.message}")
+            }
+        }
 }
