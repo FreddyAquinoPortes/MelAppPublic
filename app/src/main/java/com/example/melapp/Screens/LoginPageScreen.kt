@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import com.example.melapp.Backend.GoogleSignInHelper
 import com.google.android.gms.common.api.ApiException
 
 @Composable
@@ -33,31 +34,14 @@ fun LoginScreen(navController: NavController) {
     val auth = remember { FirebaseAuth.getInstance() }
     val context = LocalContext.current
 
-    // Create Google SignIn options
-    val gso = remember {
-        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(context.getString(R.string.default_web_client_id)) // Aquí se usa el ID del cliente web
-            .requestEmail()
-            .build()
-    }
+    // Instancia de GoogleSignInHelper para manejar la autenticación de Google
+    val googleSignInHelper = remember { GoogleSignInHelper(context, auth, navController) }
 
-    // Create Google SignIn client
-    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
-
-    // Callback for Google Sign-In result
+    // Callback para el resultado de la actividad de inicio de sesión
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-        try {
-            val account = task.getResult(ApiException::class.java)
-            account?.let {
-                firebaseAuthWithGoogle(it, auth, navController)
-            }
-        } catch (e: ApiException) {
-            // Handle sign-in error
-            println("Google sign-in failed: ${e.message}")
-        }
+        googleSignInHelper.handleSignInResult(result)
     }
 
     Box(
@@ -65,7 +49,7 @@ fun LoginScreen(navController: NavController) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Logo and Title
+        // Logo y Título
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -88,7 +72,7 @@ fun LoginScreen(navController: NavController) {
             )
         }
 
-        // Login Options
+        // Opciones de inicio de sesión
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,7 +84,7 @@ fun LoginScreen(navController: NavController) {
                 text = "Login with Google",
                 backgroundColor = Color(0xFFA4C639),
                 onClick = {
-                    val signInIntent = googleSignInClient.signInIntent
+                    val signInIntent = googleSignInHelper.getSignInIntent()
                     signInLauncher.launch(signInIntent)
                 }
             )
@@ -122,7 +106,7 @@ fun LoginScreen(navController: NavController) {
             )
         }
 
-        // Footer buttons
+        // Botones de pie de página
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -179,32 +163,4 @@ fun LoginOption(iconResId: Int, text: String, backgroundColor: Color, onClick: (
             fontWeight = FontWeight.Bold
         )
     }
-}
-
-// Function to authenticate Firebase with Google account
-private fun firebaseAuthWithGoogle(
-    account: GoogleSignInAccount,
-    auth: FirebaseAuth,
-    navController: NavController
-) {
-    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-    auth.signInWithCredential(credential)
-        .addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                // Check if the user is signed in
-                val user = auth.currentUser
-                if (user != null) {
-                    println("Sign-in successful: ${user.email}")
-                    // Navegar a la pantalla principal
-                    navController.navigate("home") {
-                        popUpTo("login") { inclusive = true } // Elimina la pantalla de login del stack
-                    }
-                } else {
-                    println("Error: User is null after sign-in.")
-                }
-            } else {
-                // Log detailed error message
-                println("Firebase Google sign-in failed: ${task.exception?.message}")
-            }
-        }
 }
