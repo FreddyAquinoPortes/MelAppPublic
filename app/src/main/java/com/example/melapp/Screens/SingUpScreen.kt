@@ -28,6 +28,7 @@ import com.example.melapp.Backend.ValidatedTextField
 import com.google.firebase.auth.FirebaseAuth
 import com.example.melapp.Backend.validateEmailAndPassword
 import androidx.compose.runtime.LaunchedEffect
+import com.example.melapp.Backend.PhoneVisualTransformation
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDate
 import java.util.Calendar
@@ -52,6 +53,9 @@ fun SignUpScreen(navController: NavController) {
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    var countryCode by remember { mutableStateOf("+1") }  // Código de país predefinido
+    var phoneNumber by remember { mutableStateOf("") }     // Número de teléfono
+    var phoneError by remember { mutableStateOf<String?>(null) }
 
     // Validación de fecha
     val birthDateError by remember {
@@ -256,6 +260,43 @@ fun SignUpScreen(navController: NavController) {
             if (generoError != null) {
                 Text(text = generoError!!, color = Color.Red)
             }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                TextField(
+                    value = countryCode,
+                    onValueChange = { /* Dejar vacío para que no se modifique */ },
+                    label = { Text("Código de País") },
+                    modifier = Modifier.weight(1f),
+                    enabled = true  // No se puede editar el código de país
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                TextField(
+                    value = phoneNumber,
+                    onValueChange = { if (it.length > 10) {
+                        phoneError = "El máximo de caracteres permitidos es 10"
+                    } else {
+                        phoneError = null
+                        phoneNumber = it
+                    }
+                                    },
+                    label = { Text("Número de Teléfono") },
+                    modifier = Modifier.weight(3f),
+                    isError = phoneError != null,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    visualTransformation = PhoneVisualTransformation()  // Transformación visual personalizada
+                )
+
+            }
+            if (phoneError != null) {
+                Text(
+                    text = phoneError!!,
+                    color = Color.Red,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
 
             Spacer(modifier = Modifier.height(60.dp))
 
@@ -369,7 +410,7 @@ fun SignUpScreen(navController: NavController) {
                                         "fecha_nacimiento" to "$day/$month/$year",
                                         "genero" to generoCodigo,
                                         "email" to email,
-                                        "userName" to userName
+
                                     )
                                     db.collection("users").add(user)
                                 } else {
@@ -414,3 +455,4 @@ private fun isValidDate(day: Int, month: Int, year: Int): Boolean {
 private fun isLeapYear(year: Int): Boolean {
     return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)
 }
+
