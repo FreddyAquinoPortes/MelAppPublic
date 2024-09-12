@@ -15,33 +15,49 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.melapp.R
 import androidx.navigation.NavController
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import com.example.melapp.Backend.GoogleSignInHelper
-import com.google.android.gms.common.api.ApiException
+import com.example.melapp.Backend.User
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
+import java.sql.Date
+
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val auth = remember { FirebaseAuth.getInstance() }
     val context = LocalContext.current
+    val db = remember { FirebaseFirestore.getInstance() } // Instancia de FirebaseFirestore
+
+    // Instancia del usuario, ajusta los valores según sea necesario
+    val user = remember {
+        User(
+            nombres = "Nombre",
+            apellidos = "Apellido",
+            fechaNacimiento = Date(2000, 1, 1), // Fecha de ejemplo
+            genero = 0, // Género de ejemplo
+            username = "usuario", // Nombre de usuario
+            rol = 0,
+            accountStatus = 0,
+            location = GeoPoint(0.0, 0.0) // Asigna una ubicación por defecto
+        )
+    }
 
     // Instancia de GoogleSignInHelper para manejar la autenticación de Google
-    val googleSignInHelper = remember { GoogleSignInHelper(context, auth, navController) }
+    val googleSignInHelper = remember {
+        GoogleSignInHelper(context, auth, db, navController) // Ahora se pasa FirebaseFirestore y NavController
+    }
 
     // Callback para el resultado de la actividad de inicio de sesión
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        googleSignInHelper.handleSignInResult(result)
+        googleSignInHelper.handleSignInResult(result, user) // Pasamos el objeto User
     }
 
     Box(
