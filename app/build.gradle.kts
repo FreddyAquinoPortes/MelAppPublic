@@ -66,6 +66,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.google.firebase.auth.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -82,4 +84,6 @@ dependencies {
     implementation(libs.maps.compose)
     implementation(libs.maps.base)
     implementation(libs.maps.location)
+    implementation(libs.play.services.auth)
+
 }

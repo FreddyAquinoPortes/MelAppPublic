@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.melapp.Screens.HomePage
 import com.example.melapp.Screens.LoginScreen
+import com.example.melapp.Screens.PasswordRecoveryScreen
 import com.example.melapp.Screens.SignUpScreen
 import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
@@ -36,6 +37,9 @@ fun AppNavigation() {
         }
         composable("map") {
             MapScreen()
+        }
+        composable("passwordRecovery") {
+            PasswordRecoveryScreen(navController = navController)
         }
     }
 }
