@@ -166,7 +166,7 @@ class GoogleSignInHelper(
                     val user = auth.currentUser
                     if (user != null) {
                         println("Sign-in successful: ${user.email}")
-                        navController.navigate("home") {
+                        navController.navigate("map") {
                             popUpTo("login") { inclusive = true }
                         }
                     } else {
