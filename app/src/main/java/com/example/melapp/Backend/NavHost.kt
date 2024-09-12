@@ -1,7 +1,7 @@
 package com.example.melapp.Backend
 
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,6 +12,7 @@ import com.example.melapp.Screens.LoginScreen
 import com.example.melapp.Screens.SignUpScreen
 import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
+import com.example.melapp.Screens.MapScreen
 
 @Composable
 fun AppNavigation() {
@@ -32,6 +33,9 @@ fun AppNavigation() {
         }
         composable("register") {
             SignUpScreen(navController)
+        }
+        composable("map") {
+            MapScreen()
         }
     }
 }

@@ -154,7 +154,7 @@ fun TradicionalLoginScreen(navController: NavController) {
                                 auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            navController.navigate("home") // Navegar a la pantalla de inicio
+                                            navController.navigate("map") // Navegar a la pantalla principal
                                         } else {
                                             errorMessage = "Credenciales incorrectas."
                                         }
