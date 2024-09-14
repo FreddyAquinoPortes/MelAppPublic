@@ -19,14 +19,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import com.google.firebase.auth.FirebaseAuth
-import androidx.compose.runtime.*
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.melapp.Backend.GoogleSignInHelper
-import com.example.melapp.Backend.User
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
-import java.sql.Date
-
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -34,30 +30,16 @@ fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     val db = remember { FirebaseFirestore.getInstance() } // Instancia de FirebaseFirestore
 
-    // Instancia del usuario, ajusta los valores según sea necesario
-    val user = remember {
-        User(
-            nombres = "Nombre",
-            apellidos = "Apellido",
-            fechaNacimiento = Date(2000, 1, 1), // Fecha de ejemplo
-            genero = 0, // Género de ejemplo
-            username = "usuario", // Nombre de usuario
-            rol = 0,
-            accountStatus = 0,
-            location = GeoPoint(0.0, 0.0) // Asigna una ubicación por defecto
-        )
-    }
-
     // Instancia de GoogleSignInHelper para manejar la autenticación de Google
     val googleSignInHelper = remember {
-        GoogleSignInHelper(context, auth, db, navController) // Ahora se pasa FirebaseFirestore y NavController
+        GoogleSignInHelper(context, auth, db, navController) // Se pasa FirebaseFirestore y NavController
     }
 
     // Callback para el resultado de la actividad de inicio de sesión
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        googleSignInHelper.handleSignInResult(result, user) // Pasamos el objeto User
+        googleSignInHelper.handleSignInResult(result) // Se elimina el paso del objeto User
     }
 
     Box(

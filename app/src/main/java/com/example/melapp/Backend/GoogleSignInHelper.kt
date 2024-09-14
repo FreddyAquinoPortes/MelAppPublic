@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.type.Date
 
 // Data class para agrupar datos de usuario
 data class User(
@@ -83,6 +84,7 @@ class FirestoreHelper(private val db: FirebaseFirestore) {
 }
 
 // Clase para manejar la autenticación de Google
+// Clase para manejar la autenticación de Google
 class GoogleSignInHelper(
     private val context: Context,
     private val auth: FirebaseAuth,
@@ -104,12 +106,33 @@ class GoogleSignInHelper(
         return googleSignInClient.signInIntent
     }
 
-    fun handleSignInResult(result: ActivityResult, user: User) {
+    fun handleSignInResult(result: ActivityResult) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
             account?.let {
-                getLocationAndRegisterUser(it, user)
+                // Extraer la información de la cuenta de Google
+                val nombres = it.givenName ?: "Nombre" // Nombre del usuario
+                val apellidos = it.familyName ?: "Apellido" // Apellido del usuario
+                val email = it.email ?: "correo@example.com" // Correo electrónico
+                val username = it.displayName ?: "usuario" // Nombre de usuario, puede ser el nombre completo
+                val fechaNacimiento =
+                    java.util.Date(2000, 1, 1) // Suponiendo que no está disponible en Google
+
+                // Crear un nuevo objeto User con los datos de la cuenta de Google
+                val updatedUser = User(
+                    nombres = nombres,
+                    apellidos = apellidos,
+                    fechaNacimiento = fechaNacimiento, // Puedes ajustar este valor si tienes un método para obtener la fecha real
+                    genero = 0, // El género puede ser ajustado de otra forma si tienes esa información
+                    username = username,
+                    rol = 0,
+                    accountStatus = 0,
+                    location = GeoPoint(0.0, 0.0) // Se actualizará después de obtener la ubicación
+                )
+
+                // Obtener la ubicación y proceder a registrar el usuario
+                getLocationAndRegisterUser(it, updatedUser)
             }
         } catch (e: ApiException) {
             println("Google sign-in failed: ${e.message}")
@@ -117,11 +140,10 @@ class GoogleSignInHelper(
     }
 
     private fun getLocationAndRegisterUser(account: GoogleSignInAccount, user: User) {
-        // Verificar permisos
+        // Verificar permisos de ubicación
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
-            // Solicitar permisos de ubicación
             ActivityCompat.requestPermissions(
                 (context as android.app.Activity),
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
@@ -177,8 +199,10 @@ class GoogleSignInHelper(
                 }
             }
     }
+}
 
     fun handleSignInResult(result: ActivityResult) {
 
     }
-}
+
+
