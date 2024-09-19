@@ -189,7 +189,7 @@ class GoogleSignInHelper(
                     if (user != null) {
                         println("Sign-in successful: ${user.email}")
                         navController.navigate("map") {
-                            popUpTo("login") { inclusive = true }
+                            popUpTo("event_form") { inclusive = true }
                         }
                     } else {
                         println("Error: User is null after sign-in.")
