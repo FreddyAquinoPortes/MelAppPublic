@@ -14,9 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.example.melapp.Components.DatePicker
 import com.example.melapp.Components.EventCategoryDropdown
+import com.example.melapp.Components.HourPicker
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -26,6 +26,7 @@ fun EventFormScreen(navController: NavController) {
     var eventDescription by remember { mutableStateOf("") }
     var attendeeCount by remember { mutableStateOf(25) }
     var selectedDate by remember { mutableStateOf("") } // Estado inicial vacío para la fecha
+    var selectedHour by remember { mutableStateOf("") } // Estado para la hora seleccionada
     var location by remember { mutableStateOf("") }
     var eventCategory by remember { mutableStateOf("Concierto") }
     var ticketUrl by remember { mutableStateOf("") }
@@ -93,6 +94,22 @@ fun EventFormScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Campo para seleccionar la hora del evento
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Icon(Icons.Default.Notifications, contentDescription = "Hora")
+            Spacer(modifier = Modifier.width(8.dp))
+            HourPicker(selectedHour) { newHour ->
+                selectedHour = newHour // Actualiza la hora seleccionada
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         // Cantidad de asistentes
         OutlinedTextField(
             value = attendeeCount.toString(),
@@ -137,6 +154,8 @@ fun EventFormScreen(navController: NavController) {
         }
     }
 }
+
+
 
 
 
