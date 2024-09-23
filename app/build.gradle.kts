@@ -87,4 +87,9 @@ dependencies {
     implementation(libs.maps.location)
     implementation(libs.play.services.auth)
 
+    //Location
+    implementation(libs.accompanist.permissions)
+
+
+
 }
