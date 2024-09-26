@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
@@ -66,7 +68,7 @@ fun MapScreen(navController: NavController) {
         bottomBar = {
             NavigationBottomBar(
                 onProfileClick = { /* Lógica para ir al perfil */ },
-                onPostEventClick = { /* Lógica para crear un evento */ },
+                onPostEventClick = { navController.navigate("event_form") },
                 onSettingsClick = { navController.navigate("settingsScreen")}
             )
         }
@@ -80,6 +82,7 @@ fun MapScreen(navController: NavController) {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
 @Composable
 fun SearchTopBar() {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
@@ -98,7 +101,12 @@ fun SearchTopBar() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Search icon
-                Icon(Icons.Default.Search, contentDescription = "Search Icon", tint = Color.Gray)
+                Icon(
+                    Icons.Default.Search,
+                    contentDescription = "Search Icon",
+                    tint = Color.Gray,
+                    modifier = Modifier.height(56.dp)
+                )
 
                 // Search text field
                 TextField(
@@ -120,7 +128,8 @@ fun SearchTopBar() {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_mic), // Replace with actual drawable
                     contentDescription = "Mic",
-                    tint = Color.Gray
+                    tint = Color.Gray,
+                    modifier = Modifier.height(56.dp)
                 )
             }
         },
@@ -180,30 +189,60 @@ fun NavigationBottomBar(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Left icon - Profile
-            IconButton(onClick = onProfileClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_user), // Replace with actual drawable
-                    contentDescription = "User Profile",
-                    tint = Color.Gray
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Left icon - Profile
+                IconButton(onClick = onProfileClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user), // Replace with actual drawable
+                        contentDescription = "User Profile",
+                        tint = Color.Gray
+                    )
+                }
+
+                Text(
+                    text = "Perfil",
+                    color = Color.Gray
                 )
             }
 
-            // Center icon - Post Event
-            IconButton(onClick = onPostEventClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_earth), // Replace with actual drawable
-                    contentDescription = "Post Event",
-                    tint = Color.Gray
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Center icon - Post Event
+                IconButton(onClick = onPostEventClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_earth), // Replace with actual drawable
+                        contentDescription = "Post Event",
+                        tint = Color.Gray
+                    )
+                }
+
+                Text(
+                    text = "Eventos",
+                    color = Color.Gray
                 )
             }
 
-            // Right icon - Settings
-            IconButton(onClick = onSettingsClick) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_settings), // Replace with actual drawable
-                    contentDescription = "Settings",
-                    tint = Color.Gray
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Right icon - Settings
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_settings), // Replace with actual drawable
+                        contentDescription = "Settings",
+                        tint = Color.Gray
+                    )
+                }
+
+                Text(
+                    text = "Ajustes",
+                    color = Color.Gray
                 )
             }
         }
