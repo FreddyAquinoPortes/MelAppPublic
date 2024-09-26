@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.Screens.EventFormScreen
 import com.example.melapp.Screens.HomePage
 import com.example.melapp.Screens.LoginScreen
@@ -15,6 +16,7 @@ import com.example.melapp.Screens.SignUpScreen
 import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
 import com.example.melapp.Screens.MapScreen
+import com.example.melapp.Screens.SettingsScreen
 
 @Composable
 fun AppNavigation() {
@@ -37,7 +39,7 @@ fun AppNavigation() {
             SignUpScreen(navController)
         }
         composable("map") {
-            MapScreen()
+            MapScreen(navController)
         }
         composable("passwordRecovery") {
             PasswordRecoveryScreen(navController = navController)
@@ -45,5 +47,8 @@ fun AppNavigation() {
         composable("event_form") { // Agregamos la nueva ruta para el formulario de eventos
             EventFormScreen(navController)
         }
+        composable("settingsScreen") { SettingsScreen(navController) }
+
+
     }
 }

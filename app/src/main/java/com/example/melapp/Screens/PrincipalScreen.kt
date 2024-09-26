@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.navigation.NavController
 import com.example.melapp.R
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -32,7 +33,7 @@ import com.google.maps.android.compose.MapProperties
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen() {
+fun MapScreen(navController: NavController) {
     val context = LocalContext.current
 
     // Initialize the camera position
@@ -62,7 +63,13 @@ fun MapScreen() {
                 CategoryBar() // Agregamos la barra de categorías aquí
             }
         },
-        bottomBar = { NavigationBottomBar() }
+        bottomBar = {
+            NavigationBottomBar(
+                onProfileClick = { /* Lógica para ir al perfil */ },
+                onPostEventClick = { /* Lógica para crear un evento */ },
+                onSettingsClick = { navController.navigate("settingsScreen")}
+            )
+        }
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -110,9 +117,11 @@ fun SearchTopBar() {
                 )
 
                 // Mic icon
-                Icon(painter = painterResource(id = R.drawable.ic_mic), // Replace with actual drawable
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_mic), // Replace with actual drawable
                     contentDescription = "Mic",
-                    tint = Color.Gray)
+                    tint = Color.Gray
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
@@ -157,10 +166,14 @@ fun CategoryItem(category: String) {
     }
 }
 
+// Reusable NavigationBottomBar Component
 @Composable
-fun NavigationBottomBar() {
+fun NavigationBottomBar(
+    onProfileClick: () -> Unit = {},
+    onPostEventClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {}
+) {
     BottomAppBar(
-
         contentPadding = PaddingValues(8.dp)
     ) {
         Row(
@@ -168,7 +181,7 @@ fun NavigationBottomBar() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             // Left icon - Profile
-            IconButton(onClick = { /* Navigate to Profile */ }) {
+            IconButton(onClick = onProfileClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_user), // Replace with actual drawable
                     contentDescription = "User Profile",
@@ -177,7 +190,7 @@ fun NavigationBottomBar() {
             }
 
             // Center icon - Post Event
-            IconButton(onClick = { /* Open Event Creation */ }) {
+            IconButton(onClick = onPostEventClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_earth), // Replace with actual drawable
                     contentDescription = "Post Event",
@@ -186,7 +199,7 @@ fun NavigationBottomBar() {
             }
 
             // Right icon - Settings
-            IconButton(onClick = { /* Navigate to Settings */ }) {
+            IconButton(onClick = onSettingsClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_settings), // Replace with actual drawable
                     contentDescription = "Settings",
