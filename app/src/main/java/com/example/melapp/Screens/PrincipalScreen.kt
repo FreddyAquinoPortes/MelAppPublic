@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -183,63 +184,62 @@ fun NavigationBottomBar(
     onSettingsClick: () -> Unit = {}
 ) {
     BottomAppBar(
-        contentPadding = PaddingValues(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFE0E0E0)) // Aquí estableces el color de fondo con Modifier.background
+            .height(100.dp) // Ajusta la altura si es necesario
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp), // Ajusta el padding horizontal si es necesario
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Botón de Perfil
             Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Left icon - Profile
                 IconButton(onClick = onProfileClick) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_user), // Replace with actual drawable
+                        painter = painterResource(id = R.drawable.ic_user),
                         contentDescription = "User Profile",
                         tint = Color.Gray
                     )
                 }
-
                 Text(
                     text = "Perfil",
                     color = Color.Gray
                 )
             }
 
+            // Botón de Eventos
             Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Center icon - Post Event
                 IconButton(onClick = onPostEventClick) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_earth), // Replace with actual drawable
+                        painter = painterResource(id = R.drawable.ic_earth),
                         contentDescription = "Post Event",
                         tint = Color.Gray
                     )
                 }
-
                 Text(
                     text = "Eventos",
                     color = Color.Gray
                 )
             }
 
+            // Botón de Ajustes
             Column(
-                modifier = Modifier.fillMaxHeight(),
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Right icon - Settings
                 IconButton(onClick = onSettingsClick) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_settings), // Replace with actual drawable
+                        painter = painterResource(id = R.drawable.ic_settings),
                         contentDescription = "Settings",
                         tint = Color.Gray
                     )
                 }
-
                 Text(
                     text = "Ajustes",
                     color = Color.Gray
