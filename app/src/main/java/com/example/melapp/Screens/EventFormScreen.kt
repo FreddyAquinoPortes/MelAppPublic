@@ -10,6 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
@@ -17,6 +19,7 @@ import androidx.navigation.NavController
 import com.example.melapp.Components.DatePicker
 import com.example.melapp.Components.EventCategoryDropdown
 import com.example.melapp.Components.HourPicker
+import com.example.melapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,7 +57,7 @@ fun EventFormScreen(navController: NavController) {
             onValueChange = { eventTitle = it },
             label = { Text("Título del evento") },
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(Icons.Default.Edit, contentDescription = "Título") }
+            leadingIcon = { Icon(painter = painterResource(R.drawable.ic_title), contentDescription = "Título") }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -73,7 +76,7 @@ fun EventFormScreen(navController: NavController) {
             onValueChange = { eventDescription = it },
             label = { Text("Descripción del evento") },
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(Icons.Default.List, contentDescription = "Descripción") }
+            leadingIcon = { Icon(painter = painterResource(R.drawable.ic_description), contentDescription = "Descripción") }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -85,7 +88,7 @@ fun EventFormScreen(navController: NavController) {
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            Icon(Icons.Default.DateRange, contentDescription = "Fecha")
+            Icon(painterResource(R.drawable.ic_calendar ), contentDescription = "Fecha")
             Spacer(modifier = Modifier.width(8.dp))
             DatePicker(selectedDate) { newDate ->
                 selectedDate = newDate // Actualiza la fecha seleccionada
@@ -154,11 +157,3 @@ fun EventFormScreen(navController: NavController) {
         }
     }
 }
-
-
-
-
-
-
-
-

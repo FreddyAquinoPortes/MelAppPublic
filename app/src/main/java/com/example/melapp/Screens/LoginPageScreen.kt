@@ -1,7 +1,7 @@
 package com.example.melapp.Screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -13,16 +13,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.melapp.R
 import androidx.navigation.NavController
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
-import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.melapp.Backend.GoogleSignInHelper
+import com.example.melapp.R
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.material3.Icon
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -78,8 +79,8 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginOption(
-                iconResId = R.drawable.vector1,
-                text = "Login with Google",
+                iconResId = R.drawable.ic_google,
+                text = "Iniciar con Google",
                 backgroundColor = Color(0xFFA4C639),
                 onClick = {
                     val signInIntent = googleSignInHelper.getSignInIntent()
@@ -90,16 +91,16 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LoginOption(
-                iconResId = R.drawable.vector,
-                text = "Login with Steam",
+                iconResId = R.drawable.ic_facebook,
+                text = "Iniciar con Facebook",
                 backgroundColor = Color(0xFF4C6A92)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             LoginOption(
-                iconResId = R.drawable.vector2,
-                text = "Login with Discord",
+                iconResId = R.drawable.ic_appleinc,
+                text = "Iniciar con  Apple",
                 backgroundColor = Color(0xFF7289DA)
             )
         }
@@ -118,7 +119,7 @@ fun LoginScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                Text(text = "Login/SignUp")
+                Text(text = "Iniciar sesión")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -146,9 +147,10 @@ fun LoginOption(iconResId: Int, text: String, backgroundColor: Color, onClick: (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Image(
+        Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
+            tint = Color.White, // Cambia el color del ícono a blanco
             modifier = Modifier.size(24.dp)
         )
 
