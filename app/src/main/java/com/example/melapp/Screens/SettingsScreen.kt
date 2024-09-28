@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -143,7 +141,7 @@ fun SettingsScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    onClick = { /* Handle Help action */ },
+                    onClick = { navController.navigate("helpScreen") },
                     modifier = Modifier
                         .padding(16.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB39DDB)) // Light purple

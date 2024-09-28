@@ -61,7 +61,7 @@ fun EventFormScreen(navController: NavController) {
 
         // Categoría del Evento
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(R.drawable.ic_description), contentDescription = "Categoría")
+            Icon(painterResource(R.drawable.ic_category), contentDescription = "Categoría")
             Spacer(modifier = Modifier.width(8.dp))
             EventCategoryDropdown(
                 selectedCategory = eventCategory,
@@ -99,8 +99,10 @@ fun EventFormScreen(navController: NavController) {
         // Hora de inicio y fin
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+
         ) {
+            Icon(painterResource(R.drawable.ic_clock), contentDescription = "Intervalo de hora del evento")
             // Campo de hora de inicio
             Box(modifier = Modifier.weight(1f)) {
                 HourPicker(

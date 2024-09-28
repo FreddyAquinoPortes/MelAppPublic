@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.Screens.EventFormScreen
+import com.example.melapp.Screens.HelpScreen
 import com.example.melapp.Screens.HomePage
 import com.example.melapp.Screens.LoginScreen
 import com.example.melapp.Screens.PasswordRecoveryScreen
@@ -48,6 +49,7 @@ fun AppNavigation() {
             EventFormScreen(navController)
         }
         composable("settingsScreen") { SettingsScreen(navController) }
+        composable("helpScreen") { HelpScreen(navController) }
 
 
     }
