@@ -1,53 +1,50 @@
 package com.example.melapp.Screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.melapp.Components.DatePicker
 import com.example.melapp.Components.EventCategoryDropdown
 import com.example.melapp.Components.HourPicker
 import com.example.melapp.R
+import com.example.melapp.ReusableComponents.ReusableTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventFormScreen(navController: NavController) {
-    // Estado de los campos del formulario
+    // Estados del formulario
     var eventTitle by remember { mutableStateOf("") }
     var eventDescription by remember { mutableStateOf("") }
     var attendeeCount by remember { mutableStateOf(25) }
-    var selectedDate by remember { mutableStateOf("") } // Estado inicial vacío para la fecha
-    var selectedHour by remember { mutableStateOf("") } // Estado para la hora seleccionada
-    var location by remember { mutableStateOf("") }
-    var eventCategory by remember { mutableStateOf("Concierto") }
+    var selectedDate by remember { mutableStateOf("") }
+    var startTime by remember { mutableStateOf("") }
+    var endTime by remember { mutableStateOf("") }
     var ticketUrl by remember { mutableStateOf("") }
+    var eventCategory by remember { mutableStateOf("Concierto") }
+    var cost by remember { mutableStateOf("0.00") }
+    var selectedCurrency by remember { mutableStateOf("DOP") }
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .verticalScroll(rememberScrollState()) // Scroll vertical para formulario largo
+            .verticalScroll(rememberScrollState())
     ) {
-        TopAppBar(
-            title = { Text("Publicar Evento") },
-            actions = {
-                IconButton(onClick = { /* Acción de mis eventos */ }) {
-                    Icon(Icons.Default.Info, contentDescription = "Mis eventos")
-                }
-            }
-        )
+        // TopBar reutilizable
+        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = { navController.popBackStack() })
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -62,11 +59,15 @@ fun EventFormScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Selector de categoría del evento
-        EventCategoryDropdown(
-            selectedCategory = eventCategory,
-            onCategorySelected = { eventCategory = it }
-        )
+        // Categoría del Evento
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(painterResource(R.drawable.ic_description), contentDescription = "Categoría")
+            Spacer(modifier = Modifier.width(8.dp))
+            EventCategoryDropdown(
+                selectedCategory = eventCategory,
+                onCategorySelected = { eventCategory = it }
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -76,38 +77,50 @@ fun EventFormScreen(navController: NavController) {
             onValueChange = { eventDescription = it },
             label = { Text("Descripción del evento") },
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(painter = painterResource(R.drawable.ic_description), contentDescription = "Descripción") }
+            leadingIcon = { Icon(painterResource(R.drawable.ic_description), contentDescription = "Descripción") }
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Campo para seleccionar la fecha del evento
+        // Fecha del evento
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp)
         ) {
-            Icon(painterResource(R.drawable.ic_calendar ), contentDescription = "Fecha")
+            Icon(painterResource(R.drawable.ic_calendar), contentDescription = "Fecha")
             Spacer(modifier = Modifier.width(8.dp))
-            DatePicker(selectedDate) { newDate ->
-                selectedDate = newDate // Actualiza la fecha seleccionada
-            }
+            DatePicker(selectedDate) { newDate -> selectedDate = newDate }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Campo para seleccionar la hora del evento
+        // Hora de inicio y fin
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Icon(Icons.Default.Notifications, contentDescription = "Hora")
+            // Campo de hora de inicio
+            Box(modifier = Modifier.weight(1f)) {
+                HourPicker(
+                    selectedHour = startTime,
+                    onHourSelected = { startTime = it },
+                    label = "Hora de inicio",
+                    is24HourFormat = true
+                )
+            }
+
             Spacer(modifier = Modifier.width(8.dp))
-            HourPicker(selectedHour) { newHour ->
-                selectedHour = newHour // Actualiza la hora seleccionada
+
+            // Campo de hora de fin
+            Box(modifier = Modifier.weight(1f)) {
+                HourPicker(
+                    selectedHour = endTime,
+                    onHourSelected = { endTime = it },
+                    label = "Hora de fin",
+                    is24HourFormat = true
+                )
             }
         }
 
@@ -116,13 +129,64 @@ fun EventFormScreen(navController: NavController) {
         // Cantidad de asistentes
         OutlinedTextField(
             value = attendeeCount.toString(),
-            onValueChange = { newValue ->
-                attendeeCount = newValue.toIntOrNull() ?: 25
-            },
+            onValueChange = { newValue -> attendeeCount = newValue.toIntOrNull() ?: 25 },
             label = { Text("Cantidad de asistentes") },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+            leadingIcon = { Icon(painterResource(R.drawable.ic_users), contentDescription = "Asistentes") }
         )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Campo de costo y selección de moneda en la misma fila
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            OutlinedTextField(
+                value = cost,
+                onValueChange = { cost = it },
+                label = { Text("Costo") },
+                leadingIcon = { Icon(painterResource(R.drawable.ic_money), contentDescription = "Costo") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // Dropdown para seleccionar moneda
+            Box(modifier = Modifier.weight(0.5f)) {
+                OutlinedTextField(
+                    value = selectedCurrency,
+                    onValueChange = {},
+                    label = { Text("Moneda") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "Expandir"
+                        )
+                    },
+                    readOnly = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = !expanded }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    listOf("DOP", "USD").forEach { currency ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedCurrency = currency
+                                expanded = false
+                            },
+                            text = { Text(currency) }
+                        )
+                    }
+                }
+            }
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -132,7 +196,7 @@ fun EventFormScreen(navController: NavController) {
             onValueChange = { ticketUrl = it },
             label = { Text("URL de boletos") },
             modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(Icons.Default.PlayArrow, contentDescription = "URL Boletos") }
+            leadingIcon = { Icon(painter = painterResource(R.drawable.ic_link), contentDescription = "URL Boletos") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -157,3 +221,4 @@ fun EventFormScreen(navController: NavController) {
         }
     }
 }
+

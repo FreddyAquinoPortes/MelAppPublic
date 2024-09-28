@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.melapp.R
+import com.example.melapp.ReusableComponents.ReusableTopBar
 
 @Composable
 fun CollapsibleSettingsOption(
@@ -96,20 +97,13 @@ fun CollapsibleSettingsOption(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
-    val selectedLanguage = remember { mutableStateOf<String?>(null) } // Default selected language is null
+    val selectedLanguage = remember { mutableStateOf<String?>(null) }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(text = "Ajustes", color = Color.White) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color(0xFF1A237E) // Dark purple
-                )
+            ReusableTopBar(
+                screenTitle = "Ajustes", // Pass the screen title here
+                onBackClick = { navController.popBackStack() }
             )
         },
         bottomBar = {
@@ -127,12 +121,11 @@ fun SettingsScreen(navController: NavController) {
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-            // Collapsible Main and Secondary Options with Lists
             CollapsibleSettingsOption(
                 title = "Idioma",
                 subOptions = listOf("Español", "Inglés"),
-                isCheckbox = true, // This will make the sub-options behave like checkboxes
-                selectedOption = selectedLanguage // Pass the selected language state
+                isCheckbox = true,
+                selectedOption = selectedLanguage
             )
             CollapsibleSettingsOption("Cuenta", listOf("Seguridad", "Accesibilidad"))
             CollapsibleSettingsOption("Seguridad", listOf("Cambiar contraseña", "Autenticación de dos factores"))
@@ -140,9 +133,8 @@ fun SettingsScreen(navController: NavController) {
             CollapsibleSettingsOption("Notificaciones", listOf("Activar", "Sonido", "Vibración"))
             CollapsibleSettingsOption("Condiciones y Políticas", listOf("Términos de servicio", "Política de privacidad"))
             CollapsibleSettingsOption("Acerca de", listOf("Versión", "Licencias"))
-            CollapsibleSettingsOption("Salir", emptyList()) // Option without sub-options
+            CollapsibleSettingsOption("Salir", emptyList())
 
-            // Add padding at the bottom to keep the help button visible at the end of the scrollable content
             Spacer(modifier = Modifier.weight(1f))
 
             // Help Button on the right
@@ -157,7 +149,7 @@ fun SettingsScreen(navController: NavController) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB39DDB)) // Light purple
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_help), // Add your help icon resource
+                        painter = painterResource(id = R.drawable.ic_help), // Replace with your icon
                         contentDescription = "Ayuda",
                         tint = Color.White
                     )
