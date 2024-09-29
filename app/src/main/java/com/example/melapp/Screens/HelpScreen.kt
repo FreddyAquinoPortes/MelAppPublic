@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.melapp.ReusableComponents.ReusableTopBar
 import com.example.melapp.R
+import com.example.melapp.ReusableComponents.NavigationBottomBar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable

@@ -37,16 +37,24 @@ fun EventFormScreen(navController: NavController) {
     var selectedCurrency by remember { mutableStateOf("DOP") }
     var expanded by remember { mutableStateOf(false) }
 
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState())){
+        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = { navController.popBackStack() })
+    }
+
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // TopBar reutilizable
-        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = { navController.popBackStack() })
 
-        Spacer(modifier = Modifier.height(8.dp))
+
+
+        Spacer(modifier = Modifier.height(100.dp))
 
         // Título del Evento
         OutlinedTextField(

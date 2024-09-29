@@ -1,56 +1,100 @@
 package com.example.melapp.ReusableComponents
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.melapp.R
 
 @Composable
 fun NavigationBottomBar(
-    navController: NavController,
-    onPostEventClick: () -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit = {},
+    onPostEventClick: () -> Unit = {},
+    onPublishClick: () -> Unit = {}, // Añadimos un nuevo callback para el botón de publicar
+    onSettingsClick: () -> Unit = {}
 ) {
     BottomAppBar(
-        modifier = Modifier.fillMaxWidth(),
-        containerColor = Color(0xFF1A237E), // Morado oscuro
-        contentColor = Color.White,
-        tonalElevation = 4.dp,
-        contentPadding = PaddingValues(8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFE0E0E0))
+            .height(125.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Left icon - Profile (For future use)
-            IconButton(onClick = { /* Navigate to Profile */ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_user), // Replace with actual drawable
-                    contentDescription = "User Profile",
-                    tint = Color.White
+            // Botón de Perfil
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = onProfileClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_user),
+                        contentDescription = "User Profile",
+                        tint = Color.Gray
+                    )
+                }
+                Text(
+                    text = "Perfil",
+                    color = Color.Gray
                 )
             }
 
-            // Center icon - Map Screen
-            IconButton(onClick = { navController.navigate("mapScreen") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_earth), // Replace with actual drawable
-                    contentDescription = "Map Screen",
-                    tint = Color.White
+            // Botón de Publicar (Nuevo)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = onPublishClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_plus), // Aquí usas tu ícono `ic_plus`
+                        contentDescription = "Publicar",
+                        tint = Color.Gray
+                    )
+                }
+                Text(
+                    text = "Publicar",
+                    color = Color.Gray
                 )
             }
 
-            // Right icon - Settings Screen
-            IconButton(onClick = { navController.navigate("settingsScreen") }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_settings), // Replace with actual drawable
-                    contentDescription = "Settings Screen",
-                    tint = Color.White
+            // Botón de Eventos
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = onPostEventClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_earth),
+                        contentDescription = "Post Event",
+                        tint = Color.Gray
+                    )
+                }
+                Text(
+                    text = "Eventos",
+                    color = Color.Gray
+                )
+            }
+
+            // Botón de Ajustes
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_settings),
+                        contentDescription = "Settings",
+                        tint = Color.Gray
+                    )
+                }
+                Text(
+                    text = "Ajustes",
+                    color = Color.Gray
                 )
             }
         }
