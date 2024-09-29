@@ -1,5 +1,6 @@
 package com.example.melapp.Screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,6 +32,9 @@ fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     val db = remember { FirebaseFirestore.getInstance() } // Instancia de FirebaseFirestore
 
+    BackHandler {
+        // No hacemos nada aquí para bloquear el botón de retroceso
+    }
     // Instancia de GoogleSignInHelper para manejar la autenticación de Google
     val googleSignInHelper = remember {
         GoogleSignInHelper(context, auth, db, navController) // Se pasa FirebaseFirestore y NavController

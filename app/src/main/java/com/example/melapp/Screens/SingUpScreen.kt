@@ -1,9 +1,5 @@
 package com.example.melapp.Screens
 
-
-
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -15,7 +11,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -24,13 +19,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.melapp.Backend.ValidatedTextField
 import com.google.firebase.auth.FirebaseAuth
 import com.example.melapp.Backend.validateEmailAndPassword
-import androidx.compose.runtime.LaunchedEffect
 import com.example.melapp.Backend.PhoneVisualTransformation
+import com.example.melapp.ReusableComponents.ReusableTopBar
 import com.google.firebase.firestore.FirebaseFirestore
-import java.time.LocalDate
 import java.util.Calendar
 
 
@@ -77,24 +70,12 @@ fun SignUpScreen(navController: NavController) {
             if (genero == "Seleccionar género") "Por favor selecciona un género" else null
         }
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-    ) {
-        // Fondo superior
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(20.dp)
-        ) {
-            drawRoundRect(
-                color = Color(0xFF24146C),
-                cornerRadius = CornerRadius(10f, 100f)
-            )
-        }
-
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally){
+        ReusableTopBar("Registrarse", onBackClick = { navController.popBackStack() })
+    }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -102,18 +83,8 @@ fun SignUpScreen(navController: NavController) {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(45.dp))
 
-            // Título
-            Text(
-                text = "Registrarse",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.align(Alignment.Start)
-            )
-
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(100.dp))
 
             // Sección Información Personal
             Text(
@@ -430,7 +401,6 @@ fun SignUpScreen(navController: NavController) {
             }
         }
     }
-}
 
 // Función auxiliar para validar la fecha de nacimiento
 private fun isValidDate(day: Int, month: Int, year: Int): Boolean {

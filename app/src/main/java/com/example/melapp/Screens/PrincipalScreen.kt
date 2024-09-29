@@ -3,6 +3,7 @@ package com.example.melapp.Screens
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -37,6 +38,9 @@ import com.google.maps.android.compose.MapProperties
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(navController: NavController) {
+    BackHandler {
+        // No hacemos nada aquí para bloquear el botón de retroceso
+    }
     val context = LocalContext.current
 
     // Initialize the camera position
