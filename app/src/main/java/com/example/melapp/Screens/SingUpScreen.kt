@@ -49,6 +49,7 @@ fun SignUpScreen(navController: NavController) {
     var countryCode by remember { mutableStateOf("+1") }  // Código de país predefinido
     var phoneNumber by remember { mutableStateOf("") }     // Número de teléfono
     var phoneError by remember { mutableStateOf<String?>(null) }
+    var rol by remember { mutableIntStateOf(0) }
 
     // Validación de fecha
     val birthDateError by remember {
@@ -376,11 +377,14 @@ fun SignUpScreen(navController: NavController) {
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
                                     val user = mapOf(
-                                        "nombres" to nombres,
-                                        "apellidos" to apellidos,
-                                        "fecha_nacimiento" to "$day/$month/$year",
-                                        "genero" to generoCodigo,
+                                        "name" to nombres,
+                                        "lastname" to apellidos,
+                                        "birth_date" to "$day/$month/$year",
+                                        "gender" to generoCodigo,
                                         "email" to email,
+                                        "user_name" to userName,
+                                        "Phone_number" to "${countryCode} ${phoneNumber}",
+                                        "rol" to rol
 
                                     )
                                     db.collection("users").add(user)
