@@ -1,5 +1,6 @@
 package com.example.melapp.Screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -27,9 +28,44 @@ import androidx.navigation.NavController
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.ReusableTopBar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ProfileScreen(navController: NavController) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val db = FirebaseFirestore.getInstance()
+
+    // State to hold user_name and email
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(user?.email ?: "") }
+
+    // Fetch user data from Firestore based on email when the composable is first composed
+    LaunchedEffect(email) {
+        email?.let { userEmail ->
+            Log.d("Firestore", "Fetching user data for email: $userEmail")
+
+            db.collection("users")
+                .whereEqualTo("email", userEmail)
+                .get()
+                .addOnSuccessListener { documents ->
+                    if (!documents.isEmpty) {
+                        val document = documents.first()
+                        Log.d("Firestore", "DocumentSnapshot data: ${document.data}")
+                        username = document.getString("user_name") ?: ""
+                        Log.d("Firestore", "Username obtained: $username")
+                    } else {
+                        Log.d("Firestore", "No such document with email: $userEmail")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("Firestore", "Error getting document", exception)
+                }
+        } ?: run {
+            Log.e("Firestore", "User email is null, could not fetch data")
+        }
+    }
+
     Scaffold(
         topBar = {
             ReusableTopBar(
@@ -46,7 +82,6 @@ fun ProfileScreen(navController: NavController) {
             )
         }
     ) { paddingValues ->
-        // Cambié a LazyColumn para incluir encabezados y contenido
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,6 +106,13 @@ fun ProfileScreen(navController: NavController) {
                                 .background(Color.LightGray)
                                 .border(2.dp, Color.Gray, CircleShape)
                         )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Mostrar nombre de usuario y correo
+                        Text(text = "Username: $username", style = MaterialTheme.typography.bodyLarge)
+                        Text(text = "Email: $email", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // Botones en fila (Editar Perfil y Ver Eventos Guardados)
@@ -105,23 +147,24 @@ fun ProfileScreen(navController: NavController) {
                 Text(
                     text = "Eventos Publicados",
                     modifier = Modifier.padding(horizontal = 24.dp),
-                    style = MaterialTheme.typography.titleLarge // Usamos el nuevo estilo titleLarge
+                    style = MaterialTheme.typography.titleLarge
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
             // Cuadrícula de eventos publicados
-            items(10) { index -> // Simula 10 eventos, puedes reemplazarlo con tu lista de eventos
+            items(10) { index ->
                 EventCard(
                     eventName = "Evento $index",
                     location = "@Ubicación $index",
-                    imageRes = R.drawable.ic_category // Reemplaza con la imagen de tu evento
+                    imageRes = R.drawable.ic_category
                 )
             }
         }
     }
 }
+
 
 @Composable
 fun EventCard(eventName: String, location: String, imageRes: Int) {
