@@ -17,6 +17,7 @@ import com.example.melapp.Screens.SignUpScreen
 import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
 import com.example.melapp.Screens.MapScreen
+import com.example.melapp.Screens.ProfileScreen
 import com.example.melapp.Screens.SettingsScreen
 
 @Composable
@@ -50,6 +51,7 @@ fun AppNavigation() {
         }
         composable("settingsScreen") { SettingsScreen(navController) }
         composable("helpScreen") { HelpScreen(navController) }
+        composable("profileScreen") { ProfileScreen(navController) }
 
 
     }

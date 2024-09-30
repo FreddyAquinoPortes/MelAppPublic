@@ -30,7 +30,6 @@ import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.example.melapp.utils.handleLocationPermissionAndMoveCamera
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
@@ -79,7 +78,7 @@ fun MapScreen(navController: NavController) {
         },
         bottomBar = {
             NavigationBottomBar(
-                onProfileClick = { /* Lógica para ir al perfil */ },
+                onProfileClick = { navController.navigate("profileScreen") },
                 onPostEventClick = { navController.navigate("map") },
                 onSettingsClick = { navController.navigate("settingsScreen") },
                 onPublishClick = { navController.navigate("event_form") }
