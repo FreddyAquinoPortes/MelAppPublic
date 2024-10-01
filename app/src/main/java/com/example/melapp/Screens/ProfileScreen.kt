@@ -120,7 +120,9 @@ fun ProfileScreen(navController: NavController) {
                             horizontalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.padding(horizontal = 24.dp)
                         ) {
-                            Button(onClick = { /* Lógica para editar el perfil */ }) {
+                            Button(onClick = {
+                                navController.navigate("editprofilescreen")  // Navega a la pantalla de edición de perfil
+                            }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_pencil),
                                     contentDescription = "Icono de editar"
@@ -128,6 +130,7 @@ fun ProfileScreen(navController: NavController) {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(text = "Editar Perfil")
                             }
+
 
                             Button(onClick = { /* Lógica para ver eventos guardados */ }) {
                                 Icon(

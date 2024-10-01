@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.melapp.ReusableComponents.NavigationBottomBar
+import com.example.melapp.Screens.EditProfileScreen
 import com.example.melapp.Screens.EventFormScreen
 import com.example.melapp.Screens.HelpScreen
 import com.example.melapp.Screens.HomePage
@@ -20,6 +21,7 @@ import com.example.melapp.Screens.MapScreen
 import com.example.melapp.Screens.ProfileScreen
 import com.example.melapp.Screens.RegistrationSuccessScreen
 import com.example.melapp.Screens.SettingsScreen
+
 
 @Composable
 fun AppNavigation() {
@@ -53,6 +55,10 @@ fun AppNavigation() {
         composable("settingsScreen") { SettingsScreen(navController) }
         composable("helpScreen") { HelpScreen(navController) }
         composable("profileScreen") { ProfileScreen(navController) }
+
+        composable("editprofileScreen") {
+            EditProfileScreen(navController = navController) }
+
         composable("registration_success") { RegistrationSuccessScreen(navController) }
 
     }
