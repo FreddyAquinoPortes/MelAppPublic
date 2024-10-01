@@ -1,5 +1,7 @@
 package com.example.melapp.Screens
 
+import android.content.Context
+import android.location.LocationManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -29,7 +32,8 @@ import java.util.Calendar
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavController) {
-    val signUpViewModel = remember { SignUpViewModel() }
+    val context = LocalContext.current
+    val signUpViewModel = remember { SignUpViewModel(context) }
 
     Column(
         modifier = Modifier
@@ -50,7 +54,7 @@ fun SignUpScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(60.dp))
             LoginInfoSection(signUpViewModel)
             Spacer(modifier = Modifier.height(16.dp))
-            RegisterButton(signUpViewModel)
+            RegisterButton(signUpViewModel, navController)
 
             if (signUpViewModel.errorMessage != null) {
                 Text(
@@ -61,60 +65,6 @@ fun SignUpScreen(navController: NavController) {
             }
         }
     }
-}
-
-@Composable
-fun PersonalInfoSection(viewModel: SignUpViewModel) {
-    SectionTitle("Información Personal")
-    Spacer(modifier = Modifier.height(8.dp))
-    CustomTextField(
-        value = viewModel.nombres,
-        onValueChange = { viewModel.nombres = it },
-        label = "Nombres"
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    CustomTextField(
-        value = viewModel.apellidos,
-        onValueChange = { viewModel.apellidos = it },
-        label = "Apellidos"
-    )
-    Spacer(modifier = Modifier.height(30.dp))
-    BirthDateFields(viewModel)
-    Spacer(modifier = Modifier.height(8.dp))
-    GenderDropdown(viewModel)
-    Spacer(modifier = Modifier.height(16.dp))
-    PhoneNumberFields(viewModel)
-}
-
-@Composable
-fun LoginInfoSection(viewModel: SignUpViewModel) {
-    SectionTitle("Inicio de Sesión")
-    Spacer(modifier = Modifier.height(8.dp))
-    CustomTextField(
-        value = viewModel.userName,
-        onValueChange = { viewModel.userName = it },
-        label = "Nombre de Usuario"
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    CustomTextField(
-        value = viewModel.email,
-        onValueChange = { viewModel.email = it },
-        label = "Correo Electrónico",
-        keyboardType = KeyboardType.Email
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    PasswordField(viewModel)
-}
-
-@Composable
-fun SectionTitle(title: String) {
-    Text(
-        text = title,
-        fontSize = 20.sp,
-        fontWeight = FontWeight.Bold,
-        color = Color.Gray,
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @Composable
@@ -158,6 +108,64 @@ fun BirthDateFields(viewModel: SignUpViewModel) {
         Text(text = viewModel.birthDateError!!, color = Color.Red)
     }
 }
+@Composable
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = Color.Gray,
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+@Composable
+fun PersonalInfoSection(viewModel: SignUpViewModel) {
+    SectionTitle("Información Personal")
+    Spacer(modifier = Modifier.height(8.dp))
+    CustomTextField(
+        value = viewModel.nombres,
+        onValueChange = { viewModel.nombres = it },
+        label = "Nombres",
+        isError = viewModel.shouldShowError && viewModel.nombres.isEmpty()
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    CustomTextField(
+        value = viewModel.apellidos,
+        onValueChange = { viewModel.apellidos = it },
+        label = "Apellidos",
+        isError = viewModel.shouldShowError && viewModel.apellidos.isEmpty()
+    )
+    Spacer(modifier = Modifier.height(30.dp))
+    BirthDateFields(viewModel)
+    Spacer(modifier = Modifier.height(8.dp))
+    GenderDropdown(viewModel)
+    Spacer(modifier = Modifier.height(8.dp))
+    CountryDropdown(viewModel)
+    Spacer(modifier = Modifier.height(16.dp))
+    PhoneNumberFields(viewModel)
+}
+
+@Composable
+fun LoginInfoSection(viewModel: SignUpViewModel) {
+    SectionTitle("Inicio de Sesión")
+    Spacer(modifier = Modifier.height(8.dp))
+    CustomTextField(
+        value = viewModel.userName,
+        onValueChange = { viewModel.userName = it },
+        label = "Nombre de Usuario",
+        isError = viewModel.shouldShowError && viewModel.userName.isEmpty()
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    CustomTextField(
+        value = viewModel.email,
+        onValueChange = { viewModel.email = it },
+        label = "Correo Electrónico",
+        keyboardType = KeyboardType.Email,
+        isError = viewModel.shouldShowError && viewModel.email.isEmpty()
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    PasswordField(viewModel)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -166,18 +174,19 @@ fun CustomTextField(
     onValueChange: (String) -> Unit,
     label: String,
     keyboardType: KeyboardType = KeyboardType.Text,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isError: Boolean = false
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        modifier = modifier,
-        isError = value.isEmpty(),
+        modifier = modifier.fillMaxWidth(),
+        isError = isError,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         trailingIcon = {
-            if (value.isEmpty()) {
-                Icon(Icons.Default.Info, contentDescription = "Campo obligatorio")
+            if (isError) {
+                Icon(Icons.Default.Info, contentDescription = "Campo obligatorio", tint = Color.Red)
             }
         }
     )
@@ -200,10 +209,10 @@ fun GenderDropdown(viewModel: SignUpViewModel) {
                 .clickable { viewModel.expanded = !viewModel.expanded },
             colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent, cursorColor = Color.Black),
             enabled = false,
-            isError = viewModel.genero == "Seleccionar género",
+            isError = viewModel.shouldShowError && viewModel.genero == "Seleccionar género",
             trailingIcon = {
-                if (viewModel.genero == "Seleccionar género") {
-                    Icon(Icons.Default.Info, contentDescription = "Campo obligatorio")
+                if (viewModel.shouldShowError && viewModel.genero == "Seleccionar género") {
+                    Icon(Icons.Default.Info, contentDescription = "Campo obligatorio", tint = Color.Red)
                 }
             }
         )
@@ -231,6 +240,50 @@ fun GenderDropdown(viewModel: SignUpViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun CountryDropdown(viewModel: SignUpViewModel) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+    ) {
+        TextField(
+            value = viewModel.selectedCountry,
+            onValueChange = { viewModel.selectedCountry = it },
+            label = { Text("País") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { viewModel.countryExpanded = !viewModel.countryExpanded },
+            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent, cursorColor = Color.Black),
+            enabled = false,
+            isError = viewModel.shouldShowError && viewModel.selectedCountry.isEmpty(),
+            trailingIcon = {
+                if (viewModel.shouldShowError && viewModel.selectedCountry.isEmpty()) {
+                    Icon(Icons.Default.Info, contentDescription = "Campo obligatorio", tint = Color.Red)
+                }
+            }
+        )
+
+        DropdownMenu(
+            expanded = viewModel.countryExpanded,
+            onDismissRequest = { viewModel.countryExpanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            viewModel.countries.forEach { (countryName, phoneCode) ->
+                DropdownMenuItem(
+                    text = { Text(countryName) },
+                    onClick = {
+                        viewModel.selectedCountry = countryName
+                        viewModel.countryCode = phoneCode
+                        viewModel.countryExpanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun PhoneNumberFields(viewModel: SignUpViewModel) {
     Row(modifier = Modifier.fillMaxWidth()) {
         TextField(
@@ -246,7 +299,7 @@ fun PhoneNumberFields(viewModel: SignUpViewModel) {
             onValueChange = viewModel::updatePhoneNumber,
             label = { Text("Número de Teléfono") },
             modifier = Modifier.weight(3f),
-            isError = viewModel.phoneError != null,
+            isError = viewModel.shouldShowError && viewModel.phoneNumber.isEmpty(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             visualTransformation = PhoneVisualTransformation()
         )
@@ -270,10 +323,10 @@ fun PasswordField(viewModel: SignUpViewModel) {
         visualTransformation = if (viewModel.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = Modifier.fillMaxWidth(),
-        isError = viewModel.password.isEmpty(),
+        isError = viewModel.shouldShowError && viewModel.password.isEmpty(),
         trailingIcon = {
-            if (viewModel.password.isEmpty()) {
-                Icon(Icons.Default.Info, contentDescription = "Campo obligatorio")
+            if (viewModel.shouldShowError && viewModel.password.isEmpty()) {
+                Icon(Icons.Default.Info, contentDescription = "Campo obligatorio", tint = Color.Red)
             }
         }
     )
@@ -290,16 +343,19 @@ fun PasswordField(viewModel: SignUpViewModel) {
 }
 
 @Composable
-fun RegisterButton(viewModel: SignUpViewModel) {
+fun RegisterButton(viewModel: SignUpViewModel, navController: NavController) {
     Button(
-        onClick = { viewModel.registerUser() },
+        onClick = {
+            viewModel.shouldShowError = true
+            viewModel.registerUser(navController)
+        },
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Registrarse")
     }
 }
 
-class SignUpViewModel {
+class SignUpViewModel(private val context: Context) {
     var nombres by mutableStateOf("")
     var apellidos by mutableStateOf("")
     var birthDay by mutableStateOf("")
@@ -316,9 +372,33 @@ class SignUpViewModel {
     var phoneNumber by mutableStateOf("")
     var phoneError by mutableStateOf<String?>(null)
     var rol by mutableStateOf(0)
+    var shouldShowError by mutableStateOf(false)
+
+    var selectedCountry by mutableStateOf("")
+    var countryExpanded by mutableStateOf(false)
+    var countries by mutableStateOf(mapOf<String, String>())
 
     val genderOptions = listOf("Mujer", "Hombre", "Intersexual", "No-binario", "Prefiero no decirlo", "Otro", "Seleccionar género")
 
+    init {
+        fetchCountries()
+    }
+
+    private fun fetchCountries() {
+        FirebaseFirestore.getInstance().collection("Country")
+            .get()
+            .addOnSuccessListener { result ->
+                countries = result.associate {
+                    // Asegúrate de que no sea null antes de acceder
+                    val countryName = it.getString("country_name") ?: "Unknown"
+                    val phoneCode = it.getString("phone_code") ?: "+0"
+                    countryName to phoneCode
+                }
+            }
+            .addOnFailureListener { exception ->
+                errorMessage = "Error fetching countries: ${exception.message}"
+            }
+    }
     val birthDateError by derivedStateOf {
         val day = birthDay.toIntOrNull()
         val month = birthMonth.toIntOrNull()
@@ -342,8 +422,7 @@ class SignUpViewModel {
             phoneNumber = newNumber
         }
     }
-
-    fun registerUser() {
+    fun registerUser(navController: NavController) {
         val day = birthDay.toIntOrNull()
         val month = birthMonth.toIntOrNull()
         val year = birthYear.toIntOrNull()
@@ -378,7 +457,9 @@ class SignUpViewModel {
                             "email" to email,
                             "user_name" to userName,
                             "Phone_number" to "${countryCode}${phoneNumber}",
-                            "rol" to rol
+                            "rol" to rol,
+                            "account_state" to 0,
+                            "user_location" to getUserLocation()
                         )
 
                         val userId = FirebaseAuth.getInstance().currentUser?.uid
@@ -388,7 +469,8 @@ class SignUpViewModel {
                                 .addOnSuccessListener {
                                     // Éxito al guardar en Firestore
                                     errorMessage = null
-                                    // Aquí puedes navegar a la siguiente pantalla o mostrar un mensaje de éxito
+                                    sendVerificationEmail()
+                                    navController.navigate("registrationSuccess")
                                 }
                                 .addOnFailureListener { e ->
                                     // Error al guardar en Firestore
@@ -404,6 +486,36 @@ class SignUpViewModel {
         }
     }
 
+    private fun getUserLocation(): String {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return try {
+            val lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if (lastKnownLocation != null) {
+                "${lastKnownLocation.latitude},${lastKnownLocation.longitude}"
+            } else {
+                "Location not available"
+            }
+        } catch (e: SecurityException) {
+            "Location permission not granted"
+        }
+    }
+
+    private fun sendVerificationEmail() {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null && !user.isEmailVerified) {
+            user.sendEmailVerification()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Email sent
+                    } else {
+                        // Error sending email
+                        errorMessage = "Error al enviar el correo de verificación: ${task.exception?.message}"
+                    }
+                }
+        } else {
+            errorMessage = "Usuario no autenticado o el correo ya está verificado."
+        }
+    }
     private fun isValidDate(day: Int, month: Int, year: Int): Boolean {
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         val minimumYear = currentYear - 10
