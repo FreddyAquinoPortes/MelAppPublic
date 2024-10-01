@@ -53,7 +53,7 @@ fun AppNavigation() {
         composable("settingsScreen") { SettingsScreen(navController) }
         composable("helpScreen") { HelpScreen(navController) }
         composable("profileScreen") { ProfileScreen(navController) }
-
+        composable("registration_success") { RegistrationSuccessScreen(navController) }
 
     }
 }

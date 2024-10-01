@@ -2,6 +2,8 @@ package com.example.melapp.Screens
 
 import android.content.Context
 import android.location.LocationManager
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -49,7 +51,7 @@ fun SignUpScreen(navController: NavController) {
                 .padding(horizontal = 32.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(50.dp))
             PersonalInfoSection(signUpViewModel)
             Spacer(modifier = Modifier.height(60.dp))
             LoginInfoSection(signUpViewModel)
@@ -469,8 +471,14 @@ class SignUpViewModel(private val context: Context) {
                                 .addOnSuccessListener {
                                     // Éxito al guardar en Firestore
                                     errorMessage = null
+
                                     sendVerificationEmail()
-                                    navController.navigate("registrationSuccess")
+                                    // Agregar un retraso antes de enviar el correo de verificación
+                                    Handler(Looper.getMainLooper()).postDelayed({
+
+                                        navController.navigate("registration_success")
+                                    }, 2000) // retraso de 2 segundos
+
                                 }
                                 .addOnFailureListener { e ->
                                     // Error al guardar en Firestore
@@ -485,6 +493,7 @@ class SignUpViewModel(private val context: Context) {
                 }
         }
     }
+
 
     private fun getUserLocation(): String {
         val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
