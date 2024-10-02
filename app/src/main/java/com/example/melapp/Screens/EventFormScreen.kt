@@ -1,5 +1,7 @@
 package com.example.melapp.Screens
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,11 +22,12 @@ import com.example.melapp.Components.EventCategoryDropdown
 import com.example.melapp.Components.HourPicker
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.ReusableTopBar
+import coil.compose.rememberAsyncImagePainter
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun EventFormScreen(navController: NavController) {
-    // Estados del formulario
+    // Form states
     var eventTitle by remember { mutableStateOf("") }
     var eventDescription by remember { mutableStateOf("") }
     var attendeeCount by remember { mutableStateOf(25) }
@@ -36,202 +39,244 @@ fun EventFormScreen(navController: NavController) {
     var cost by remember { mutableStateOf("0.00") }
     var selectedCurrency by remember { mutableStateOf("DOP") }
     var expanded by remember { mutableStateOf(false) }
-
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState())){
-        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = {  val result = navController.popBackStack()
-            if (!result) {
-                navController.navigate("map") // Navega a la pantalla deseada si no puede hacer pop
-            } })
-    }
-
-
+    var eventImage by remember { mutableStateOf<Uri?>(null) }
+    var additionalImages by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
+        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = { navController.popBackStack() })
 
-
-
-        Spacer(modifier = Modifier.height(100.dp))
-
-        // Título del Evento
-        OutlinedTextField(
-            value = eventTitle,
-            onValueChange = { eventTitle = it },
-            label = { Text("Título del evento") },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(painter = painterResource(R.drawable.ic_title), contentDescription = "Título") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Categoría del Evento
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painterResource(R.drawable.ic_category), contentDescription = "Categoría")
-            Spacer(modifier = Modifier.width(8.dp))
-            EventCategoryDropdown(
-                selectedCategory = eventCategory,
-                onCategorySelected = { eventCategory = it }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Descripción del Evento
-        OutlinedTextField(
-            value = eventDescription,
-            onValueChange = { eventDescription = it },
-            label = { Text("Descripción del evento") },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(painterResource(R.drawable.ic_description), contentDescription = "Descripción") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Fecha del evento
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Icon(painterResource(R.drawable.ic_calendar), contentDescription = "Fecha")
-            Spacer(modifier = Modifier.width(8.dp))
-            DatePicker(selectedDate) { newDate -> selectedDate = newDate }
-        }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Hora de inicio y fin
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(),
-
-        ) {
-            Icon(painterResource(R.drawable.ic_clock), contentDescription = "Intervalo de hora del evento")
-            // Campo de hora de inicio
-            Box(modifier = Modifier.weight(1f)) {
-                HourPicker(
-                    selectedHour = startTime,
-                    onHourSelected = { startTime = it },
-                    label = "Hora de inicio",
-                    is24HourFormat = true
-                )
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Campo de hora de fin
-            Box(modifier = Modifier.weight(1f)) {
-                HourPicker(
-                    selectedHour = endTime,
-                    onHourSelected = { endTime = it },
-                    label = "Hora de fin",
-                    is24HourFormat = true
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Cantidad de asistentes
-        OutlinedTextField(
-            value = attendeeCount.toString(),
-            onValueChange = { newValue -> attendeeCount = newValue.toIntOrNull() ?: 25 },
-            label = { Text("Cantidad de asistentes") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            leadingIcon = { Icon(painterResource(R.drawable.ic_users), contentDescription = "Asistentes") }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Campo de costo y selección de moneda en la misma fila
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
+            // Event Title
             OutlinedTextField(
-                value = cost,
-                onValueChange = { cost = it },
-                label = { Text("Costo") },
-                leadingIcon = { Icon(painterResource(R.drawable.ic_money), contentDescription = "Costo") },
-                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f)
+                value = eventTitle,
+                onValueChange = { eventTitle = it },
+                label = { Text("Título del evento") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = { Icon(painterResource(R.drawable.ic_title), contentDescription = "Título") }
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Dropdown para seleccionar moneda
-            Box(modifier = Modifier.weight(0.5f)) {
-                OutlinedTextField(
-                    value = selectedCurrency,
-                    onValueChange = {},
-                    label = { Text("Moneda") },
-                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Filled.ArrowDropDown,
-                            contentDescription = "Expandir"
-                        )
+            // Main Event Image
+            Text("Agregar Imagen Principal del Evento", style = MaterialTheme.typography.titleMedium)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clickable {
+                        // Implement logic to select image from gallery or camera
                     },
-                    readOnly = true,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expanded = !expanded }
+                contentAlignment = Alignment.Center
+            ) {
+                if (eventImage != null) {
+                    Image(
+                        painter = rememberAsyncImagePainter(eventImage),
+                        contentDescription = "Imagen del evento",
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_images),
+                        contentDescription = "Agregar imagen",
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Additional Images
+            Text("Agregar Imágenes Adicionales del Evento", style = MaterialTheme.typography.titleMedium)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .clickable {
+                        // Implement logic to select multiple images
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                if (additionalImages.isNotEmpty()) {
+                    // Show a grid or list of selected images
+                } else {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_images),
+                        contentDescription = "Agregar imágenes",
+                        modifier = Modifier.size(64.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Event Category
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(painter = painterResource(R.drawable.ic_category), contentDescription = "Categoría")
+                Spacer(modifier = Modifier.width(8.dp))
+                EventCategoryDropdown(
+                    selectedCategory = eventCategory,
+                    onCategorySelected = { eventCategory = it }
                 )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    listOf("DOP", "USD").forEach { currency ->
-                        DropdownMenuItem(
-                            onClick = {
-                                selectedCurrency = currency
-                                expanded = false
-                            },
-                            text = { Text(currency) }
-                        )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Event Description
+            OutlinedTextField(
+                value = eventDescription,
+                onValueChange = { eventDescription = it },
+                label = { Text("Descripción del evento") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = { Icon(painter = painterResource(R.drawable.ic_description), contentDescription = "Descripción") }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Event Date
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Icon(painter = painterResource(R.drawable.ic_calendar), contentDescription = "Fecha")
+                Spacer(modifier = Modifier.width(8.dp))
+                DatePicker(selectedDate) { newDate -> selectedDate = newDate }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Start and End Time
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Icon(painter = painterResource(R.drawable.ic_clock), contentDescription = "Intervalo de hora del evento")
+                Box(modifier = Modifier.weight(1f)) {
+                    HourPicker(
+                        selectedHour = startTime,
+                        onHourSelected = { startTime = it },
+                        label = "Hora de inicio",
+                        is24HourFormat = true
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Box(modifier = Modifier.weight(1f)) {
+                    HourPicker(
+                        selectedHour = endTime,
+                        onHourSelected = { endTime = it },
+                        label = "Hora de fin",
+                        is24HourFormat = true
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Attendee Count
+            OutlinedTextField(
+                value = attendeeCount.toString(),
+                onValueChange = { newValue -> attendeeCount = newValue.toIntOrNull() ?: 25 },
+                label = { Text("Cantidad de asistentes") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                leadingIcon = { Icon(painter = painterResource(R.drawable.ic_users), contentDescription = "Asistentes") }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Cost and Currency
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = cost,
+                    onValueChange = { cost = it },
+                    label = { Text("Costo") },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.ic_money), contentDescription = "Costo") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Box(modifier = Modifier.weight(0.5f)) {
+                    OutlinedTextField(
+                        value = selectedCurrency,
+                        onValueChange = {},
+                        label = { Text("Moneda") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowDropDown,
+                                contentDescription = "Expandir"
+                            )
+                        },
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expanded = !expanded }
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        listOf("DOP", "USD").forEach { currency ->
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedCurrency = currency
+                                    expanded = false
+                                },
+                                text = { Text(currency) }
+                            )
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // URL de boletos
-        OutlinedTextField(
-            value = ticketUrl,
-            onValueChange = { ticketUrl = it },
-            label = { Text("URL de boletos") },
-            modifier = Modifier.fillMaxWidth(),
-            leadingIcon = { Icon(painter = painterResource(R.drawable.ic_link), contentDescription = "URL Boletos") }
-        )
+            // Ticket URL
+            OutlinedTextField(
+                value = ticketUrl,
+                onValueChange = { ticketUrl = it },
+                label = { Text("URL de boletos") },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = { Icon(painter = painterResource(R.drawable.ic_link), contentDescription = "URL Boletos") }
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Botones de Publicar y Cancelar
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Button(
-                onClick = { /* Acción para publicar el evento */ },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            // Publish and Cancel Buttons
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "Publicar")
-            }
-            Button(
-                onClick = { /* Acción para cancelar */ },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-            ) {
-                Text(text = "Cancelar")
+                Button(
+                    onClick = { /* Action to publish the event */ },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = "Publicar")
+                }
+                Button(
+                    onClick = { /* Action to cancel */ },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
+                    Text(text = "Cancelar")
+                }
             }
         }
     }
 }
-
