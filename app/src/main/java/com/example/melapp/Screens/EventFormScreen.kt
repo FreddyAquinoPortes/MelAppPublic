@@ -40,7 +40,10 @@ fun EventFormScreen(navController: NavController) {
     Column(modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())){
-        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = { navController.popBackStack() })
+        ReusableTopBar(screenTitle = "Publicar Evento", onBackClick = {  val result = navController.popBackStack()
+            if (!result) {
+                navController.navigate("map") // Navega a la pantalla deseada si no puede hacer pop
+            } })
     }
 
 

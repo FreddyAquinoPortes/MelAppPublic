@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.ReusableTopBar
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun CollapsibleSettingsOption(
@@ -25,19 +26,23 @@ fun CollapsibleSettingsOption(
     subOptions: List<String>,
     isSecondary: Boolean = false,
     isCheckbox: Boolean = false,
-    selectedOption: MutableState<String?> = mutableStateOf(null) // Track selected option
+    selectedOption: MutableState<String?> = mutableStateOf(null),
+    onOptionClick: (() -> Unit)? = null // Nuevo parámetro para manejar clics
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = if (isSecondary) 16.dp else 8.dp) // More padding for secondary sections
+            .padding(vertical = if (isSecondary) 16.dp else 8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { isExpanded = !isExpanded }
+                .clickable {
+                    isExpanded = !isExpanded
+                    onOptionClick?.invoke() // Ejecutar la acción cuando se hace clic
+                }
                 .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -53,41 +58,19 @@ fun CollapsibleSettingsOption(
                 tint = Color(0xFF1A237E)
             )
         }
-        if (isExpanded) {
+
+        if (isExpanded && subOptions.isNotEmpty()) {
             subOptions.forEach { option ->
-                if (isCheckbox) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
-                            .clickable {
-                                // Deselect the previously selected option and select the new one
-                                selectedOption.value = option
-                            },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = selectedOption.value == option,
-                            onCheckedChange = {
-                                selectedOption.value = option
-                            },
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = Color(0xFF1A237E)
-                            )
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = option)
+                ClickableText(
+                    text = AnnotatedString(option),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp),
+                    onClick = {
+                        // Manejar clics en cada subopción si es necesario
                     }
-                } else {
-                    ClickableText(
-                        text = AnnotatedString(option),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp),
-                        onClick = { /* Handle option click */ }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp)) // More space between sub-options
-                }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
@@ -97,26 +80,29 @@ fun CollapsibleSettingsOption(
 @Composable
 fun SettingsScreen(navController: NavController) {
     val selectedLanguage = remember { mutableStateOf<String?>(null) }
+    var showLogoutDialog by remember { mutableStateOf(false) } // Estado para mostrar el diálogo
 
     Scaffold(
         topBar = {
             ReusableTopBar(
-                screenTitle = "Ajustes", // Pass the screen title here
+                screenTitle = "Ajustes",
                 onBackClick = { navController.popBackStack() }
             )
         },
         bottomBar = {
             NavigationBottomBar(
-                onProfileClick = { /* Navigate to profile */ },
-                onPostEventClick = { /* Navigate to create an event */ },
+                onProfileClick = { navController.navigate("profileScreen") },
+                onPostEventClick = { navController.navigate("map") },
+                onPublishClick = { navController.navigate("event_form") },
                 onSettingsClick = { navController.navigate("settingsScreen") }
             )
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // Make the content scrollable
+                .verticalScroll(rememberScrollState())
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
@@ -132,11 +118,19 @@ fun SettingsScreen(navController: NavController) {
             CollapsibleSettingsOption("Notificaciones", listOf("Activar", "Sonido", "Vibración"))
             CollapsibleSettingsOption("Condiciones y Políticas", listOf("Términos de servicio", "Política de privacidad"))
             CollapsibleSettingsOption("Acerca de", listOf("Versión", "Licencias"))
-            CollapsibleSettingsOption("Salir", emptyList())
+
+            // Implementación de Cerrar Sesión con confirmación
+            CollapsibleSettingsOption(
+                title = "Cerrar sesión",
+                subOptions = emptyList(),
+                onOptionClick = {
+                    showLogoutDialog = true // Mostrar el diálogo de confirmación
+                }
+            )
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Help Button on the right
+            // Botón de Ayuda
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
@@ -145,10 +139,10 @@ fun SettingsScreen(navController: NavController) {
                     onClick = { navController.navigate("helpScreen") },
                     modifier = Modifier
                         .padding(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB39DDB)) // Light purple
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB39DDB))
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_help), // Replace with your icon
+                        painter = painterResource(id = R.drawable.ic_help),
                         contentDescription = "Ayuda",
                         tint = Color.White
                     )
@@ -156,6 +150,36 @@ fun SettingsScreen(navController: NavController) {
                     Text(text = "Ayuda", color = Color.White)
                 }
             }
+        }
+
+        // Diálogo de confirmación para cerrar sesión
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false }, // Cierra el diálogo al hacer clic fuera
+                title = { Text(text = "Cerrar sesión") },
+                text = { Text("¿Estás seguro de que quieres cerrar sesión?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            FirebaseAuth.getInstance().signOut() // Cerrar sesión
+                            navController.navigate("login") {
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                launchSingleTop = true
+                            }
+                            showLogoutDialog = false // Cierra el diálogo
+                        }
+                    ) {
+                        Text("Sí")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutDialog = false } // Cierra el diálogo sin cerrar sesión
+                    ) {
+                        Text("No")
+                    }
+                }
+            )
         }
     }
 }

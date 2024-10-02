@@ -73,7 +73,7 @@ fun ProfileScreen(navController: NavController) {
         },
         bottomBar = {
             NavigationBottomBar(
-                onProfileClick = { /* Lógica para ir a la pantalla de perfil */ },
+                onProfileClick = { navController.navigate("profileScreen") },
                 onPostEventClick = { navController.navigate("map") },
                 onPublishClick = { navController.navigate("event_form") },
                 onSettingsClick = { navController.navigate("settingsScreen") }
@@ -177,7 +177,7 @@ fun ProfileScreen(navController: NavController) {
             }
 
             // Cuadrícula de eventos publicados
-            items(10) { index ->
+            items(4) { index ->
                 EventCard(
                     eventName = "Evento $index",
                     location = "@Ubicación $index",
