@@ -1,18 +1,20 @@
 package com.example.melapp.Screens
 
-import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.activity.ComponentActivity
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.melapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun RegistrationSuccessScreen(navController: NavController) {
@@ -20,14 +22,31 @@ fun RegistrationSuccessScreen(navController: NavController) {
     val db = FirebaseFirestore.getInstance()
     val user = auth.currentUser
     val email = user?.email ?: "Correo no disponible"
-    val userName = user?.displayName ?: "Usuario" // Puedes obtener el nombre de usuario desde Firestore si está guardado
 
+    var userName by remember { mutableStateOf("Usuario") } // Variable para guardar el nombre de usuario
     var isEmailVerified by remember { mutableStateOf(user?.isEmailVerified ?: false) }
     var statusMessage by remember { mutableStateOf("Verificando el estado de verificación...") }
     var resendEmailMessage by remember { mutableStateOf("") }
 
-    // Efecto para verificar si el correo está verificado periódicamente
+    // Efecto para buscar el nombre de usuario en Firestore
     LaunchedEffect(user) {
+        user?.let {
+            try {
+                val snapshot = db.collection("users")
+                    .whereEqualTo("email", email)
+                    .get()
+                    .await()
+
+                if (snapshot.documents.isNotEmpty()) {
+                    val userData = snapshot.documents[0]
+                    userName = userData.getString("user_name") ?: "Usuario"
+                }
+            } catch (e: Exception) {
+                statusMessage = "Error al obtener los datos del usuario: ${e.message}"
+            }
+        }
+
+        // Verificar si el correo está verificado periódicamente
         while (!isEmailVerified && user != null) {
             user.reload().addOnCompleteListener {
                 isEmailVerified = user.isEmailVerified
@@ -36,7 +55,6 @@ fun RegistrationSuccessScreen(navController: NavController) {
         }
 
         if (isEmailVerified) {
-            // Si el correo está verificado, actualiza el estado de la cuenta en Firestore
             user?.uid?.let { userId ->
                 db.collection("users").document(userId)
                     .update("account_state", 1)
@@ -71,20 +89,43 @@ fun RegistrationSuccessScreen(navController: NavController) {
         Text(
             text = "¡Te has registrado correctamente, $userName!",
             style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Por favor, revisa tu correo y confirma tu cuenta.",
+            text = "Por favor, revisa tu correo ($email) y confirma tu cuenta.",
             style = MaterialTheme.typography.bodyLarge,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = statusMessage,
-            style = MaterialTheme.typography.bodyLarge,
+            fontSize = 18.sp,
+            color = Color.Gray
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (!isEmailVerified) {
+        if (isEmailVerified) {
+            // Muestra el ícono verde cuando el correo está verificado
+            Image(
+                painter = painterResource(id = R.drawable.ic_user_check), // Asegúrate de tener el icono en drawable
+                contentDescription = "Correo Verificado",
+                modifier = Modifier.size(64.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = statusMessage,
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Green // Texto verde para indicar éxito
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = { navController.navigate("map") },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text(text = "Continuar")
+            }
+        } else {
+            Text(
+                text = statusMessage,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Tu correo no ha sido verificado.",
                 color = MaterialTheme.colorScheme.error,
@@ -100,12 +141,6 @@ fun RegistrationSuccessScreen(navController: NavController) {
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium,
                 )
-            }
-        } else {
-            Button(onClick = {
-                navController.navigate("next_screen_route") // Cambia a la siguiente pantalla si el correo está verificado
-            }) {
-                Text(text = "Continuar")
             }
         }
     }
