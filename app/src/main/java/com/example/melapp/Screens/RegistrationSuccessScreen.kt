@@ -115,7 +115,7 @@ fun RegistrationSuccessScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { navController.navigate("traditional_login") },
+                onClick = { navController.navigate("map") },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text(text = "Continuar")
