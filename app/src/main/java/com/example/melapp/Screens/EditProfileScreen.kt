@@ -1,32 +1,50 @@
 package com.example.melapp.Screens
 
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.melapp.ReusableComponents.ReusableTopBar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-
+import com.google.firebase.storage.FirebaseStorage
 
 @Composable
 fun EditProfileScreen(navController: NavController) {
     val user = FirebaseAuth.getInstance().currentUser
     val db = FirebaseFirestore.getInstance()
+    val storage = FirebaseStorage.getInstance()
 
-    // State to hold the user's current username and email
+    // State to hold the user's current username, email, and profile image URL
     var newUsername by remember { mutableStateOf("") }
     var email by remember { mutableStateOf(user?.email ?: "") }
+    var profileImageUrl by remember { mutableStateOf("") } // URL de la imagen de perfil
+
+    // Lanzador para seleccionar imagen
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            // Subir la imagen a Firebase Storage cuando se selecciona
+            uploadImageToFirebaseStorage(it) { downloadUrl ->
+                profileImageUrl = downloadUrl
+            }
+        }
+    }
 
     // Fetch user data from Firestore based on email when the composable is first composed
     LaunchedEffect(email) {
         email?.let { userEmail ->
-            Log.d("Firestore", "Fetching user data for email: $userEmail")
-
             db.collection("users")
                 .whereEqualTo("email", userEmail)
                 .get()
@@ -34,15 +52,12 @@ fun EditProfileScreen(navController: NavController) {
                     if (!documents.isEmpty) {
                         val document = documents.first()
                         newUsername = document.getString("user_name") ?: ""
-                    } else {
-                        Log.d("Firestore", "No user found with email: $userEmail")
+                        profileImageUrl = document.getString("profile_image") ?: ""
                     }
                 }
                 .addOnFailureListener { exception ->
                     Log.e("Firestore", "Error fetching user data", exception)
                 }
-        } ?: run {
-            Log.e("Firestore", "User email is null, could not fetch data")
         }
     }
 
@@ -50,7 +65,7 @@ fun EditProfileScreen(navController: NavController) {
         topBar = {
             ReusableTopBar(
                 screenTitle = "Editar Perfil",
-                onBackClick = { navController.popBackStack() } // Go back to profile screen
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
@@ -65,7 +80,28 @@ fun EditProfileScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Text field to edit username
+            // Mostrar imagen de perfil
+            if (profileImageUrl.isNotEmpty()) {
+                Image(
+                    painter = rememberAsyncImagePainter(profileImageUrl),
+                    contentDescription = "Imagen de perfil",
+                    modifier = Modifier.size(128.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Botón para seleccionar una nueva imagen de perfil
+            Button(onClick = {
+                launcher.launch("image/*") // Lanza el selector de imágenes
+            }) {
+                Text("Seleccionar Imagen")
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Campo para editar nombre de usuario
             OutlinedTextField(
                 value = newUsername,
                 onValueChange = { newUsername = it },
@@ -74,10 +110,10 @@ fun EditProfileScreen(navController: NavController) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Button to save changes
+            // Botón para guardar cambios
             Button(onClick = {
                 if (newUsername.isNotEmpty()) {
-                    // Update username in Firestore
+                    // Actualizar nombre de usuario y URL de imagen en Firestore
                     email?.let { userEmail ->
                         db.collection("users")
                             .whereEqualTo("email", userEmail)
@@ -86,19 +122,22 @@ fun EditProfileScreen(navController: NavController) {
                                 if (!documents.isEmpty) {
                                     val documentId = documents.first().id
                                     db.collection("users").document(documentId)
-                                        .update("user_name", newUsername)
+                                        .update(mapOf(
+                                            "user_name" to newUsername,
+                                            "profile_image" to profileImageUrl
+                                        ))
                                         .addOnSuccessListener {
-                                            Log.d("Firestore", "Username successfully updated.")
-                                            navController.popBackStack() // Navigate back after saving
+                                            Log.d("Firestore", "Perfil actualizado correctamente.")
+                                            navController.popBackStack()
                                         }
                                         .addOnFailureListener { e ->
-                                            Log.e("Firestore", "Error updating username", e)
+                                            Log.e("Firestore", "Error actualizando perfil", e)
                                         }
                                 }
                             }
                     }
                 } else {
-                    Log.e("EditProfileScreen", "Username cannot be empty.")
+                    Log.e("EditProfileScreen", "El nombre de usuario no puede estar vacío.")
                 }
             }) {
                 Text(text = "Guardar Cambios")
@@ -106,4 +145,24 @@ fun EditProfileScreen(navController: NavController) {
         }
     }
 }
+
+// Función para subir la imagen a Firebase Storage
+fun uploadImageToFirebaseStorage(imageUri: Uri, onSuccess: (String) -> Unit) {
+    val user = FirebaseAuth.getInstance().currentUser
+    val storage = FirebaseStorage.getInstance()
+    val storageRef = storage.reference
+    val profileImagesRef = storageRef.child("profile_images/${user?.uid}.jpg")
+
+    val uploadTask = profileImagesRef.putFile(imageUri)
+
+    uploadTask.addOnSuccessListener {
+        profileImagesRef.downloadUrl.addOnSuccessListener { uri ->
+            onSuccess(uri.toString()) // Devolver la URL de descarga
+        }
+    }.addOnFailureListener {
+        Log.e("FirebaseStorage", "Error al subir la imagen", it)
+    }
+}
+
+
 

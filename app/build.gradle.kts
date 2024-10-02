@@ -80,6 +80,10 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.auth.ktx)
+    implementation("com.google.firebase:firebase-storage-ktx:20.2.0")
+    implementation ("io.coil-kt:coil-compose:2.0.0")
+
+
 
     //Map
     implementation(libs.maps.sdk)
