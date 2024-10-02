@@ -50,7 +50,8 @@ fun HelpScreen(navController: NavController) {
                     // Opciones de ayuda
                     HelpOptionRow(
                         optionText = "Reportar un problema",
-                        onClick = { /* Navigate to Report a Problem screen */ }
+                        onClick = { navController.navigate("reportProblemScreen")
+                        }
                     )
 
                     HelpOptionRow(
