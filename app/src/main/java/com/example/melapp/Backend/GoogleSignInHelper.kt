@@ -33,57 +33,6 @@ data class User(
     val location: GeoPoint
 )
 
-// Clase para manejar la interacción con Firestore
-class FirestoreHelper(private val db: FirebaseFirestore) {
-
-    fun checkUserExists(
-        email: String,
-        onUserExists: () -> Unit,
-        onUserDoesNotExist: (GoogleSignInAccount) -> Unit,
-        account: GoogleSignInAccount
-    ) {
-        val usersCollection = db.collection("users")
-        val query = usersCollection.whereEqualTo("correo", email)
-
-        query.get().addOnSuccessListener { documents ->
-            if (documents.isEmpty) {
-                // Usuario no existe
-                onUserDoesNotExist(account)
-            } else {
-                // Usuario ya existe
-                onUserExists()
-            }
-        }.addOnFailureListener {
-            println("Error al verificar si el usuario existe: ${it.message}")
-        }
-    }
-
-    fun registerNewUser(
-        account: GoogleSignInAccount,
-        user: User
-    ) {
-        val userData = hashMapOf(
-            "Nombres" to user.nombres,
-            "Apellidos" to user.apellidos,
-            "Fecha de nacimiento" to user.fechaNacimiento,
-            "Genero" to user.genero,
-            "correo" to account.email,
-            "Username" to "@${user.username}",
-            "rol" to user.rol,
-            "accountStatus" to user.accountStatus,
-            "location" to user.location
-        )
-
-        db.collection("users").document(account.email ?: "").set(userData)
-            .addOnSuccessListener {
-                println("Usuario registrado exitosamente.")
-            }.addOnFailureListener { e ->
-                println("Error al registrar usuario: ${e.message}")
-            }
-    }
-}
-
-// Clase para manejar la autenticación de Google
 // Clase para manejar la autenticación de Google
 class GoogleSignInHelper(
     private val context: Context,
@@ -112,27 +61,31 @@ class GoogleSignInHelper(
             val account = task.getResult(ApiException::class.java)
             account?.let {
                 // Extraer la información de la cuenta de Google
-                val nombres = it.givenName ?: "Nombre" // Nombre del usuario
-                val apellidos = it.familyName ?: "Apellido" // Apellido del usuario
-                val email = it.email ?: "correo@example.com" // Correo electrónico
-                val username = it.displayName ?: "usuario" // Nombre de usuario, puede ser el nombre completo
-                val fechaNacimiento =
-                    java.util.Date(2000, 1, 1) // Suponiendo que no está disponible en Google
+                val nombres = it.givenName ?: ""
+                val apellidos = it.familyName ?: ""
+                val email = it.email ?: "correo@example.com"
+                val username = it.displayName ?: "usuario"
 
-                // Crear un nuevo objeto User con los datos de la cuenta de Google
-                val updatedUser = User(
+                // Valores predeterminados
+                val fechaNacimiento = java.util.Date(2000, 1, 1) // Valor predeterminado
+                val genero = 0 // Valor predeterminado
+                val rol = 0
+                val accountStatus = 0 // Por defecto 0 para los nuevos usuarios
+
+                // Crear un objeto User con los valores de Google y predeterminados
+                val newUser = User(
                     nombres = nombres,
                     apellidos = apellidos,
-                    fechaNacimiento = fechaNacimiento, // Puedes ajustar este valor si tienes un método para obtener la fecha real
-                    genero = 0, // El género puede ser ajustado de otra forma si tienes esa información
+                    fechaNacimiento = fechaNacimiento,
+                    genero = genero,
                     username = username,
-                    rol = 0,
-                    accountStatus = 0,
-                    location = GeoPoint(0.0, 0.0) // Se actualizará después de obtener la ubicación
+                    rol = rol,
+                    accountStatus = accountStatus,
+                    location = GeoPoint(0.0, 0.0) // Se actualiza después de obtener la ubicación
                 )
 
-                // Obtener la ubicación y proceder a registrar el usuario
-                getLocationAndRegisterUser(it, updatedUser)
+                // Obtener la ubicación y proceder a registrar o autenticar el usuario
+                getLocationAndRegisterUser(it, newUser)
             }
         } catch (e: ApiException) {
             println("Google sign-in failed: ${e.message}")
@@ -140,7 +93,6 @@ class GoogleSignInHelper(
     }
 
     private fun getLocationAndRegisterUser(account: GoogleSignInAccount, user: User) {
-        // Verificar permisos de ubicación
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -152,7 +104,6 @@ class GoogleSignInHelper(
             return
         }
 
-        // Obtener la ubicación
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
                 val geoPoint = GeoPoint(location.latitude, location.longitude)
@@ -169,15 +120,36 @@ class GoogleSignInHelper(
         firestoreHelper.checkUserExists(
             email = account.email ?: "",
             onUserExists = {
-                firebaseAuthWithGoogle(account) // Si el usuario ya existe, inicia sesión normalmente
+                // Si el usuario existe, verificar el estado de la cuenta
+                checkAccountStatusAndNavigate(account)
             },
             onUserDoesNotExist = {
                 // Registrar nuevo usuario
                 firestoreHelper.registerNewUser(account, user)
-                firebaseAuthWithGoogle(account) // Iniciar sesión después de registrar
+                firebaseAuthWithGoogle(account)
             },
             account = account
         )
+    }
+
+    private fun checkAccountStatusAndNavigate(account: GoogleSignInAccount) {
+        val userEmail = account.email ?: return
+        val usersCollection = FirebaseFirestore.getInstance().collection("users")
+
+        usersCollection.document(userEmail).get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                val accountState = document.getLong("accountStatus") ?: 0
+                if (accountState == 0L) {
+                    // Redirigir a HalfSignUpScreen si el estado de la cuenta es 0
+                    navController.navigate("half_signup_screen")
+                } else {
+                    // De lo contrario, redirigir a event_form
+                    navController.navigate("event_form")
+                }
+            }
+        }.addOnFailureListener {
+            println("Error al verificar el estado de la cuenta: ${it.message}")
+        }
     }
 
     private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
@@ -188,9 +160,7 @@ class GoogleSignInHelper(
                     val user = auth.currentUser
                     if (user != null) {
                         println("Sign-in successful: ${user.email}")
-                        navController.navigate("map") {
-                            popUpTo("event_form") { inclusive = true }
-                        }
+                        // No hacemos la navegación aquí, ya se maneja en checkAccountStatusAndNavigate
                     } else {
                         println("Error: User is null after sign-in.")
                     }
@@ -201,8 +171,49 @@ class GoogleSignInHelper(
     }
 }
 
-    fun handleSignInResult(result: ActivityResult) {
+class FirestoreHelper(private val db: FirebaseFirestore) {
 
+    // Verificar si el usuario ya existe en Firestore
+    fun checkUserExists(
+        email: String,
+        onUserExists: () -> Unit,
+        onUserDoesNotExist: () -> Unit,
+        account: GoogleSignInAccount
+    ) {
+        db.collection("users").document(email).get().addOnSuccessListener { document ->
+            if (document.exists()) {
+                // El usuario ya existe
+                onUserExists()
+            } else {
+                // El usuario no existe
+                onUserDoesNotExist()
+            }
+        }.addOnFailureListener {
+            println("Error al verificar la existencia del usuario: ${it.message}")
+        }
     }
 
+    // Registrar un nuevo usuario en Firestore
+    fun registerNewUser(account: GoogleSignInAccount, user: User) {
+        val Phonenumber = ""
+        val userEmail = account.email ?: return
+        val userMap = hashMapOf(
+            "name" to user.nombres,
+            "lastname" to user.apellidos,
+            "birth_date" to user.fechaNacimiento,
+            "gender" to user.genero,
+            "user_name" to user.username,
+            "rol" to user.rol,
+            "account_state" to user.accountStatus,
+            "user_location" to user.location,
+            "email" to userEmail,
+            "Phone_number" to Phonenumber
+        )
 
+        db.collection("users").document(userEmail).set(userMap).addOnSuccessListener {
+            println("Usuario registrado exitosamente: $userEmail")
+        }.addOnFailureListener {
+            println("Error al registrar el usuario: ${it.message}")
+        }
+    }
+}

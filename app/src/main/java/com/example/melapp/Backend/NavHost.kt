@@ -2,14 +2,12 @@ package com.example.melapp.Backend
 
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.remember
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.Screens.EditProfileScreen
 import com.example.melapp.Screens.EventFormScreen
+import com.example.melapp.Screens.HalfSignUpScreen
 import com.example.melapp.Screens.HelpScreen
 import com.example.melapp.Screens.HomePage
 import com.example.melapp.Screens.LoginScreen
@@ -60,6 +58,7 @@ fun AppNavigation() {
         composable("editprofileScreen") { EditProfileScreen(navController = navController) }
         composable("ReportProblemScreen") { ReportProblemScreen(navController) }
         composable("registration_success") { RegistrationSuccessScreen(navController) }
+        composable("half_signup_screen") { HalfSignUpScreen(navController) }
 
     }
 }
