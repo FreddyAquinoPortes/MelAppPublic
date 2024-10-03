@@ -1,4 +1,3 @@
-// PrincipalScreen.kt
 package com.example.melapp.Screens
 
 import android.Manifest
@@ -42,6 +41,7 @@ import com.google.maps.android.compose.MapProperties
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.Backend.Evento
 import com.example.melapp.Backend.EventoState
+import com.google.firebase.firestore.FirebaseFirestore
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,6 +158,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     }
 }
 
+
 // Función regular (no @Composable) para centrar la cámara en la ubicación real del usuario
 @SuppressLint("MissingPermission")
 fun centerCameraOnUser(
@@ -241,7 +242,26 @@ fun SearchTopBar() {
 
 @Composable
 fun CategoryBar() {
-    val categories = listOf("Conciertos", "Deportes", "Culturales", "Infantiles", "Arte", "Cine", "Religiosos")
+    val categories = remember { mutableStateListOf<String>() } // Estado mutable para almacenar los campos de cada documento
+
+    // Obtener los campos de la colección event_category de Firestore
+    LaunchedEffect(Unit) {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("event_category")
+            .get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    val data = document.data // Obtenemos todos los campos del documento como un mapa
+                    // Iterar sobre cada campo del documento y agregar el valor a la lista de categorías
+                    data.forEach { (key, value) ->
+                        categories.add("$key: $value")
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                // Manejar error si es necesario
+            }
+    }
 
     LazyRow(
         modifier = Modifier
@@ -249,7 +269,7 @@ fun CategoryBar() {
             .padding(vertical = 8.dp)
     ) {
         items(categories.size) { index ->
-            CategoryItem(categories[index])
+            CategoryItem(categories[index]) // Mostrar el valor del campo
         }
     }
 }
