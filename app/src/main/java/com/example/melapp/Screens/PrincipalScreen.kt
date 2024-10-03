@@ -1,3 +1,4 @@
+// PrincipalScreen.kt
 package com.example.melapp.Screens
 
 import android.Manifest
@@ -6,14 +7,16 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,22 +28,32 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MapProperties
+import com.example.melapp.Backend.EventoViewModel
+import com.example.melapp.Backend.Evento
+import com.example.melapp.Backend.EventoState
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(navController: NavController) {
+fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
+
+    val eventoState by eventoViewModel.eventoState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        eventoViewModel.obtenerTodosLosEventos()
+    }
+
     BackHandler {
         // Bloquear el botón de retroceso
     }
@@ -107,14 +120,43 @@ fun MapScreen(navController: NavController) {
         },
         floatingActionButtonPosition = FabPosition.Center // Omitir si ya no es necesario cambiar la posición
     ) {
+        // Mapa con marcadores de eventos
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = myLocationEnabled)
-        )
+        ) {
+            // Agregar marcadores para cada evento
+            when (eventoState) {
+                is EventoState.Success -> {
+                    val data = (eventoState as EventoState.Success).data
+                    if (data is List<*>) {
+                        data.filterIsInstance<Evento>().forEach { evento ->
+                            Marker(
+                                state = MarkerState(position = LatLng(evento.latitud, evento.longitud)),
+                                title = evento.nombre,
+                                snippet = evento.descripcion,
+                                onClick = {
+                                    // Manejar el clic en el marcador
+                                    // Por ejemplo, navegar a una pantalla de detalles del evento
+                                    navController.navigate("eventDetails/${evento.id}")
+                                    true
+                                }
+                            )
+                        }
+                    }
+                }
+                is EventoState.Error -> {
+                    // Opcional: Mostrar un mensaje de error en el mapa
+                    // Puedes usar un Overlay o algún otro método para mostrar mensajes
+                }
+                else -> {
+                    // Otros estados (Idle, Loading)
+                }
+            }
+        }
     }
 }
-
 
 // Función regular (no @Composable) para centrar la cámara en la ubicación real del usuario
 @SuppressLint("MissingPermission")
@@ -197,7 +239,6 @@ fun SearchTopBar() {
     )
 }
 
-
 @Composable
 fun CategoryBar() {
     val categories = listOf("Conciertos", "Deportes", "Culturales", "Infantiles", "Arte", "Cine", "Religiosos")
@@ -232,5 +273,3 @@ fun CategoryItem(category: String) {
         Text(category)
     }
 }
-
-
