@@ -79,6 +79,7 @@ fun AppNavigation() {
                 // Pasar las coordenadas seleccionadas de vuelta a EventFormScreen
                 navController.previousBackStackEntry?.savedStateHandle?.set("latitud", lat)
                 navController.previousBackStackEntry?.savedStateHandle?.set("longitud", lng)
+//                navController.popBackStack()
             }
         }
         composable("ReportProblemScreen") { ReportProblemScreen(navController) }
