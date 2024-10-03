@@ -235,7 +235,7 @@ fun CategoryBar() {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    val category = document.getString("name") // Asegúrate de que el campo en Firestore es 'name'
+                    val category = document.getString("category_name") // Asegúrate de que el campo en Firestore es 'name'
                     if (category != null) {
                         categories.add(category)
                     }
