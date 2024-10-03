@@ -209,7 +209,11 @@ fun GenderDropdown(viewModel: SignUpViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { viewModel.expanded = !viewModel.expanded },
-            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent, cursorColor = Color.Black),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                cursorColor = Color.Black
+            ),
             enabled = false,
             isError = viewModel.shouldShowError && viewModel.genero == "Seleccionar género",
             trailingIcon = {
@@ -218,6 +222,7 @@ fun GenderDropdown(viewModel: SignUpViewModel) {
                 }
             }
         )
+
 
         DropdownMenu(
             expanded = viewModel.expanded,
@@ -255,7 +260,11 @@ fun CountryDropdown(viewModel: SignUpViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { viewModel.countryExpanded = !viewModel.countryExpanded },
-            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent, cursorColor = Color.Black),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                cursorColor = Color.Black
+            ),
             enabled = false,
             isError = viewModel.shouldShowError && viewModel.selectedCountry.isEmpty(),
             trailingIcon = {
@@ -264,6 +273,7 @@ fun CountryDropdown(viewModel: SignUpViewModel) {
                 }
             }
         )
+
 
         DropdownMenu(
             expanded = viewModel.countryExpanded,

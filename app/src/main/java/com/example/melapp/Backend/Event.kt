@@ -1,7 +1,8 @@
 // Event.kt
 package com.example.melapp.Backend
 
-import com.google.firebase.database.IgnoreExtraProperties
+
+import com.google.firebase.firestore.IgnoreExtraProperties
 
 @IgnoreExtraProperties
 data class Evento(

@@ -50,6 +50,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.util.Calendar
 
 
+
 @Composable
 fun HalfSignUpScreen(navController: NavController) {
 
@@ -190,7 +191,11 @@ fun GenderDropdown(viewModel: HalfSignUpViewModel) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { viewModel.expanded = !viewModel.expanded },
-            colors = TextFieldDefaults.textFieldColors(containerColor = Color.Transparent, cursorColor = Color.Black),
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.Transparent,
+                focusedContainerColor = Color.Transparent,
+                cursorColor = Color.Black
+            ),
             enabled = false,
             isError = viewModel.shouldShowError && viewModel.genero == "Seleccionar género",
             trailingIcon = {
@@ -199,6 +204,7 @@ fun GenderDropdown(viewModel: HalfSignUpViewModel) {
                 }
             }
         )
+
 
         DropdownMenu(
             expanded = viewModel.expanded,
