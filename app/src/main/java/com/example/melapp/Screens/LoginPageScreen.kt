@@ -1,7 +1,8 @@
 package com.example.melapp.Screens
 
-import androidx.compose.foundation.Image
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -13,35 +14,37 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.melapp.R
 import androidx.navigation.NavController
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
-import androidx.compose.runtime.*
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.example.melapp.Backend.GoogleSignInHelper
-import com.google.android.gms.common.api.ApiException
+import com.example.melapp.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.material3.Icon
 
 @Composable
 fun LoginScreen(navController: NavController) {
     val auth = remember { FirebaseAuth.getInstance() }
     val context = LocalContext.current
+    val db = remember { FirebaseFirestore.getInstance() } // Instancia de FirebaseFirestore
 
+    BackHandler {
+        // No hacemos nada aquí para bloquear el botón de retroceso
+    }
     // Instancia de GoogleSignInHelper para manejar la autenticación de Google
-    val googleSignInHelper = remember { GoogleSignInHelper(context, auth, navController) }
+    val googleSignInHelper = remember {
+        GoogleSignInHelper(context, auth, db, navController) // Se pasa FirebaseFirestore y NavController
+    }
 
     // Callback para el resultado de la actividad de inicio de sesión
     val signInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        googleSignInHelper.handleSignInResult(result)
+        googleSignInHelper.handleSignInResult(result) // Se elimina el paso del objeto User
     }
 
     Box(
@@ -80,8 +83,8 @@ fun LoginScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LoginOption(
-                iconResId = R.drawable.vector1,
-                text = "Login with Google",
+                iconResId = R.drawable.ic_google,
+                text = "Iniciar con Google",
                 backgroundColor = Color(0xFFA4C639),
                 onClick = {
                     val signInIntent = googleSignInHelper.getSignInIntent()
@@ -92,16 +95,16 @@ fun LoginScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             LoginOption(
-                iconResId = R.drawable.vector,
-                text = "Login with Steam",
+                iconResId = R.drawable.ic_facebook,
+                text = "Iniciar con Facebook",
                 backgroundColor = Color(0xFF4C6A92)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             LoginOption(
-                iconResId = R.drawable.vector2,
-                text = "Login with Discord",
+                iconResId = R.drawable.ic_appleinc,
+                text = "Iniciar con  Apple",
                 backgroundColor = Color(0xFF7289DA)
             )
         }
@@ -120,7 +123,7 @@ fun LoginScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                Text(text = "Login/SignUp")
+                Text(text = "Iniciar sesión")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -148,9 +151,10 @@ fun LoginOption(iconResId: Int, text: String, backgroundColor: Color, onClick: (
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Image(
+        Icon(
             painter = painterResource(id = iconResId),
             contentDescription = null,
+            tint = Color.White, // Cambia el color del ícono a blanco
             modifier = Modifier.size(24.dp)
         )
 

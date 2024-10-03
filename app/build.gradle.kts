@@ -62,8 +62,16 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.firestore.ktx)
-    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.firebase.auth.ktx)
+    //implementation(libs.play.services.location)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.androidx.material3.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -73,6 +81,20 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.kotlin.coroutines.android) // Corregido
     implementation(libs.play.services.auth)
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+    implementation ("io.coil-kt:coil-compose:2.0.0")
+
+
+
+    // Maps
+    implementation(libs.maps.sdk)
+    implementation(libs.maps.compose)
+    implementation(libs.maps.base)
+    implementation(libs.maps.location)
+
+    // Location
+    implementation(libs.accompanist.permissions)
 
 }

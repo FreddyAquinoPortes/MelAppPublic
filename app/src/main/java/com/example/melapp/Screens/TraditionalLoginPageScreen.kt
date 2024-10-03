@@ -23,6 +23,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.melapp.R
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.launch
 
 @Composable
@@ -32,6 +33,7 @@ fun TradicionalLoginScreen(navController: NavController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
     val coroutineScope = rememberCoroutineScope()
 
     Box(
@@ -149,7 +151,6 @@ fun TradicionalLoginScreen(navController: NavController) {
             // Botón "Iniciar"
             Button(
                 onClick = {
-                    // Validation and authentication logic
                     coroutineScope.launch {
                         when {
                             email.isEmpty() -> errorMessage = "El campo de correo no puede estar vacío."
@@ -160,7 +161,23 @@ fun TradicionalLoginScreen(navController: NavController) {
                                 auth.signInWithEmailAndPassword(email, password)
                                     .addOnCompleteListener { task ->
                                         if (task.isSuccessful) {
-                                            navController.navigate("home") // Navegar a la pantalla de inicio
+                                            val userId = auth.currentUser?.uid
+                                            if (userId != null) {
+                                                firestore.collection("users").document(userId).get()
+                                                    .addOnSuccessListener { document ->
+                                                        val accountState = document.getLong("account_state")
+                                                        if (accountState == 1L) {
+                                                            navController.navigate("map") // Navegar a la pantalla principal
+                                                        } else if (accountState == 0L) {
+                                                            navController.navigate("registration_success") // Redirigir a RegistrationSuccessScreen
+                                                        } else {
+                                                            errorMessage = "Estado de la cuenta no válido."
+                                                        }
+                                                    }
+                                                    .addOnFailureListener {
+                                                        errorMessage = "No se pudo obtener el estado de la cuenta."
+                                                    }
+                                            }
                                         } else {
                                             errorMessage = "Credenciales incorrectas."
                                         }
@@ -204,4 +221,3 @@ fun TradicionalLoginScreen(navController: NavController) {
         }
     }
 }
-

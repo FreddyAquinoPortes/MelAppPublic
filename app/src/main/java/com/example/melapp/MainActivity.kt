@@ -17,10 +17,15 @@ import com.example.melapp.Screens.SignUpScreen
 import com.example.melapp.Screens.SplashScreen
 import com.example.melapp.Screens.TradicionalLoginScreen
 import com.example.melapp.ui.theme.MelAppTheme
+import com.google.firebase.FirebaseApp
+
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.melapp.Backend.EventoViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this) // Inicializar Firebase
         enableEdgeToEdge()
         setContent {
             MelAppTheme {
