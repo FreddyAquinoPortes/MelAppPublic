@@ -198,15 +198,13 @@ fun SearchTopBar() {
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
+                    colors = TextFieldDefaults.textFieldColors(
+                        containerColor = Color.Transparent,
                         cursorColor = Color.Black,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     )
                 )
-
 
                 // Mic icon
                 Icon(
@@ -225,7 +223,6 @@ fun SearchTopBar() {
 }
 
 
-
 @Composable
 fun CategoryBar() {
     val categories = remember { mutableStateListOf<String>() } // Estado mutable para almacenar las categorías
@@ -237,7 +234,7 @@ fun CategoryBar() {
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    val category = document.getString("category_name") // Asegúrate de que el campo en Firestore es 'name'
+                    val category = document.getString("name") // Asegúrate de que el campo en Firestore es 'name'
                     if (category != null) {
                         categories.add(category)
                     }
@@ -258,6 +255,8 @@ fun CategoryBar() {
         }
     }
 }
+
+
 
 
 @Composable
