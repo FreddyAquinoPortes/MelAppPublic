@@ -6,18 +6,40 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,33 +49,23 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
-import com.google.maps.android.compose.*
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.MapProperties
-import com.example.melapp.Backend.EventoViewModel
-import com.example.melapp.Backend.Evento
-import com.example.melapp.Backend.EventoState
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
-
-    val eventoState by eventoViewModel.eventoState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        eventoViewModel.obtenerTodosLosEventos()
-    }
-
+fun MapScreen(navController: NavController) {
     BackHandler {
         // Bloquear el botón de retroceso
     }
@@ -120,41 +132,11 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         },
         floatingActionButtonPosition = FabPosition.Center // Omitir si ya no es necesario cambiar la posición
     ) {
-        // Mapa con marcadores de eventos
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = myLocationEnabled)
-        ) {
-            // Agregar marcadores para cada evento
-            when (eventoState) {
-                is EventoState.Success -> {
-                    val data = (eventoState as EventoState.Success).data
-                    if (data is List<*>) {
-                        data.filterIsInstance<Evento>().forEach { evento ->
-                            Marker(
-                                state = MarkerState(position = LatLng(evento.latitud, evento.longitud)),
-                                title = evento.nombre,
-                                snippet = evento.descripcion,
-                                onClick = {
-                                    // Manejar el clic en el marcador
-                                    // Por ejemplo, navegar a una pantalla de detalles del evento
-                                    navController.navigate("eventDetails/${evento.id}")
-                                    true
-                                }
-                            )
-                        }
-                    }
-                }
-                is EventoState.Error -> {
-                    // Opcional: Mostrar un mensaje de error en el mapa
-                    // Puedes usar un Overlay o algún otro método para mostrar mensajes
-                }
-                else -> {
-                    // Otros estados (Idle, Loading)
-                }
-            }
-        }
+        )
     }
 }
 
@@ -217,13 +199,12 @@ fun SearchTopBar() {
                         .weight(1f)
                         .padding(start = 8.dp),
                     colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
                         focusedContainerColor = Color.Transparent,
-                        cursorColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                        unfocusedContainerColor = Color.Transparent,
+                        cursorColor = Color.Black
                     )
                 )
+
 
 
                 // Mic icon
@@ -242,21 +223,21 @@ fun SearchTopBar() {
     )
 }
 
+
 @Composable
 fun CategoryBar() {
-    val categories = remember { mutableStateListOf<String>() } // Estado mutable para almacenar los campos de cada documento
+    val categories = remember { mutableStateListOf<String>() } // Estado mutable para almacenar las categorías
 
-    // Obtener los campos de la colección event_category de Firestore
+    // Obtener las categorías de Firestore
     LaunchedEffect(Unit) {
         val firestore = FirebaseFirestore.getInstance()
         firestore.collection("event_category")
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
-                    val data = document.data // Obtenemos todos los campos del documento como un mapa
-                    // Iterar sobre cada campo del documento y agregar el valor a la lista de categorías
-                    data.forEach { (key, value) ->
-                        categories.add("$key: $value")
+                    val category = document.getString("category_name") // Asegúrate de que el campo en Firestore es 'name'
+                    if (category != null) {
+                        categories.add(category)
                     }
                 }
             }
@@ -271,10 +252,13 @@ fun CategoryBar() {
             .padding(vertical = 8.dp)
     ) {
         items(categories.size) { index ->
-            CategoryItem(categories[index]) // Mostrar el valor del campo
+            CategoryItem(categories[index]) // Utiliza el nombre de la categoría obtenida
         }
     }
 }
+
+
+
 
 @Composable
 fun CategoryItem(category: String) {
@@ -295,3 +279,5 @@ fun CategoryItem(category: String) {
         Text(category)
     }
 }
+
+
