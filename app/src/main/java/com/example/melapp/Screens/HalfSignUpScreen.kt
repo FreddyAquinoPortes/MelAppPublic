@@ -1,5 +1,6 @@
 package com.example.melapp.Screens
 
+import com.example.melapp.Backend.PhoneVisualTransformation
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.clickable
@@ -43,7 +44,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.melapp.Backend.PhoneVisualTransformation
 import com.example.melapp.ReusableComponents.ReusableTopBar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -370,11 +370,12 @@ class HalfSignUpViewModel(private val context: Context,private val userEmail: St
     }
 
     fun updatePhoneNumber(newNumber: String) {
-        if (newNumber.length > 10) {
-            phoneError = "El máximo de caracteres permitidos es 10"
-        } else {
+        val digitsOnly = newNumber.filter { it.isDigit() }
+        if (digitsOnly.length <= 10) {
+            phoneNumber = digitsOnly
             phoneError = null
-            phoneNumber = newNumber
+        } else {
+            phoneError = "El máximo de caracteres permitidos es 10"
         }
     }
 

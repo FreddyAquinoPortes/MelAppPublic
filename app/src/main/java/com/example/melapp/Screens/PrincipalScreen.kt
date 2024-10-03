@@ -198,13 +198,14 @@ fun SearchTopBar() {
                     modifier = Modifier
                         .weight(1f)
                         .padding(start = 8.dp),
-                    colors = TextFieldDefaults.textFieldColors(
-                        containerColor = Color.Transparent,
-                        cursorColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        cursorColor = Color.Black
                     )
                 )
+
+
 
                 // Mic icon
                 Icon(
