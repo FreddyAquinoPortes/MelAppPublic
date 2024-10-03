@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,8 +39,8 @@ fun HelpScreen(navController: NavController) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues) // Avoid overlap with top bar and bottom bar
-                    .padding(16.dp) // Additional content padding
+                    .padding(paddingValues) // Evita solapamiento con top y bottom bar
+                    .padding(16.dp) // Padding adicional para el contenido
             ) {
                 item {
                     Text(text = "¿En qué te podemos ayudar?", fontSize = 22.sp)
@@ -50,8 +50,7 @@ fun HelpScreen(navController: NavController) {
                     // Opciones de ayuda
                     HelpOptionRow(
                         optionText = "Reportar un problema",
-                        onClick = { navController.navigate("reportProblemScreen")
-                        }
+                        onClick = { navController.navigate("reportProblemScreen") }
                     )
 
                     HelpOptionRow(
@@ -64,16 +63,6 @@ fun HelpScreen(navController: NavController) {
                         onClick = { /* Navigate to Help Service screen */ }
                     )
 
-                    HelpOptionRow(
-                        optionText = "Ayuda sobre privacidad y seguridad",
-                        onClick = { /* Navigate to Privacy and Security screen */ }
-                    )
-
-                    HelpOptionRow(
-                        optionText = "Solicitudes de ayuda",
-                        onClick = { /* Navigate to Help Requests screen */ }
-                    )
-
                     Spacer(modifier = Modifier.height(24.dp)) // Espacio entre secciones
                 }
 
@@ -83,10 +72,15 @@ fun HelpScreen(navController: NavController) {
                 }
 
                 // Lista de FAQs
-                items(faqQuestions.size) { index ->
+                items(faqList.size) { index ->
+                    val (question, answer) = faqList[index]
+                    var expanded by remember { mutableStateOf(false) }
+
                     FAQItem(
-                        questionText = faqQuestions[index],
-                        onClick = { /* Acción para la pregunta seleccionada */ }
+                        questionText = question,
+                        answerText = answer,
+                        expanded = expanded,
+                        onClick = { expanded = !expanded }
                     )
                 }
 
@@ -130,40 +124,53 @@ fun HelpOptionRow(optionText: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun FAQItem(questionText: String, onClick: () -> Unit) {
-    Row(
+fun FAQItem(questionText: String, answerText: String, expanded: Boolean, onClick: () -> Unit) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically, // Centra verticalmente el icono y el texto
-        horizontalArrangement = Arrangement.Start
+            .clickable(onClick = onClick)
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_newspaper),  // Icono de periódico
-            contentDescription = "FAQ Icon",
-            modifier = Modifier.size(24.dp),  // Tamaño del ícono
-            tint = Color.Gray  // Color del ícono
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically, // Centra verticalmente el icono y el texto
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_newspaper), // Icono de periódico
+                contentDescription = "FAQ Icon",
+                modifier = Modifier.size(24.dp), // Tamaño del ícono
+                tint = Color.Gray // Color del ícono
+            )
+            Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
 
-        Spacer(modifier = Modifier.width(8.dp)) // Espacio entre el icono y el texto
-
-        Text(
-            text = questionText,
-            fontSize = 16.sp,
-            color = Color.Gray // Color para preguntas frecuentes
-        )
+            Text(
+                text = questionText,
+                fontSize = 16.sp,
+                color = Color.Gray // Color para preguntas frecuentes
+            )
+        }
+        if (expanded) {
+            Spacer(modifier = Modifier.height(8.dp)) // Espacio entre la pregunta y la respuesta
+            Text(
+                text = answerText,
+                fontSize = 14.sp,
+                color = Color.Black // Color para las respuestas
+            )
+        }
     }
 }
 
-// Lista de preguntas frecuentes
-val faqQuestions = listOf(
-    "¿Cómo funciona la aplicación?",
-    "¿Puedo buscar eventos por categoría o ubicación específica?",
-    "¿Hay un calendario de mis eventos guardados en la app?",
-    "¿Puedo filtrar los resultados por fecha, hora o precio del evento?",
-    "¿Cómo puedo contactar con el organizador de un evento?",
-    "¿Puedo recibir notificaciones sobre eventos cercanos o actualizaciones del calendario?",
-    "¿Puedo compartir los eventos que me gustan en redes sociales?",
-    "¿Cómo puedo reportar problemas, sugerencias u ofrecer información adicional?"
+// Lista de FAQs con preguntas y respuestas
+val faqList = listOf(
+    Pair("¿Cómo funciona la aplicación?", "La aplicación te permite buscar, explorar y guardar eventos de acuerdo a tus preferencias."),
+    Pair("¿Puedo buscar eventos por categoría o ubicación específica?", "Sí, puedes filtrar eventos según categorías como música, teatro, deportes, etc., y también por ubicación."),
+    Pair("¿Hay un calendario de mis eventos guardados en la app?", "Sí, hay un calendario que te permite ver todos los eventos que has guardado o marcado como favoritos."),
+    Pair("¿Puedo filtrar los resultados por fecha, hora o precio del evento?", "Sí, puedes usar filtros para ajustar los resultados por fecha, hora o rango de precios."),
+    Pair("¿Cómo puedo contactar con el organizador de un evento?", "En cada evento encontrarás un botón de contacto que te redirige a los datos de contacto del organizador."),
+    Pair("¿Puedo recibir notificaciones sobre eventos cercanos o actualizaciones del calendario?", "Sí, puedes habilitar las notificaciones para recibir alertas sobre eventos cercanos o cambios en tus eventos guardados."),
+    Pair("¿Puedo compartir los eventos que me gustan en redes sociales?", "Sí, cada evento tiene un botón para compartirlo en tus redes sociales favoritas."),
+    Pair("¿Cómo puedo reportar problemas, sugerencias u ofrecer información adicional?", "En la sección de Ajustes encontrarás la opción de 'Reportar un problema' o 'Enviar sugerencias'.")
 )
+
+
+
