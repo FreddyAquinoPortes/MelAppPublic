@@ -19,7 +19,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
-import com.google.type.Date
 
 // Data class para agrupar datos de usuario
 data class User(
@@ -138,13 +137,13 @@ class GoogleSignInHelper(
 
         usersCollection.document(userEmail).get().addOnSuccessListener { document ->
             if (document.exists()) {
-                val accountState = document.getLong("accountStatus") ?: 0
+                val accountState = document.getLong("account_state") ?: 0
                 if (accountState == 0L) {
                     // Redirigir a HalfSignUpScreen si el estado de la cuenta es 0
                     navController.navigate("half_signup_screen")
                 } else {
                     // De lo contrario, redirigir a event_form
-                    navController.navigate("event_form")
+                    navController.navigate("map")
                 }
             }
         }.addOnFailureListener {
