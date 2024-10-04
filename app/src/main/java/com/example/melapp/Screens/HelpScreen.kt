@@ -20,7 +20,10 @@ import com.example.melapp.ReusableComponents.NavigationBottomBar
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
+
 fun HelpScreen(navController: NavController) {
+    var showContactInfo by remember { mutableStateOf(false) } // Controla si se muestra la información de contacto
+
     Scaffold(
         topBar = {
             ReusableTopBar(
@@ -54,16 +57,29 @@ fun HelpScreen(navController: NavController) {
                     )
 
                     HelpOptionRow(
-                        optionText = "Estado de la cuenta",
-                        onClick = { /* Navigate to Account Status screen */ }
-                    )
-
-                    HelpOptionRow(
-                        optionText = "Servicio de ayuda",
-                        onClick = { /* Navigate to Help Service screen */ }
+                        optionText = "Contacto",
+                        onClick = { showContactInfo = !showContactInfo } // Alternar la visibilidad de la información de contacto
                     )
 
                     Spacer(modifier = Modifier.height(24.dp)) // Espacio entre secciones
+                }
+
+                // Mostrar información de contacto si se presionó la opción
+                if (showContactInfo) {
+                    item {
+                        Text(
+                            text = "Contáctanos en: melapp@yopmail.com",
+                            fontSize = 16.sp,
+                            color = Color.Blue
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Podemos ofrecerte asistencia para resolver cualquier problema relacionado con la app o responder tus preguntas.",
+                            fontSize = 14.sp,
+                            color = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.height(24.dp)) // Espacio antes de continuar con otras opciones
+                    }
                 }
 
                 // Preguntas Frecuentes
@@ -99,6 +115,7 @@ fun HelpScreen(navController: NavController) {
         }
     )
 }
+
 
 @Composable
 fun HelpOptionRow(optionText: String, onClick: () -> Unit) {
@@ -171,6 +188,5 @@ val faqList = listOf(
     Pair("¿Puedo compartir los eventos que me gustan en redes sociales?", "Sí, cada evento tiene un botón para compartirlo en tus redes sociales favoritas."),
     Pair("¿Cómo puedo reportar problemas, sugerencias u ofrecer información adicional?", "En la sección de Ajustes encontrarás la opción de 'Reportar un problema' o 'Enviar sugerencias'.")
 )
-
 
 
