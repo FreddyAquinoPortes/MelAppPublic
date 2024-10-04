@@ -82,9 +82,15 @@ fun AppNavigation() {
 //                navController.popBackStack()
             }
         }
-        composable("ReportProblemScreen") { ReportProblemScreen(navController) }
-        composable("registration_success") { RegistrationSuccessScreen(navController) }
-        composable("half_signup_screen") { HalfSignUpScreen(navController) }
+        composable("ReportProblemScreen") {
+            ReportProblemScreen(navController)
+        }
+        composable("registration_success") {
+            RegistrationSuccessScreen(navController)
+        }
+        composable("half_signup_screen") {
+            HalfSignUpScreen(navController)
+        }
 
     }
 }
