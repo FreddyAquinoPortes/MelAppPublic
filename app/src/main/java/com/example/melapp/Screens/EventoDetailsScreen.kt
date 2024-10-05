@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
+import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.google.firebase.firestore.DocumentSnapshot
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +48,14 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
                         Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "Volver")
                     }
                 }
+            )
+        },
+        bottomBar = {
+            NavigationBottomBar(
+                onProfileClick = { navController.navigate("profileScreen") },
+                onPostEventClick = { navController.navigate("map") },
+                onSettingsClick = { navController.navigate("settingsScreen") },
+                onPublishClick = { navController.navigate("event_form") }
             )
         },
         content = { innerPadding ->
