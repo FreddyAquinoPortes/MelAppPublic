@@ -1,125 +1,74 @@
-// EventoViewModel.kt
 package com.example.melapp.Backend
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.melapp.Backend.Evento
-import com.example.melapp.Backend.EventoRepository
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 sealed class EventoState {
     object Idle : EventoState()
     object Loading : EventoState()
-    data class Success(val data: Any?) : EventoState()
+    data class SuccessList(val data: List<DocumentSnapshot>) : EventoState()
+    data class SuccessSingle(val data: DocumentSnapshot) : EventoState()
     data class Error(val message: String) : EventoState()
 }
 
-class EventoViewModel(
-    private val repository: EventoRepository = EventoRepository()
-) : ViewModel() {
+class EventoViewModel : ViewModel() {
 
     private val _eventoState = MutableStateFlow<EventoState>(EventoState.Idle)
     val eventoState: StateFlow<EventoState> = _eventoState
 
-    // Crear un evento
-    fun crearEvento(evento: Evento) {
+    private val firestore = FirebaseFirestore.getInstance()
+
+    fun obtenerEvento(eventoId: String) {
         viewModelScope.launch {
-            _eventoState.value = EventoState.Loading
-            val resultado = repository.crearEvento(evento)
-            resultado.fold(
-                onSuccess = { id ->
-                    _eventoState.value = EventoState.Success(id)
-                },
-                onFailure = { throwable ->
-                    _eventoState.value = EventoState.Error(throwable.localizedMessage ?: "Error al crear el evento")
+            try {
+                _eventoState.value = EventoState.Loading
+                Log.d("EventoViewModel", "Fetching event with ID: $eventoId")
+
+                val documentSnapshot = firestore.collection("Event").document(eventoId).get().await()
+
+                if (documentSnapshot.exists()) {
+                    Log.d("EventoViewModel", "Successfully fetched event: ${documentSnapshot.id}")
+                    _eventoState.value = EventoState.SuccessSingle(documentSnapshot)
+                } else {
+                    Log.e("EventoViewModel", "Event not found")
+                    _eventoState.value = EventoState.Error("Evento no encontrado")
                 }
-            )
+            } catch (e: Exception) {
+                Log.e("EventoViewModel", "Error fetching event: ${e.message}", e)
+                _eventoState.value = EventoState.Error("Error al obtener el evento: ${e.message}")
+            }
         }
     }
 
-    // Obtener un evento
-    fun obtenerEvento(id: String) {
-        viewModelScope.launch {
-            _eventoState.value = EventoState.Loading
-            val resultado = repository.obtenerEvento(id)
-            resultado.fold(
-                onSuccess = { evento ->
-                    if (evento != null) {
-                        _eventoState.value = EventoState.Success(evento)
-                    } else {
-                        _eventoState.value = EventoState.Error("Evento no encontrado")
-                    }
-                },
-                onFailure = { throwable ->
-                    _eventoState.value = EventoState.Error(throwable.localizedMessage ?: "Error al obtener el evento")
-                }
-            )
-        }
-    }
-
-    // Actualizar un evento
-    fun actualizarEvento(id: String, datosActualizados: Map<String, Any>) {
-        viewModelScope.launch {
-            _eventoState.value = EventoState.Loading
-            val resultado = repository.actualizarEvento(id, datosActualizados)
-            resultado.fold(
-                onSuccess = {
-                    _eventoState.value = EventoState.Success("Evento actualizado correctamente")
-                },
-                onFailure = { throwable ->
-                    _eventoState.value = EventoState.Error(throwable.localizedMessage ?: "Error al actualizar el evento")
-                }
-            )
-        }
-    }
-
-    // Eliminar un evento
-    fun eliminarEvento(id: String) {
-        viewModelScope.launch {
-            _eventoState.value = EventoState.Loading
-            val resultado = repository.eliminarEvento(id)
-            resultado.fold(
-                onSuccess = {
-                    _eventoState.value = EventoState.Success("Evento eliminado correctamente")
-                },
-                onFailure = { throwable ->
-                    _eventoState.value = EventoState.Error(throwable.localizedMessage ?: "Error al eliminar el evento")
-                }
-            )
-        }
-    }
-
-    // Obtener todos los eventos
     fun obtenerTodosLosEventos() {
         viewModelScope.launch {
-            _eventoState.value = EventoState.Loading
-            val resultado = repository.obtenerTodosLosEventos()
-            resultado.fold(
-                onSuccess = { eventos ->
-                    _eventoState.value = EventoState.Success(eventos)
-                },
-                onFailure = { throwable ->
-                    _eventoState.value = EventoState.Error(throwable.localizedMessage ?: "Error al obtener los eventos")
-                }
-            )
-        }
-    }
+            try {
+                _eventoState.value = EventoState.Loading
+                Log.d("EventoViewModel", "Starting to fetch all events from Firestore")
 
-    // Obtener eventos por usuario
-    fun obtenerEventosPorUsuario(usuarioId: String) {
-        viewModelScope.launch {
-            _eventoState.value = EventoState.Loading
-            val resultado = repository.obtenerEventosPorUsuario(usuarioId)
-            resultado.fold(
-                onSuccess = { eventos ->
-                    _eventoState.value = EventoState.Success(eventos)
-                },
-                onFailure = { throwable ->
-                    _eventoState.value = EventoState.Error(throwable.localizedMessage ?: "Error al obtener los eventos del usuario")
-                }
-            )
+                val eventosCollection = firestore.collection("Event")
+                val querySnapshot = eventosCollection.get().await()
+                val documentos = querySnapshot.documents
+
+                Log.d("EventoViewModel", "Successfully fetched ${documentos.size} events")
+                _eventoState.value = EventoState.SuccessList(documentos)
+            } catch (e: Exception) {
+                Log.e("EventoViewModel", "Error fetching events: ${e.message}", e)
+                _eventoState.value = EventoState.Error("Error al obtener los eventos: ${e.message}")
+            }
         }
     }
 }
+
+
+
+
+
+

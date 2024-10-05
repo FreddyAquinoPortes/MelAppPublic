@@ -1,23 +1,33 @@
 package com.example.melapp.Screens
 
-// EventoDetailsScreen.kt
-
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.melapp.Backend.Evento
-import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.Backend.EventoState
+import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.google.firebase.firestore.DocumentSnapshot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,24 +61,9 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
                         CircularProgressIndicator()
                     }
                 }
-                is EventoState.Success -> {
-                    val data = (eventoState as EventoState.Success).data
-                    if (data is Evento) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(16.dp)
-                        ) {
-                            Text(text = data.nombre, style = MaterialTheme.typography.headlineMedium)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = data.descripcion, style = MaterialTheme.typography.bodyLarge)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "Fecha: ${formatFecha(data.fecha)}", style = MaterialTheme.typography.bodyMedium)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(text = "Ubicación: (${data.latitud}, ${data.longitud})", style = MaterialTheme.typography.bodyMedium)
-                            // Agrega más detalles según sea necesario
-                        }
-                    }
+                is EventoState.SuccessSingle -> {
+                    val documento = (eventoState as EventoState.SuccessSingle).data
+                    DisplayEventDetails(documento)
                 }
                 is EventoState.Error -> {
                     Box(
@@ -88,12 +83,16 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
     )
 }
 
-// Función para formatear la fecha desde Long a String
-fun formatFecha(timestamp: Long?): String {
-    return if (timestamp != null && timestamp > 0) {
-        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        sdf.format(Date(timestamp))
-    } else {
-        "Fecha no disponible"
+@Composable
+fun DisplayEventDetails(documento: DocumentSnapshot) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        documento.data?.forEach { (key, value) ->
+            Text(text = "$key: $value", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 }

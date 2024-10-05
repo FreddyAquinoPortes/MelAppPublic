@@ -1,10 +1,12 @@
 package com.example.melapp.Backend
 
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.melapp.Screens.EditProfileScreen
 import com.example.melapp.Screens.EventFormScreen
 import com.example.melapp.Screens.EventoDetailsScreen
@@ -12,16 +14,16 @@ import com.example.melapp.Screens.HalfSignUpScreen
 import com.example.melapp.Screens.HelpScreen
 import com.example.melapp.Screens.HomePage
 import com.example.melapp.Screens.LoginScreen
-import com.example.melapp.Screens.PasswordRecoveryScreen
-import com.example.melapp.Screens.SignUpScreen
-import com.example.melapp.Screens.SplashScreen
-import com.example.melapp.Screens.TradicionalLoginScreen
 import com.example.melapp.Screens.MapScreen
+import com.example.melapp.Screens.PasswordRecoveryScreen
 import com.example.melapp.Screens.ProfileScreen
 import com.example.melapp.Screens.RegistrationSuccessScreen
 import com.example.melapp.Screens.ReportProblemScreen
 import com.example.melapp.Screens.SelectLocationScreen
 import com.example.melapp.Screens.SettingsScreen
+import com.example.melapp.Screens.SignUpScreen
+import com.example.melapp.Screens.SplashScreen
+import com.example.melapp.Screens.TradicionalLoginScreen
 
 
 @Composable
@@ -70,9 +72,12 @@ fun AppNavigation() {
         composable("registration_success") {
             RegistrationSuccessScreen(navController)
         }
-        composable("eventDetails/{eventoId}") { backStackEntry ->
-            val eventoId = backStackEntry.arguments?.getString("eventoId") ?: ""
-            EventoDetailsScreen(navController = navController, eventoId = eventoId)
+        composable(
+            "eventDetails/{eventoId}",
+            arguments = listOf(navArgument("eventoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventoId = backStackEntry.arguments?.getString("eventoId") ?: return@composable
+            EventoDetailsScreen(navController, eventoId)
         }
         composable("selectLocation") {
             SelectLocationScreen(navController = navController) { lat, lng ->
