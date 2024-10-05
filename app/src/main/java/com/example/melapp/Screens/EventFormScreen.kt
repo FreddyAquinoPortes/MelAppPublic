@@ -124,9 +124,6 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            ReusableTopBar(
-                screenTitle = "Publicar Evento",
-                onBackClick = { navController.popBackStack() })
 
             Column(
                 modifier = Modifier
