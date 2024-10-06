@@ -10,13 +10,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+// Mantener una sola declaración de EventoState
 sealed class EventoState {
     object Idle : EventoState()
     object Loading : EventoState()
-    data class SuccessList(val data: List<DocumentSnapshot>) : EventoState()
-    data class SuccessSingle(val data: DocumentSnapshot) : EventoState()
+    data class SuccessList(val data: List<DocumentSnapshot>) : EventoState() // Para cuando obtienes una lista de eventos
+    data class SuccessSingle(val data: DocumentSnapshot) : EventoState() // Para un solo evento
+    data class Success(val evento: Evento) : EventoState() // Para cuando obtienes un evento convertido a tu clase Evento
     data class Error(val message: String) : EventoState()
 }
+
+// Clase para representar un evento
+data class Evento(
+    val eventName: String = "",
+    val eventDescription: String = "",
+    val eventLocation: String = ""
+)
 
 class EventoViewModel : ViewModel() {
 
@@ -25,6 +34,7 @@ class EventoViewModel : ViewModel() {
 
     private val firestore = FirebaseFirestore.getInstance()
 
+    // Obtener un evento por ID
     fun obtenerEvento(eventoId: String) {
         viewModelScope.launch {
             try {
@@ -47,6 +57,7 @@ class EventoViewModel : ViewModel() {
         }
     }
 
+    // Obtener todos los eventos
     fun obtenerTodosLosEventos() {
         viewModelScope.launch {
             try {
@@ -65,7 +76,29 @@ class EventoViewModel : ViewModel() {
             }
         }
     }
+
+    // Obtener un evento por ID y convertirlo a clase Evento
+    fun obtenerEventoPorId(eventoId: String) {
+        viewModelScope.launch {
+            try {
+                _eventoState.value = EventoState.Loading
+
+                val documento = firestore.collection("eventos").document(eventoId).get().await()
+                val evento = documento.toObject(Evento::class.java) // Conversión del documento a clase Evento
+
+                if (evento != null) {
+                    _eventoState.value = EventoState.Success(evento)
+                } else {
+                    _eventoState.value = EventoState.Error("Evento no encontrado")
+                }
+            } catch (e: Exception) {
+                _eventoState.value = EventoState.Error(e.localizedMessage ?: "Error desconocido")
+            }
+        }
+    }
 }
+
+
 
 
 

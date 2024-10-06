@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -53,9 +52,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.melapp.Backend.Evento
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
+import com.example.melapp.ReusableComponents.EventCardDescription
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -85,34 +86,27 @@ fun parseLocation(locationString: String): LatLng? {
     }
 }
 
-
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
     val eventoState by eventoViewModel.eventoState.collectAsState()
+    var selectedEvent by remember { mutableStateOf<Evento?>(null) } // Estado para manejar el evento seleccionado
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
-    }
-
-    BackHandler {
-        // Bloquear el botón de retroceso
     }
 
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     // Posición inicial de la cámara
-    val initialPosition = LatLng(40.7128, -74.0060) // NYC
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition(initialPosition, 12f, 0f, 0f)
+        position = CameraPosition(LatLng(40.7128, -74.0060), 12f, 0f, 0f)
     }
 
-    // Manejar permisos de ubicación
     var myLocationEnabled by remember { mutableStateOf(false) }
 
-    // Solicitar permisos fuera de LaunchedEffect
     if (ActivityCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
@@ -120,7 +114,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         ) == PackageManager.PERMISSION_GRANTED
     ) {
         myLocationEnabled = true
-        // Lógica para mover la cámara a la ubicación actual
         centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
     }
 
@@ -140,7 +133,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
             )
         },
         floatingActionButton = {
-            // Usamos un Box para manejar la posición del botón
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -148,21 +140,18 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
             ) {
                 FloatingActionButton(
                     onClick = {
-                        // Llama a la función para centrar en la ubicación del usuario
                         centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
                     },
                     containerColor = Color(0xFF1A237E),
                     contentColor = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart) // Alinear el botón en la esquina inferior izquierda
+                    modifier = Modifier.align(Alignment.BottomStart)
                 ) {
                     Icon(painterResource(R.drawable.ic_target), contentDescription = "Centrar en mi ubicación")
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.Center // Omitir si ya no es necesario cambiar la posición
+        floatingActionButtonPosition = FabPosition.Center
     ) {
-        // Mapa con marcadores de eventos
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -176,9 +165,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                         val eventDescription = documento.getString("event_description") ?: "Sin descripción"
                         val eventLocation = documento.getString("event_location") ?: ""
 
-                        // Debug print
-                        Log.d("MapScreen", "Processing event: $eventName, Location: $eventLocation")
-
                         val location = parseLocation(eventLocation)
                         location?.let { latLng ->
                             Marker(
@@ -186,7 +172,8 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                                 title = eventName,
                                 snippet = eventDescription,
                                 onClick = {
-                                    navController.navigate("eventDetails/${documento.id}")
+                                    selectedEvent = Evento(eventName, eventDescription, eventLocation)
+                                    eventoViewModel.obtenerEventoPorId(documento.id) // Obtenemos el evento por ID desde Firestore
                                     true
                                 }
                             )
@@ -200,13 +187,23 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                     // Handle loading state if needed
                 }
             }
+
+        }
+        selectedEvent?.let { evento ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                EventCardDescription(
+                    imageResource = R.drawable.img_juan_luis, // Verifica que este recurso exista
+                    eventName = evento.eventName,
+                    eventDescription = evento.eventDescription,
+                    eventLocation = evento.eventLocation,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd) // Asegúrate de usar .align dentro de un Box
+                        .padding(bottom = 150.dp, end = 16.dp, start = 86.dp)
+                )
+            }
         }
     }
-
-    }
-
-
-
+}
 // Función regular (no @Composable) para centrar la cámara en la ubicación real del usuario
 @SuppressLint("MissingPermission")
 fun centerCameraOnUser(
