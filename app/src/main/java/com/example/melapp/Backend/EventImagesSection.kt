@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -36,126 +37,81 @@ fun EventImagesSection(
     onEventImageClick: () -> Unit,
     onAdditionalImagesClick: () -> Unit
 ) {
-    /*Column(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(8.dp)
     ) {
-        // Sección para la imagen del evento
-        Column(
+        Text(
+            text = "Miniatura del evento",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .clickable(onClick = onEventImageClick)
+                .align(Alignment.Start)
+        )
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray)
+                .clickable(onClick = onEventImageClick),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Imagen del Evento",
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .clickable(onClick = onEventImageClick)
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray)
-                    .clickable(onClick = onEventImageClick),
-                contentAlignment = Alignment.Center
-            ) {
-                if (eventImage != null) {
-                    AsyncImage(
-                        model = eventImage,
-                        contentDescription = "Event Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_images),
-                        contentDescription = "Select Event Image",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+            if (selectedImageUri != null) {
+                AsyncImage(
+                    model = selectedImageUri,
+                    contentDescription = "Event thumbnail Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_images),
+                    contentDescription = "Select Event thumbnail Image",
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
             }
-        }*/
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Sección para la imagen adicional
-        Column(
+        Text(
+            text = "Imágenes Adicionales",
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .clickable(onClick = onAdditionalImagesClick)
+                .align(Alignment.Start)
+        )
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.Gray)
+                .clickable(onClick = onAdditionalImagesClick),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "Miniatura del evento",
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .clickable(onClick = onEventImageClick)
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray)
-                    .clickable(onClick = onEventImageClick),
-                contentAlignment = Alignment.Center
-            ) {
-                if (selectedImageUri != null) {
-                    AsyncImage(
-                        model = selectedImageUri,
-                        contentDescription = "Event thumbnail Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_images),
-                        contentDescription = "Select Event thumnail Image",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Imágenes Adicionales",
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .clickable(onClick = onAdditionalImagesClick)
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.Gray)
-                    .clickable(onClick = onEventImageClick),
-                contentAlignment = Alignment.Center
-            ) {
-                if (additionalImageUri != null) {
-                    AsyncImage(
-                        model = additionalImageUri,
-                        contentDescription = "Additional Image",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_images),
-                        contentDescription = "Select Additional Image",
-                        tint = Color.White,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
+            if (additionalImageUri != null) {
+                AsyncImage(
+                    model = additionalImageUri,
+                    contentDescription = "Additional Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_images),
+                    contentDescription = "Select Additional Image",
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
             }
         }
     }
+}
