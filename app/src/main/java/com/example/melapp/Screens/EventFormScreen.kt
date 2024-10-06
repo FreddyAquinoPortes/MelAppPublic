@@ -1,8 +1,11 @@
 // EventFormScreen.kt
 package com.example.melapp.Screens
 
+import android.net.Uri
 import android.os.Build
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.melapp.Backend.EventImagesSection
 import com.example.melapp.Backend.EventoViewModel
+import com.example.melapp.Backend.uploadThumbnailImage
 import com.example.melapp.Components.DatePicker
 import com.example.melapp.Components.EventCategoryDropdown
 import com.example.melapp.Components.HourPicker
@@ -112,6 +116,9 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     val formattedDateTime = currentDateTime.value.format(formatter)
 
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var eventImageUrl by remember { mutableStateOf<String?>(null) }
+    var selectedAditionalImageUri by remember { mutableStateOf<Uri?>(null) }
     LaunchedEffect(lat, lng) {
         lat?.let { latitud = it }
         lng?.let { longitud = it }
@@ -154,19 +161,36 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                     )
                 }
             )
+            // Image picker launcher
+            val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+                uri?.let {
+                    selectedImageUri = it
+                    // Upload image to Firebase and get the URL
+                    uploadThumbnailImage(uri, { url ->
+                        eventImageUrl = url // Set the image URL to display the thumbnail
+                    }, {
+                        // Handle upload failure
+                    })
+                }
+            }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(60.dp))
 
+            // Llamar a EventImagesSection correctamente
             EventImagesSection(
-                eventImage = eventImage,
-                additionalImages = additionalImages,
+                eventImage = eventImageUrl,         // URL de la imagen seleccionada para el evento
+                additionalImageUri = selectedAditionalImageUri,//selectedAditionalImageUri, // Pasar la URI de la imagen seleccionada aquí
+                selectedImageUri = selectedImageUri,  // URI de la miniatura seleccionada
                 onEventImageClick = {
-                    // Lógica para seleccionar imagen principal
+                    // Lógica para seleccionar la imagen del evento (lanzar picker)
+                    launcher.launch("image/*")
                 },
                 onAdditionalImagesClick = {
-                    // Lógica para seleccionar imágenes adicionales
+                    // Lógica para seleccionar imágenes adicionales (lanzar picker)
                 }
             )
+
+
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -386,7 +410,8 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                                 "event_title" to eventTitle,
                                 "event_url" to ticketUrl,
                                 "event_verification" to "pendiente",
-                                "event_post_date" to formattedDateTime
+                                "event_post_date" to formattedDateTime,
+                                "event_thumbnail" to eventImageUrl
                             )
 
                             db.collection("Event")

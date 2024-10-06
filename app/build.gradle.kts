@@ -83,8 +83,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.kotlin.coroutines.android) // Corregido
     implementation(libs.play.services.auth)
-    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
-    implementation ("io.coil-kt:coil-compose:2.0.0")
+    implementation(libs.firebase.storage.ktx)
+    implementation (libs.coil.compose)
 
 
 
