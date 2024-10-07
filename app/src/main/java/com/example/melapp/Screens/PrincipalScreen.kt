@@ -1,5 +1,6 @@
 package com.example.melapp.Screens
 
+import EventCardDescription
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -56,7 +57,6 @@ import com.example.melapp.Backend.Evento
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
-import com.example.melapp.ReusableComponents.EventCardDescription
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -192,7 +192,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         selectedEvent?.let { evento ->
             Box(modifier = Modifier.fillMaxSize()) {
                 EventCardDescription(
-                    imageResource = R.drawable.img_juan_luis, // Verifica que este recurso exista
+                    imageUrl = evento.eventThumbnail, // Pasar la URL de la miniatura
                     eventName = evento.eventName,
                     eventDescription = evento.eventDescription,
                     eventLocation = evento.eventLocation,

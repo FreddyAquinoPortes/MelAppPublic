@@ -119,6 +119,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var eventImageUrl by remember { mutableStateOf<String?>(null) }
     var selectedAditionalImageUri by remember { mutableStateOf<Uri?>(null) }
+
     LaunchedEffect(lat, lng) {
         lat?.let { latitud = it }
         lng?.let { longitud = it }
@@ -237,10 +238,6 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Icon(
-                    painterResource(R.drawable.ic_clock),
-                    contentDescription = "Intervalo de hora del evento"
-                )
                 Box(modifier = Modifier.weight(1f)) {
                     HourPicker(
                         selectedHour = startTime,

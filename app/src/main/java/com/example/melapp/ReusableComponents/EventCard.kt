@@ -1,12 +1,5 @@
-package com.example.melapp.ReusableComponents
-
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -16,16 +9,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.melapp.R
+import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter // Importar Coil para cargar imágenes desde una URL
 
 @Composable
 fun EventCardDescription(
-    imageResource: Int, // Asegúrate de que este es el parámetro que estás usando en todo el código.
+    imageUrl: String, // Cambiado a String para manejar la URL de la imagen
     eventName: String,
     eventDescription: String,
     eventLocation: String,
@@ -44,9 +37,9 @@ fun EventCardDescription(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Miniatura del evento
+            // Cargar miniatura desde una URL usando Coil
             Image(
-                painter = painterResource(id = imageResource), // Usando imageResource aquí
+                painter = rememberAsyncImagePainter(model = imageUrl), // Cambiado a rememberAsyncImagePainter
                 contentDescription = "Event Thumbnail",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -80,13 +73,5 @@ fun EventCardDescription(
 }
 
 
-@Preview
-@Composable
-fun PreviewEventCard() {
-    EventCardDescription(
-        imageResource = R.drawable.img_juan_luis, // Reemplaza con tu recurso de imagen
-        eventName = "Juan Luis Tour 2024",
-        eventDescription = "Disfruta del merengue y bachata clasica dominicana",
-        eventLocation = "Casa de Teatro, Santo Domingo"
-    )
-}
+
+

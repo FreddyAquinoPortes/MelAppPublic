@@ -2,10 +2,17 @@ package com.example.melapp.Components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.res.painterResource
+import com.example.melapp.R
 
 @Composable
 fun HourPicker(
@@ -16,7 +23,6 @@ fun HourPicker(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    // Lógica para manejar el formato de 24 y 12 horas con intervalos de 30 minutos
     val hours = if (is24HourFormat) {
         (0..23).flatMap { hour ->
             listOf("%02d:00".format(hour), "%02d:30".format(hour))
@@ -30,20 +36,34 @@ fun HourPicker(
         } + listOf("12:00 AM", "12:30 AM", "12:00 PM", "12:30 PM")
     }
 
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = selectedHour,
             onValueChange = {},
             label = { Text(label) },
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { expanded = true },
-            readOnly = true
+                .onFocusChanged { if (it.isFocused) expanded = true },
+            readOnly = true,
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_clock),
+                    contentDescription = "Clock icon"
+                )
+            },
+            trailingIcon = {
+                Icon(
+                    imageVector = if (expanded) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = "Toggle dropdown",
+                    modifier = Modifier.clickable { expanded = !expanded }
+                )
+            }
         )
 
         DropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
         ) {
             hours.forEach { hour ->
                 DropdownMenuItem(
