@@ -175,6 +175,16 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                 }
             }
 
+            // Estado para manejar las imágenes adicionales
+            val additionalImages = remember { mutableStateOf(listOf<Uri>()) }
+
+            // Image picker launcher para imágenes adicionales
+            val additionalImagesLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
+                uris?.let {
+                    additionalImages.value = additionalImages.value + uris // Agregar las imágenes seleccionadas a la lista
+                }
+            }
+
             Spacer(modifier = Modifier.height(60.dp))
 
             // Llamar a EventImagesSection correctamente
@@ -188,6 +198,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                 },
                 onAdditionalImagesClick = {
                     // Lógica para seleccionar imágenes adicionales (lanzar picker)
+                    additionalImagesLauncher.launch("image/*")
                 }
             )
 
