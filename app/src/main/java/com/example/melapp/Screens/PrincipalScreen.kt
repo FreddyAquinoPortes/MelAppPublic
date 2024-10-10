@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -129,7 +130,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 onProfileClick = { navController.navigate("profileScreen") },
                 onPostEventClick = { navController.navigate("map") },
                 onSettingsClick = { navController.navigate("settingsScreen") },
-                onPublishClick = { navController.navigate("event_form") }
+                onPublishClick = { navController.navigate("event_list") }
             )
         },
         floatingActionButton = {
