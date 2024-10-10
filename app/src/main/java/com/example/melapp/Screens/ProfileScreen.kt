@@ -166,57 +166,21 @@ fun ProfileScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Título de la sección de eventos publicados
-                Text(
-                    text = "Eventos Publicados",
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    style = MaterialTheme.typography.titleLarge
-                )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        // Navegar a la pantalla de eventos creados por el usuario
+                        navController.navigate("event_list")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(text = "Mis eventos")
+                }
             }
 
-            // Cuadrícula de eventos publicados
-            items(4) { index ->
-                EventCard(
-                    eventName = "Evento $index",
-                    location = "@Ubicación $index",
-                    imageRes = R.drawable.ic_category
-                )
-            }
         }
     }
 }
 
-@Composable
-fun EventCard(eventName: String, location: String, imageRes: Int) {
-    Card(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column {
-            Image(
-                painter = painterResource(id = imageRes),
-                contentDescription = null,
-                modifier = Modifier
-                    .height(150.dp)
-                    .fillMaxWidth(),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = eventName,
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(horizontal = 8.dp)
-            )
-            Text(
-                text = location,
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            )
-        }
-    }
-}

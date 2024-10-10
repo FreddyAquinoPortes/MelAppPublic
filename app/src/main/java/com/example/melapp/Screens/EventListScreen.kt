@@ -21,6 +21,8 @@ import com.example.melapp.Backend.Evento
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.Backend.toEvento
+import com.example.melapp.ReusableComponents.NavigationBottomBar
+import com.example.melapp.ReusableComponents.ReusableTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,13 +37,17 @@ fun EventListScreen(navController: NavController, eventoViewModel: EventoViewMod
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Mis Eventos") },
-                actions = {
-                    IconButton(onClick = { navController.navigate("event_form") }) {
-                        Icon(Icons.Default.Add, contentDescription = "Crear Evento")
-                    }
-                }
+            ReusableTopBar(
+                screenTitle = "Mis eventos",
+                onBackClick = { navController.popBackStack() }
+            )
+        },
+        bottomBar = {
+            NavigationBottomBar(
+                onProfileClick = { navController.navigate("profileScreen") },
+                onPostEventClick = { navController.navigate("map") },
+                onPublishClick = { navController.navigate("event_form") },
+                onSettingsClick = { navController.navigate("settingsScreen") }
             )
         },
         floatingActionButton = {
