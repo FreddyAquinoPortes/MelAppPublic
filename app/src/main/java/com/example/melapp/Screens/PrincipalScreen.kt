@@ -193,7 +193,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         selectedEvent?.let { evento ->
             Box(modifier = Modifier.fillMaxSize()) {
                 EventCardDescription(
-                    imageUrl = evento.eventThumbnail, // Pasar la URL de la miniatura
+                    event_thumbnail = evento.eventThumbnail, // Pasar la URL de la miniatura
                     eventName = evento.eventName,
                     eventDescription = evento.eventDescription,
                     eventLocation = evento.eventLocation,
