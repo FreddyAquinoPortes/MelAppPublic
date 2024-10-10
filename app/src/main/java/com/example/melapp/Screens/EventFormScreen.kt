@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,7 +47,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.melapp.Backend.EventImagesSection
+import com.example.melapp.Backend.Evento
+import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
+import com.example.melapp.Backend.toEvento
 import com.example.melapp.Backend.uploadThumbnailImage
 import com.example.melapp.Components.DatePicker
 import com.example.melapp.Components.EventCategoryDropdown
@@ -81,10 +85,32 @@ fun validateForm(
             longitud != 0.0 && cost.isNotBlank()
 }
 
+fun parseLatLng(locationString: String): Pair<Double, Double>? {
+    val regex = """Lat:\s*([+-]?\d+(\.\d+)?),\s*Lng:\s*([+-]?\d+(\.\d+)?)""".toRegex()
+    val matchResult = regex.find(locationString)
+    return matchResult?.let {
+        val lat = it.groupValues[1].toDoubleOrNull()
+        val lng = it.groupValues[3].toDoubleOrNull()
+        if (lat != null && lng != null) {
+            Pair(lat, lng)
+        } else {
+            null
+        }
+    }
+}
+
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
+fun EventFormScreen(
+    navController: NavController,
+    eventoId: String? = null,
+    eventoViewModel: EventoViewModel = viewModel()
+) {
+
+    // Recolectar el estado del ViewModel
+    val eventoState by eventoViewModel.eventoState.collectAsState()
+
     // Estados del formulario
     var eventTitle by remember { mutableStateOf("") }
     var eventDescription by remember { mutableStateOf("") }
@@ -130,7 +156,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
     Scaffold(
         topBar = {
             ReusableTopBar(
-                screenTitle = "Publicar Evento",
+                screenTitle = if (eventoId != null) "Actualizar Evento" else "Publicar Evento",
                 onBackClick = { navController.popBackStack() },
             )
         },
@@ -139,7 +165,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                 onProfileClick = { navController.navigate("profileScreen") },
                 onPostEventClick = { navController.navigate("map") },
                 onSettingsClick = { navController.navigate("settingsScreen") },
-                onPublishClick = { navController.navigate("event_form") }
+                onPublishClick = { navController.navigate("event_list") }
             )
         }
     ) { paddingValues ->
@@ -171,6 +197,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                         eventImageUrl = url // Set the image URL to display the thumbnail
                     }, {
                         // Handle upload failure
+
                     })
                 }
             }
@@ -206,6 +233,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Categoría del Evento
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(painterResource(R.drawable.ic_category), contentDescription = "Categoría")
                 Spacer(modifier = Modifier.width(8.dp))
@@ -217,6 +245,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Descripción del Evento
             OutlinedTextField(
                 value = eventDescription,
                 onValueChange = { eventDescription = it },
@@ -232,6 +261,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Fecha del Evento
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -245,6 +275,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Hora de Inicio y Fin
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth(),
@@ -272,6 +303,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Ubicación del Evento
             OutlinedTextField(
                 value = if (latitud != 0.0 && longitud != 0.0) {
                     "Lat: ${latitud.format(4)}, Lng: ${longitud.format(4)}"
@@ -296,6 +328,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Cantidad de Asistentes
             OutlinedTextField(
                 value = attendeeCount,
                 onValueChange = { newValue ->
@@ -316,6 +349,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Costo y Moneda
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
@@ -371,6 +405,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // URL de Boletos
             OutlinedTextField(
                 value = ticketUrl,
                 onValueChange = { ticketUrl = it },
@@ -386,7 +421,9 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+            val context = LocalContext.current
 
+            // Botones de Publicar y Cancelar
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
@@ -401,6 +438,9 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                             // Guardar en Firestore
                             val db = FirebaseFirestore.getInstance()
 
+                            // Construir el rango de precio
+                            val eventPriceRange = "$cost $selectedCurrency"
+
                             val eventData = hashMapOf(
                                 "user_email" to (currentUser?.email ?: ""),
                                 "event_age" to "Todas las edades",
@@ -411,7 +451,7 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                                 "event_location" to "Lat: $latitud, Lng: $longitud",
                                 "event_name" to eventTitle,
                                 "event_number_of_attendees" to attendeeCount,
-                                "event_price_range" to "$cost $selectedCurrency",
+                                "event_price_range" to eventPriceRange,
                                 "event_rating" to "0",
                                 "event_start_time" to startTime,
                                 "event_status" to "pendiente",
@@ -419,23 +459,65 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
                                 "event_url" to ticketUrl,
                                 "event_verification" to "pendiente",
                                 "event_post_date" to formattedDateTime,
-                                "event_thumbnail" to eventImageUrl
+                                "event_thumbnail" to (eventImageUrl ?: "")
                             )
 
-                            db.collection("Event")
-                                .add(eventData)
-                                .addOnSuccessListener {
-                                    showToast = true
-                                }
-                                .addOnFailureListener {
-                                    //Toast.makeText(LocalContext.current, "Error al publicar el evento", Toast.LENGTH_SHORT).show()
-                                }
+                            // Nuevo, para que elija entre crear y modificar
+                            if (eventoId == null) {
+                                // Crear un nuevo evento
+                                eventoViewModel.crearEvento(Evento(
+                                    eventName = eventTitle,
+                                    eventDescription = eventDescription,
+                                    eventLocation = "Lat: $latitud, Lng: $longitud",
+                                    eventThumbnail = eventImageUrl ?: ""
+                                    // Añade otros campos si es necesario
+                                ))
+                                // Navegar de vuelta después de publicar
+                                navController.popBackStack()
+                                showToast = true
+                            } else {
+                                // Actualizar un evento existente
+                                eventoViewModel.actualizarEvento(
+                                    Evento(
+                                    id = eventoId,
+                                    eventName = eventTitle,
+                                    eventDescription = eventDescription,
+                                    eventLocation = "Lat: $latitud, Lng: $longitud",
+                                    eventThumbnail = eventImageUrl ?: ""
+                                    // Añade otros campos si es necesario
+                                )
+                                )
+                                // Navegar de vuelta después de actualizar
+                                navController.popBackStack()
+                                showToast = true
+                            }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Por favor, completa todos los campos correctamente.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     },
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("Publicar")
+                    Text(if (eventoId == null) "Publicar" else "Actualizar")
                 }
+
+//                            db.collection("Event")
+//                                .add(eventData)
+//                                .addOnSuccessListener {
+//                                    showToast = true
+//                                }
+//                                .addOnFailureListener {
+//                                    //Toast.makeText(LocalContext.current, "Error al publicar el evento", Toast.LENGTH_SHORT).show()
+//                                }
+//                        }
+//                    },
+//                    modifier = Modifier.weight(1f)
+//                ) {
+//                    Text("Publicar")
+//                }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
@@ -452,8 +534,51 @@ fun EventFormScreen(navController: NavController, eventoViewModel: EventoViewMod
     if (showToast) {
         Toast.makeText(
             LocalContext.current,
-            "Formulario publicado correctamente",
+            if (eventoId == null) "Evento publicado correctamente" else "Evento actualizado correctamente",
             Toast.LENGTH_SHORT
         ).show()
+    }
+
+    // Prellenar los campos si se está actualizando un evento
+    LaunchedEffect(eventoId) {
+        if (eventoId != null) {
+            eventoViewModel.obtenerEvento(eventoId)
+        }
+    }
+
+    // Manejar los datos del evento obtenido para actualización
+    val eventoData = if (eventoState is EventoState.SuccessSingle && (eventoState as EventoState.SuccessSingle).data.exists()) {
+        (eventoState as EventoState.SuccessSingle).data.toEvento()
+    } else {
+        null
+    }
+
+    // Prellenar los campos si es una actualización
+    LaunchedEffect(eventoData) {
+        eventoData?.let { evento ->
+            eventTitle = evento.eventName
+            eventDescription = evento.eventDescription
+            attendeeCount = evento.eventNumberOfAttendees
+            selectedDate = evento.eventDate
+            startTime = evento.eventStartTime
+            endTime = evento.eventEndTime
+            ticketUrl = evento.eventUrl
+            eventCategory = evento.eventCategory
+            eventImageUrl = evento.eventThumbnail
+
+            // Parse eventPriceRange to get cost and selectedCurrency
+            val priceParts = evento.eventPriceRange.split(" ")
+            if (priceParts.size >= 2) {
+                cost = priceParts[0]
+                selectedCurrency = priceParts[1]
+            }
+
+            // Parse location
+            val locationPair = parseLatLng(evento.eventLocation)
+            if (locationPair != null) {
+                latitud = locationPair.first
+                longitud = locationPair.second
+            }
+        }
     }
 }

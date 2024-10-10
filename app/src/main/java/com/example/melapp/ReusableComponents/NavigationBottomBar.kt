@@ -53,13 +53,13 @@ fun NavigationBottomBar(
             ) {
                 IconButton(onClick = onPublishClick) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_plus), // Aquí usas tu ícono `ic_plus`
-                        contentDescription = "Publicar",
+                        painter = painterResource(id = R.drawable.ic_edit_calendar), // Aquí usas tu ícono `ic_plus`
+                        contentDescription = "Gestionar",
                         tint = Color.Gray
                     )
                 }
                 Text(
-                    text = "Publicar",
+                    text = "Gestionar \neventos",
                     color = Color.Gray
                 )
             }
@@ -76,7 +76,7 @@ fun NavigationBottomBar(
                     )
                 }
                 Text(
-                    text = "Eventos",
+                    text = "Mapa de \neventos",
                     color = Color.Gray
                 )
             }

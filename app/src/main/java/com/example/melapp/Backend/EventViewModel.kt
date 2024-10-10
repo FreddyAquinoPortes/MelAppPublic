@@ -25,10 +25,24 @@ sealed class EventoState {
 
 data class Evento(
     val id: String = "",
-    val eventName: String = "",
+    val userEmail: String = "",
+    val eventAge: String = "",
+    val eventCategory: String = "",
+    val eventDate: String = "",
     val eventDescription: String = "",
+    val eventEndTime: String = "",
     val eventLocation: String = "",
-    var eventThumbnail: String = "" // Nuevo campo para la URL de la miniatura
+    val eventName: String = "",
+    val eventNumberOfAttendees: String = "",
+    val eventPriceRange: String = "",
+    val eventRating: String = "",
+    val eventStartTime: String = "",
+    val eventStatus: String = "",
+    val eventTitle: String = "",
+    val eventUrl: String = "",
+    val eventVerification: String = "",
+    val eventPostDate: String = "",
+    var eventThumbnail: String = "" // URL de la miniatura
 )
 
 class EventoViewModel : ViewModel() {
@@ -153,11 +167,23 @@ class EventoViewModel : ViewModel() {
 
                 val eventData = hashMapOf(
                     "user_email" to (auth.currentUser?.email ?: ""),
-                    "event_name" to evento.eventName,
+                    "event_age" to evento.eventAge,
+                    "event_category" to evento.eventCategory,
+                    "event_date" to evento.eventDate,
                     "event_description" to evento.eventDescription,
+                    "event_end_time" to evento.eventEndTime,
                     "event_location" to evento.eventLocation,
-                    "event_thumbnail" to evento.eventThumbnail,
-                    "event_post_date" to System.currentTimeMillis() // Puedes ajustar según tu lógica
+                    "event_name" to evento.eventName,
+                    "event_number_of_attendees" to evento.eventNumberOfAttendees,
+                    "event_price_range" to evento.eventPriceRange,
+                    "event_rating" to evento.eventRating,
+                    "event_start_time" to evento.eventStartTime,
+                    "event_status" to evento.eventStatus,
+                    "event_title" to evento.eventTitle,
+                    "event_url" to evento.eventUrl,
+                    "event_verification" to evento.eventVerification,
+                    "event_post_date" to evento.eventPostDate,
+                    "event_thumbnail" to (evento.eventThumbnail ?: "")
                 )
 
                 // Usar la función de suspensión add().await()
@@ -168,7 +194,8 @@ class EventoViewModel : ViewModel() {
                 Log.d("EventoViewModel", "Event created with ID: ${documentReference.id}")
 
                 // Obtener el documento creado
-                val createdDocument = firestore.collection("Event").document(documentReference.id).get().await()
+                //val createdDocument = firestore.collection("Event").document(documentReference.id).get().await()
+                val createdDocument = documentReference.get().await()
                 _eventoState.value = EventoState.SuccessSingle(createdDocument)
 
             } catch (e: Exception) {
@@ -186,11 +213,24 @@ class EventoViewModel : ViewModel() {
                 Log.d("EventoViewModel", "Updating event with ID: ${evento.id}")
 
                 val eventData = hashMapOf(
-                    "event_name" to evento.eventName,
+                    "user_email" to evento.userEmail,
+                    "event_age" to evento.eventAge,
+                    "event_category" to evento.eventCategory,
+                    "event_date" to evento.eventDate,
                     "event_description" to evento.eventDescription,
+                    "event_end_time" to evento.eventEndTime,
                     "event_location" to evento.eventLocation,
-                    "event_thumbnail" to evento.eventThumbnail,
-                    "event_post_date" to System.currentTimeMillis() // Puedes ajustar según tu lógica
+                    "event_name" to evento.eventName,
+                    "event_number_of_attendees" to evento.eventNumberOfAttendees,
+                    "event_price_range" to evento.eventPriceRange,
+                    "event_rating" to evento.eventRating,
+                    "event_start_time" to evento.eventStartTime,
+                    "event_status" to evento.eventStatus,
+                    "event_title" to evento.eventTitle,
+                    "event_url" to evento.eventUrl,
+                    "event_verification" to evento.eventVerification,
+                    "event_post_date" to evento.eventPostDate,
+                    "event_thumbnail" to (evento.eventThumbnail ?: "")
                 )
 
                 // Usar la función de suspensión update().await()

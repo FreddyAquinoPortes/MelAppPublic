@@ -99,6 +99,7 @@ fun DisplayEventDetails(documento: DocumentSnapshot) {
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        Spacer(modifier = Modifier.height(64.dp))
         documento.data?.forEach { (key, value) ->
             Text(text = "$key: $value", style = MaterialTheme.typography.bodyMedium)
             Spacer(modifier = Modifier.height(8.dp))
