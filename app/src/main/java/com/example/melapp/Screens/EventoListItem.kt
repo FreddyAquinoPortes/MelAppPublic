@@ -36,11 +36,11 @@ fun EventoListItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f).clickable { onViewDetails() }) {
-                Text(text = evento.eventName, style = MaterialTheme.typography.titleMedium)
+                Text(text = evento.event_name!!, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = evento.eventDescription, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
+                Text(text = evento.event_description!!, style = MaterialTheme.typography.bodyMedium, maxLines = 2)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "Ubicación: ${evento.eventLocation}", style = MaterialTheme.typography.bodySmall)
+                Text(text = "Ubicación: ${evento.event_location}", style = MaterialTheme.typography.bodySmall)
             }
             Row {
                 IconButton(onClick = onViewDetails) {

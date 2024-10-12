@@ -189,28 +189,31 @@ fun EventFormScreen(
                 }
             )
             // Image picker launcher
-            val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-                uri?.let {
-                    selectedImageUri = it
-                    // Upload image to Firebase and get the URL
-                    uploadThumbnailImage(uri, { url ->
-                        eventImageUrl = url // Set the image URL to display the thumbnail
-                    }, {
-                        // Handle upload failure
+            val launcher =
+                rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+                    uri?.let {
+                        selectedImageUri = it
+                        // Upload image to Firebase and get the URL
+                        uploadThumbnailImage(uri, { url ->
+                            eventImageUrl = url // Set the image URL to display the thumbnail
+                        }, {
+                            // Handle upload failure
 
-                    })
+                        })
+                    }
                 }
-            }
 
             // Estado para manejar las imágenes adicionales
             val additionalImages = remember { mutableStateOf(listOf<Uri>()) }
 
             // Image picker launcher para imágenes adicionales
-            val additionalImagesLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
-                uris?.let {
-                    additionalImages.value = additionalImages.value + uris // Agregar las imágenes seleccionadas a la lista
+            val additionalImagesLauncher =
+                rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
+                    uris?.let {
+                        additionalImages.value =
+                            additionalImages.value + uris // Agregar las imágenes seleccionadas a la lista
+                    }
                 }
-            }
 
             Spacer(modifier = Modifier.height(60.dp))
 
@@ -465,13 +468,15 @@ fun EventFormScreen(
                             // Nuevo, para que elija entre crear y modificar
                             if (eventoId == null) {
                                 // Crear un nuevo evento
-                                eventoViewModel.crearEvento(Evento(
-                                    eventName = eventTitle,
-                                    eventDescription = eventDescription,
-                                    eventLocation = "Lat: $latitud, Lng: $longitud",
-                                    eventThumbnail = eventImageUrl ?: ""
-                                    // Añade otros campos si es necesario
-                                ))
+                                eventoViewModel.crearEvento(
+                                    Evento(
+                                        event_name = eventTitle,
+                                        event_description = eventDescription,
+                                        event_location = "Lat: $latitud, Lng: $longitud",
+                                        event_thumbnail = eventImageUrl ?: ""
+                                        // Añade otros campos si es necesario
+                                    )
+                                )
                                 // Navegar de vuelta después de publicar
                                 navController.popBackStack()
                                 showToast = true
@@ -479,13 +484,13 @@ fun EventFormScreen(
                                 // Actualizar un evento existente
                                 eventoViewModel.actualizarEvento(
                                     Evento(
-                                    id = eventoId,
-                                    eventName = eventTitle,
-                                    eventDescription = eventDescription,
-                                    eventLocation = "Lat: $latitud, Lng: $longitud",
-                                    eventThumbnail = eventImageUrl ?: ""
-                                    // Añade otros campos si es necesario
-                                )
+                                        id = eventoId,
+                                        event_name = eventTitle,
+                                        event_description = eventDescription,
+                                        event_location = "Lat: $latitud, Lng: $longitud",
+                                        event_thumbnail = eventImageUrl ?: ""
+                                        // Añade otros campos si es necesario
+                                    )
                                 )
                                 // Navegar de vuelta después de actualizar
                                 navController.popBackStack()
@@ -547,34 +552,36 @@ fun EventFormScreen(
     }
 
     // Manejar los datos del evento obtenido para actualización
-    val eventoData = if (eventoState is EventoState.SuccessSingle && (eventoState as EventoState.SuccessSingle).data.exists()) {
-        (eventoState as EventoState.SuccessSingle).data.toEvento()
-    } else {
-        null
-    }
+    val eventoData =
+        if (eventoState is EventoState.SuccessSingle && (eventoState as EventoState.SuccessSingle).data.exists()) {
+            (eventoState as EventoState.SuccessSingle).data.toEvento()
+        } else {
+            null
+        }
 
-    // Prellenar los campos si es una actualización
     LaunchedEffect(eventoData) {
         eventoData?.let { evento ->
-            eventTitle = evento.eventName
-            eventDescription = evento.eventDescription
-            attendeeCount = evento.eventNumberOfAttendees
-            selectedDate = evento.eventDate
-            startTime = evento.eventStartTime
-            endTime = evento.eventEndTime
-            ticketUrl = evento.eventUrl
-            eventCategory = evento.eventCategory
-            eventImageUrl = evento.eventThumbnail
+            eventTitle = evento.event_name ?: "" // Proporciona un valor por defecto
+            eventDescription = evento.event_description ?: ""
+            attendeeCount =
+                evento.event_number_of_attendees?.toString() ?: "0" // Asigna "0" si es null
+            selectedDate = evento.event_date ?: ""
+            startTime = evento.event_start_time ?: ""
+            endTime = evento.event_end_time ?: ""
+            ticketUrl = evento.event_url ?: ""
+            eventCategory = evento.event_category ?: ""
+            eventImageUrl = evento.event_thumbnail ?: ""
 
             // Parse eventPriceRange to get cost and selectedCurrency
-            val priceParts = evento.eventPriceRange.split(" ")
+            val priceParts = evento.event_price_range?.split(" ")
+                ?: listOf("") // Proporciona una lista vacía si es null
             if (priceParts.size >= 2) {
                 cost = priceParts[0]
                 selectedCurrency = priceParts[1]
             }
 
             // Parse location
-            val locationPair = parseLatLng(evento.eventLocation)
+            val locationPair = parseLatLng(evento.event_location ?: "")
             if (locationPair != null) {
                 latitud = locationPair.first
                 longitud = locationPair.second

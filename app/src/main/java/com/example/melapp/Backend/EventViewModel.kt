@@ -24,25 +24,26 @@ sealed class EventoState {
 }
 
 data class Evento(
-    val id: String = "",
-    val userEmail: String = "",
-    val eventAge: String = "",
-    val eventCategory: String = "",
-    val eventDate: String = "",
-    val eventDescription: String = "",
-    val eventEndTime: String = "",
-    val eventLocation: String = "",
-    val eventName: String = "",
-    val eventNumberOfAttendees: String = "",
-    val eventPriceRange: String = "",
-    val eventRating: String = "",
-    val eventStartTime: String = "",
-    val eventStatus: String = "",
-    val eventTitle: String = "",
-    val eventUrl: String = "",
-    val eventVerification: String = "",
-    val eventPostDate: String = "",
-    var eventThumbnail: String = "" // URL de la miniatura
+    val user_email: String? = null,
+    val event_location: String? = null,
+    val event_post_date: String? = null,
+    val event_description: String? = null,
+    val event_title: String? = null,
+    val event_category: String? = null,
+    val event_url: String? = null,
+    val event_end_time: String? = null,
+    val event_number_of_attendees: String? = null,
+    val event_verification: String? = null,
+    val event_date: String? = null,
+    val event_name: String? = null,
+    val event_start_time: String? = null,
+    val event_price_range: String? = null,
+    val event_age: String? = null,
+    val event_status: String? = null,
+    var event_thumbnail: String? = null,
+    val id: String? = null, // Agrega este campo para almacenar el ID del evento
+    val event_rating: String? = null
+
 )
 
 class EventoViewModel : ViewModel() {
@@ -129,34 +130,29 @@ class EventoViewModel : ViewModel() {
         }
     }
 
-    fun obtenerEventoPorId(eventoId: String) {
-        viewModelScope.launch {
-            try {
-                _eventoState.value = EventoState.Loading
+    fun obtenerEventoPorId(eventId: String, onEventLoaded: (Evento) -> Unit) {
+        firestore.collection("eventos").document(eventId).get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    // Convert the document to Evento
+                    val evento = document.toObject(Evento::class.java)
 
-                val documento = firestore.collection("Event").document(eventoId).get().await()
-                val evento = documento.toObject(Evento::class.java)
-
-                if (evento != null) {
-                    if (evento.eventThumbnail.isNotEmpty()) {
-                        try {
-                            val storageRef = storage.reference.child(evento.eventThumbnail)
-                            val downloadUrl = storageRef.downloadUrl.await()
-                            evento.eventThumbnail = downloadUrl.toString()
-                        } catch (e: Exception) {
-                            Log.e("EventoViewModel", "Error obteniendo URL de imagen: ${e.message}")
-                            // Si hay un error al obtener la URL, mantenemos la referencia original
-                        }
+                    // Check if evento is not null before notifying the caller
+                    if (evento != null) {
+                        onEventLoaded(evento) // Notify the caller with the loaded event
+                    } else {
+                        Log.e("EventoViewModel", "El evento es null")
                     }
-                    _eventoState.value = EventoState.Success(evento)
                 } else {
-                    _eventoState.value = EventoState.Error("Evento no encontrado")
+                    Log.e("EventoViewModel", "No existe el documento")
                 }
-            } catch (e: Exception) {
-                _eventoState.value = EventoState.Error(e.localizedMessage ?: "Error desconocido")
             }
-        }
+            .addOnFailureListener { exception ->
+                Log.e("EventoViewModel", "Error obteniendo evento: ${exception.message}")
+            }
     }
+
+
 
     // Crear un nuevo evento
     fun crearEvento(evento: Evento) {
@@ -167,23 +163,23 @@ class EventoViewModel : ViewModel() {
 
                 val eventData = hashMapOf(
                     "user_email" to (auth.currentUser?.email ?: ""),
-                    "event_age" to evento.eventAge,
-                    "event_category" to evento.eventCategory,
-                    "event_date" to evento.eventDate,
-                    "event_description" to evento.eventDescription,
-                    "event_end_time" to evento.eventEndTime,
-                    "event_location" to evento.eventLocation,
-                    "event_name" to evento.eventName,
-                    "event_number_of_attendees" to evento.eventNumberOfAttendees,
-                    "event_price_range" to evento.eventPriceRange,
-                    "event_rating" to evento.eventRating,
-                    "event_start_time" to evento.eventStartTime,
-                    "event_status" to evento.eventStatus,
-                    "event_title" to evento.eventTitle,
-                    "event_url" to evento.eventUrl,
-                    "event_verification" to evento.eventVerification,
-                    "event_post_date" to evento.eventPostDate,
-                    "event_thumbnail" to (evento.eventThumbnail ?: "")
+                    "event_age" to evento.event_age,
+                    "event_category" to evento.event_category,
+                    "event_date" to evento.event_date,
+                    "event_description" to evento.event_description,
+                    "event_end_time" to evento.event_end_time,
+                    "event_location" to evento.event_location,
+                    "event_name" to evento.event_name,
+                    "event_number_of_attendees" to evento.event_number_of_attendees,
+                    "event_price_range" to evento.event_price_range,
+                    "event_rating" to evento.event_rating,
+                    "event_start_time" to evento.event_start_time,
+                    "event_status" to evento.event_status,
+                    "event_title" to evento.event_title,
+                    "event_url" to evento.event_url,
+                    "event_verification" to evento.event_verification,
+                    "event_post_date" to evento.event_post_date,
+                    "event_thumbnail" to (evento.event_thumbnail ?: "")
                 )
 
                 // Usar la función de suspensión add().await()
@@ -213,28 +209,28 @@ class EventoViewModel : ViewModel() {
                 Log.d("EventoViewModel", "Updating event with ID: ${evento.id}")
 
                 val eventData = hashMapOf(
-                    "user_email" to evento.userEmail,
-                    "event_age" to evento.eventAge,
-                    "event_category" to evento.eventCategory,
-                    "event_date" to evento.eventDate,
-                    "event_description" to evento.eventDescription,
-                    "event_end_time" to evento.eventEndTime,
-                    "event_location" to evento.eventLocation,
-                    "event_name" to evento.eventName,
-                    "event_number_of_attendees" to evento.eventNumberOfAttendees,
-                    "event_price_range" to evento.eventPriceRange,
-                    "event_rating" to evento.eventRating,
-                    "event_start_time" to evento.eventStartTime,
-                    "event_status" to evento.eventStatus,
-                    "event_title" to evento.eventTitle,
-                    "event_url" to evento.eventUrl,
-                    "event_verification" to evento.eventVerification,
-                    "event_post_date" to evento.eventPostDate,
-                    "event_thumbnail" to (evento.eventThumbnail ?: "")
+                    "user_email" to (auth.currentUser?.email ?: ""),
+                    "event_age" to evento.event_age,
+                    "event_category" to evento.event_category,
+                    "event_date" to evento.event_date,
+                    "event_description" to evento.event_description,
+                    "event_end_time" to evento.event_end_time,
+                    "event_location" to evento.event_location,
+                    "event_name" to evento.event_name,
+                    "event_number_of_attendees" to evento.event_number_of_attendees,
+                    "event_price_range" to evento.event_price_range,
+                    "event_rating" to evento.event_rating,
+                    "event_start_time" to evento.event_start_time,
+                    "event_status" to evento.event_status,
+                    "event_title" to evento.event_title,
+                    "event_url" to evento.event_url,
+                    "event_verification" to evento.event_verification,
+                    "event_post_date" to evento.event_post_date,
+                    "event_thumbnail" to (evento.event_thumbnail ?: "")
                 )
 
                 // Usar la función de suspensión update().await()
-                firestore.collection("Event").document(evento.id)
+                firestore.collection("Event").document(evento.id!!)
                     .update(eventData as Map<String, Any>)
                     .await()
 

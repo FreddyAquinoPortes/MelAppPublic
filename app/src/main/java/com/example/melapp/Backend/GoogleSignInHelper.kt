@@ -19,12 +19,13 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import java.util.Date
 
 // Data class para agrupar datos de usuario
 data class User(
     val nombres: String,
     val apellidos: String,
-    val fechaNacimiento: java.util.Date,
+    val fechaNacimiento: Date,
     val genero: Int,
     val username: String,
     val rol: Int = 0,
@@ -66,7 +67,7 @@ class GoogleSignInHelper(
                 val username = it.displayName ?: "usuario"
 
                 // Valores predeterminados
-                val fechaNacimiento = java.util.Date(2000, 1, 1) // Valor predeterminado
+                val fechaNacimiento = Date(2000, 1, 1) // Valor predeterminado
                 val genero = 0 // Valor predeterminado
                 val rol = 0
                 val accountStatus = 0 // Por defecto 0 para los nuevos usuarios
@@ -119,11 +120,12 @@ class GoogleSignInHelper(
         firestoreHelper.checkUserExists(
             email = account.email ?: "",
             onUserExists = {
-                // Si el usuario existe, verificar el estado de la cuenta
+                // Si el usuario existe, actualizar la última fecha de inicio de sesión
+                firestoreHelper.updateLastSignIn(account.email ?: "")
                 checkAccountStatusAndNavigate(account)
             },
             onUserDoesNotExist = {
-                // Registrar nuevo usuario
+                // Registrar nuevo usuario con la fecha de registro
                 firestoreHelper.registerNewUser(account, user)
                 firebaseAuthWithGoogle(account)
             },
@@ -192,9 +194,18 @@ class FirestoreHelper(private val db: FirebaseFirestore) {
         }
     }
 
+    // Actualizar la última fecha de inicio de sesión
+    fun updateLastSignIn(email: String) {
+        val userRef = db.collection("users").document(email)
+        userRef.update("user_last_signIn", Date()).addOnSuccessListener {
+            println("Última fecha de inicio de sesión actualizada.")
+        }.addOnFailureListener {
+            println("Error al actualizar la última fecha de inicio de sesión: ${it.message}")
+        }
+    }
+
     // Registrar un nuevo usuario en Firestore
     fun registerNewUser(account: GoogleSignInAccount, user: User) {
-        val Phonenumber = ""
         val userEmail = account.email ?: return
         val userMap = hashMapOf(
             "name" to user.nombres,
@@ -206,7 +217,8 @@ class FirestoreHelper(private val db: FirebaseFirestore) {
             "account_state" to user.accountStatus,
             "user_location" to user.location,
             "email" to userEmail,
-            "Phone_number" to Phonenumber
+            "user_registration_date" to Date(), // Fecha de registro
+            "user_last_signIn" to Date() // Última fecha de inicio de sesión
         )
 
         db.collection("users").document(userEmail).set(userMap).addOnSuccessListener {

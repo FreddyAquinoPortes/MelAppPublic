@@ -162,22 +162,20 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 is EventoState.SuccessList -> {
                     val documentos = (eventoState as EventoState.SuccessList).data
                     documentos.forEach { documento ->
-                        val eventName = documento.getString("event_name") ?: "Evento sin nombre"
-                        val eventDescription = documento.getString("event_description") ?: "Sin descripción"
-                        val eventLocation = documento.getString("event_location") ?: ""
-
-                        val location = parseLocation(eventLocation)
-                        location?.let { latLng ->
-                            Marker(
-                                state = MarkerState(position = latLng),
-                                title = eventName,
-                                snippet = eventDescription,
-                                onClick = {
-                                    selectedEvent = Evento(eventName, eventDescription, eventLocation)
-                                    eventoViewModel.obtenerEventoPorId(documento.id) // Obtenemos el evento por ID desde Firestore
-                                    true
-                                }
-                            )
+                        val evento = documento.toObject(Evento::class.java)?.copy(id = documento.id)
+                        evento?.let {
+                            val location = parseLocation(it.event_location ?: "")
+                            location?.let { latLng ->
+                                Marker(
+                                    state = MarkerState(position = latLng),
+                                    title = it.event_name ?: "Evento sin nombre",
+                                    snippet = it.event_description ?: "Sin descripción",
+                                    onClick = {
+                                        selectedEvent = evento
+                                        true
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -188,21 +186,19 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                     // Handle loading state if needed
                 }
             }
-
         }
+
         selectedEvent?.let { evento ->
             Box(modifier = Modifier.fillMaxSize()) {
                 EventCardDescription(
-                    event_thumbnail = evento.eventThumbnail, // Pasar la URL de la miniatura
-                    eventName = evento.eventName,
-                    eventDescription = evento.eventDescription,
-                    eventLocation = evento.eventLocation,
+                    evento = evento,
                     modifier = Modifier
-                        .align(Alignment.BottomEnd) // Asegúrate de usar .align dentro de un Box
+                        .align(Alignment.BottomEnd)
                         .padding(bottom = 150.dp, end = 16.dp, start = 86.dp)
                 )
             }
         }
+
     }
 }
 // Función regular (no @Composable) para centrar la cámara en la ubicación real del usuario
