@@ -438,64 +438,42 @@ fun EventFormScreen(
                             attendeeCount, ticketUrl, latitud, longitud, cost
                         )
                         if (isValid) {
-                            // Guardar en Firestore
-                            val db = FirebaseFirestore.getInstance()
-
                             // Construir el rango de precio
                             val eventPriceRange = "$cost $selectedCurrency"
 
-                            val eventData = hashMapOf(
-                                "user_email" to (currentUser?.email ?: ""),
-                                "event_age" to "Todas las edades",
-                                "event_category" to eventCategory,
-                                "event_date" to selectedDate,
-                                "event_description" to eventDescription,
-                                "event_end_time" to endTime,
-                                "event_location" to "Lat: $latitud, Lng: $longitud",
-                                "event_name" to eventTitle,
-                                "event_number_of_attendees" to attendeeCount,
-                                "event_price_range" to eventPriceRange,
-                                "event_rating" to "0",
-                                "event_start_time" to startTime,
-                                "event_status" to "pendiente",
-                                "event_title" to eventTitle,
-                                "event_url" to ticketUrl,
-                                "event_verification" to "pendiente",
-                                "event_post_date" to formattedDateTime,
-                                "event_thumbnail" to (eventImageUrl ?: "")
+                            val evento = Evento(
+                                id = eventoId,
+                                user_email = currentUser?.email ?: "",
+                                event_age = "Todas las edades",
+                                event_category = eventCategory,
+                                event_date = selectedDate,
+                                event_description = eventDescription,
+                                event_end_time = endTime,
+                                event_location = "Lat: $latitud, Lng: $longitud",
+                                event_name = eventTitle,
+                                event_number_of_attendees = attendeeCount,
+                                event_price_range = eventPriceRange,
+                                event_rating = "0",
+                                event_start_time = startTime,
+                                event_status = "pendiente",
+                                event_title = eventTitle,
+                                event_url = ticketUrl,
+                                event_verification = "pendiente",
+                                event_post_date = formattedDateTime,
+                                event_thumbnail = eventImageUrl
                             )
 
-                            // Nuevo, para que elija entre crear y modificar
                             if (eventoId == null) {
                                 // Crear un nuevo evento
-                                eventoViewModel.crearEvento(
-                                    Evento(
-                                        event_name = eventTitle,
-                                        event_description = eventDescription,
-                                        event_location = "Lat: $latitud, Lng: $longitud",
-                                        event_thumbnail = eventImageUrl ?: ""
-                                        // Añade otros campos si es necesario
-                                    )
-                                )
-                                // Navegar de vuelta después de publicar
-                                navController.popBackStack()
-                                showToast = true
+                                eventoViewModel.crearEvento(evento)
                             } else {
                                 // Actualizar un evento existente
-                                eventoViewModel.actualizarEvento(
-                                    Evento(
-                                        id = eventoId,
-                                        event_name = eventTitle,
-                                        event_description = eventDescription,
-                                        event_location = "Lat: $latitud, Lng: $longitud",
-                                        event_thumbnail = eventImageUrl ?: ""
-                                        // Añade otros campos si es necesario
-                                    )
-                                )
-                                // Navegar de vuelta después de actualizar
-                                navController.popBackStack()
-                                showToast = true
+                                eventoViewModel.actualizarEvento(evento)
                             }
+
+                            // Navegar de vuelta después de publicar o actualizar
+                            navController.popBackStack()
+                            showToast = true
                         } else {
                             Toast.makeText(
                                 context,
