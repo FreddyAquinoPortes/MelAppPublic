@@ -9,31 +9,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.lazy.items
-import androidx.compose.runtime.*
 
-
+data class Category(
+    val name: String,
+    val colorCode: String
+)
 @Composable
 fun CategoryBar(onCategoriesSelected: (List<String>) -> Unit) {
-    var categories by remember { mutableStateOf(listOf<String>()) }
+    var categories by remember { mutableStateOf(listOf<Category>()) }
     var selectedCategories by remember { mutableStateOf(setOf("Todas")) }
 
-    // Obtener las categorías de Firestore
+    // Obtener las categorías y colores de Firestore
     LaunchedEffect(Unit) {
         val firestore = FirebaseFirestore.getInstance()
         firestore.collection("event_category")
             .get()
             .addOnSuccessListener { documents ->
-                val fetchedCategories = documents.mapNotNull { it.getString("category_name") }
-                categories = listOf("Todas") + fetchedCategories.sorted()
+                val fetchedCategories = documents.map { doc ->
+                    Category(
+                        name = doc.getString("category_name") ?: "",
+                        colorCode = doc.getString("category_color_code") ?: "0xFF1A237E"
+                    )
+                }.sortedBy { it.name }
+                categories = listOf(Category("Todas", "0xFF1A237E")) + fetchedCategories
             }
             .addOnFailureListener { exception ->
                 // Manejar error si es necesario
@@ -57,13 +61,13 @@ fun CategoryBar(onCategoriesSelected: (List<String>) -> Unit) {
         items(categories) { category ->
             CategoryItem(
                 category = category,
-                isSelected = category in selectedCategories,
+                isSelected = category.name in selectedCategories,
                 onSelected = { selected ->
                     selectedCategories = when {
-                        category == "Todas" && selected -> setOf("Todas")
-                        category == "Todas" && !selected -> emptySet()
-                        selected -> selectedCategories + category - "Todas"
-                        else -> selectedCategories - category
+                        category.name == "Todas" && selected -> setOf("Todas")
+                        category.name == "Todas" && !selected -> emptySet()
+                        selected -> selectedCategories + category.name - "Todas"
+                        else -> selectedCategories - category.name
                     }
                 }
             )
@@ -73,22 +77,38 @@ fun CategoryBar(onCategoriesSelected: (List<String>) -> Unit) {
 
 @Composable
 fun CategoryItem(
-    category: String,
+    category: Category,
     isSelected: Boolean,
     onSelected: (Boolean) -> Unit
 ) {
+    val backgroundColor = if (isSelected) {
+        parseColor(category.colorCode)
+    } else {
+        Color.White
+    }
+
     Button(
         onClick = { onSelected(!isSelected) },
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color(0xFF1A237E) else Color.White,
+            containerColor = backgroundColor,
             contentColor = if (isSelected) Color.White else Color.Black
         ),
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .height(40.dp),
         shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, if (isSelected) Color(0xFF1A237E) else Color.LightGray)
+        border = BorderStroke(1.dp, if (isSelected) backgroundColor else Color.LightGray)
     ) {
-        Text(category)
+        Text(category.name)
+    }
+}
+
+fun parseColor(colorString: String): Color {
+    return try {
+        val colorLong = colorString.removePrefix("0x").toLong(16)
+        Color(colorLong)
+    } catch (e: NumberFormatException) {
+        // Si el color no es válido, devolvemos un color por defecto
+        Color(0xFF1A237E) // El color azul oscuro original
     }
 }
