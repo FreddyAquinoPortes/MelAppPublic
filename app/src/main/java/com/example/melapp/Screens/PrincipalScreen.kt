@@ -46,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -63,6 +64,7 @@ import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.SearchTopBar
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.firestore.FirebaseFirestore
@@ -72,6 +74,9 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 fun parseLocation(locationString: String): LatLng? {
     val regex = """Lat:\s*([+-]?\d+(\.\d+)?),\s*Lng:\s*([+-]?\d+(\.\d+)?)""".toRegex()
@@ -88,6 +93,45 @@ fun parseLocation(locationString: String): LatLng? {
         }
     }
 }
+// Función para convertir el string de color a un objeto Color
+fun parseColor(colorString: String): Color {
+    return try {
+        // Si el string empieza con "0x" o "#", los removemos
+        val cleanColorString = colorString.removePrefix("0x").removePrefix("#")
+        Color(android.graphics.Color.parseColor("#$cleanColorString"))
+    } catch (e: Exception) {
+        Log.e("ColorParsing", "Error parsing color: $colorString", e)
+        Color.Red // Color por defecto si hay un error
+    }
+}
+
+
+// Función para obtener los colores de las categorías
+suspend fun getCategoryColors(): Map<String, Color> {
+    return withContext(Dispatchers.IO) {
+        try {
+            val firestore = FirebaseFirestore.getInstance()
+            val querySnapshot = firestore.collection("event_category").get().await()
+            querySnapshot.documents.associate { document ->
+                val categoryName = document.getString("category_name") ?: ""
+                val colorCode = document.getString("category_color_code") ?: "FF0000" // Rojo por defecto si hay error
+                categoryName to parseColor(colorCode)
+            }
+        } catch (e: Exception) {
+            Log.e("MapScreen", "Error fetching category colors: ${e.message}", e)
+            emptyMap()
+        }
+    }
+}
+
+
+// Función para convertir Color a HUE para BitmapDescriptorFactory
+fun colorToHue(color: Color): Float {
+    val hsv = FloatArray(3)
+    android.graphics.Color.colorToHSV(color.toArgb(), hsv)
+    Log.d("MapScreen", "Hue for color ${color.toArgb()}: ${hsv[0]}") // Agregar logging
+    return hsv[0]  // Devuelve solo el hue (tono)
+}
 
 @SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,9 +141,11 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     var selectedEvent by remember { mutableStateOf<Evento?>(null) }
     var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
     var filteredEvents by remember { mutableStateOf<List<Evento>>(emptyList()) }
+    var categoryColors by remember { mutableStateOf<Map<String, Color>>(emptyMap()) }
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
+        categoryColors = getCategoryColors()
     }
 
     // Efecto para filtrar eventos cuando cambian las categorías seleccionadas o el estado de eventos
@@ -192,10 +238,11 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = myLocationEnabled)
         ) {
-            // Usar filteredEvents en lugar de eventoState directamente
             filteredEvents.forEach { evento ->
                 val location = parseLocation(evento.event_location ?: "")
                 location?.let { latLng ->
+                    val markerColor = categoryColors[evento.event_category] ?: Color.Red
+                    Log.d("MapScreen", "Category: ${evento.event_category}, Marker color: $markerColor") // Log del color
                     Marker(
                         state = MarkerState(position = latLng),
                         title = evento.event_name ?: "Evento sin nombre",
@@ -203,10 +250,12 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                         onClick = {
                             selectedEvent = evento
                             true
-                        }
+                        },
+                        icon = BitmapDescriptorFactory.defaultMarker(colorToHue(markerColor))
                     )
                 }
             }
+
         }
 
         selectedEvent?.let { evento ->
