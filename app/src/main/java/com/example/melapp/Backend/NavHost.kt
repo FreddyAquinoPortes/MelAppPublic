@@ -19,6 +19,17 @@ fun AppNavigation() {
         navController = navController,
         startDestination = "splash_screen"
     ) {
+        composable("event_form/{eventoId}",
+            arguments = listOf(navArgument("eventoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventoId = backStackEntry.arguments?.getString("eventoId")
+            if (eventoId != null) {
+                EventFormScreen(navController, eventoId)
+            } else {
+                // Manejar el caso donde eventoId es null
+                navController.navigate("event_form") // Navegar a la ruta general
+            }
+        }
         composable("home") {
             HomePage() // Asegúrate de pasar el navController si es necesario
         }
@@ -39,17 +50,6 @@ fun AppNavigation() {
         }
         composable("passwordRecovery") {
             PasswordRecoveryScreen(navController = navController)
-        }
-        composable("event_form/{eventoId}",
-            arguments = listOf(navArgument("eventoId") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val eventoId = backStackEntry.arguments?.getString("eventoId")
-            if (eventoId != null) {
-                EventFormScreen(navController, eventoId)
-            } else {
-                // Manejar el caso donde eventoId es null
-                navController.navigate("event_form") // Navegar a la ruta general
-            }
         }
         composable("event_form") { // Ruta para crear un nuevo evento
             EventFormScreen(navController)

@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -112,20 +113,20 @@ fun EventFormScreen(
     val eventoState by eventoViewModel.eventoState.collectAsState()
 
     // Estados del formulario
-    var eventTitle by remember { mutableStateOf("") }
-    var eventDescription by remember { mutableStateOf("") }
-    var attendeeCount by remember { mutableStateOf("25") }
-    var selectedDate by remember { mutableStateOf("") }
-    var startTime by remember { mutableStateOf("") }
-    var endTime by remember { mutableStateOf("") }
-    var ticketUrl by remember { mutableStateOf("") }
-    var eventCategory by remember { mutableStateOf("Concierto") }
-    var cost by remember { mutableStateOf("0.00") }
-    var selectedCurrency by remember { mutableStateOf("DOP") }
-    var expanded by remember { mutableStateOf(false) }
-    var latitud by remember { mutableStateOf(0.0) }
-    var longitud by remember { mutableStateOf(0.0) }
-    val currentDateTime = remember { mutableStateOf(LocalDateTime.now()) }
+    var eventTitle by rememberSaveable { mutableStateOf("") }
+    var eventDescription by rememberSaveable { mutableStateOf("") }
+    var attendeeCount by rememberSaveable { mutableStateOf("25") }
+    var selectedDate by rememberSaveable { mutableStateOf("") }
+    var startTime by rememberSaveable { mutableStateOf("") }
+    var endTime by rememberSaveable { mutableStateOf("") }
+    var ticketUrl by rememberSaveable { mutableStateOf("") }
+    var eventCategory by rememberSaveable { mutableStateOf("Concierto") }
+    var cost by rememberSaveable { mutableStateOf("0.00") }
+    var selectedCurrency by rememberSaveable { mutableStateOf("DOP") }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var latitud by rememberSaveable { mutableStateOf(0.0) }
+    var longitud by rememberSaveable { mutableStateOf(0.0) }
+    val currentDateTime = rememberSaveable { mutableStateOf(LocalDateTime.now()) }
 
 
     val auth = FirebaseAuth.getInstance()
@@ -142,9 +143,9 @@ fun EventFormScreen(
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     val formattedDateTime = currentDateTime.value.format(formatter)
 
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var eventImageUrl by remember { mutableStateOf<String?>(null) }
-    var selectedAditionalImageUri by remember { mutableStateOf<Uri?>(null) }
+    var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var eventImageUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var selectedAditionalImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     LaunchedEffect(lat, lng) {
         lat?.let { latitud = it }
@@ -206,7 +207,6 @@ fun EventFormScreen(
             // Estado para manejar las imágenes adicionales
             val additionalImages = remember { mutableStateOf(listOf<Uri>()) }
 
-            // Image picker launcher para imágenes adicionales
             val additionalImagesLauncher =
                 rememberLauncherForActivityResult(ActivityResultContracts.GetMultipleContents()) { uris: List<Uri> ->
                     uris?.let {
@@ -463,6 +463,7 @@ fun EventFormScreen(
                                 event_thumbnail = eventImageUrl
                             )
 
+                            // Nuevo, para que elija entre crear y modificar
                             if (eventoId == null) {
                                 // Crear un nuevo evento
                                 eventoViewModel.crearEvento(evento)
@@ -486,21 +487,6 @@ fun EventFormScreen(
                 ) {
                     Text(if (eventoId == null) "Publicar" else "Actualizar")
                 }
-
-//                            db.collection("Event")
-//                                .add(eventData)
-//                                .addOnSuccessListener {
-//                                    showToast = true
-//                                }
-//                                .addOnFailureListener {
-//                                    //Toast.makeText(LocalContext.current, "Error al publicar el evento", Toast.LENGTH_SHORT).show()
-//                                }
-//                        }
-//                    },
-//                    modifier = Modifier.weight(1f)
-//                ) {
-//                    Text("Publicar")
-//                }
 
                 Spacer(modifier = Modifier.width(8.dp))
 
