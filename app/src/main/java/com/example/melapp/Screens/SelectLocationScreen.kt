@@ -1,28 +1,51 @@
-// SelectLocationScreen.kt
 package com.example.melapp.Screens
 
-import androidx.compose.material.icons.filled.ArrowBack
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import androidx.compose.foundation.layout.*
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
+import com.example.melapp.Backend.CenterCameraButton
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
+@SuppressLint("MissingPermission", "UnusedMaterial3ScaffoldPaddingParameter")
 fun SelectLocationScreen(navController: NavController, onLocationSelected: (Double, Double) -> Unit) {
-    // Posición inicial del mapa
-    val initialPosition = LatLng(40.7128, -74.0060) // NYC
-    var selectedPosition by remember { mutableStateOf<LatLng?>(null) }
+    val context = LocalContext.current
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+
+    // Posición inicial de la cámara
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition(initialPosition, 12f, 0f, 0f)
+        position = CameraPosition(LatLng(40.7128, -74.0060), 12f, 0f, 0f)
+    }
+
+    var myLocationEnabled by remember { mutableStateOf(false) }
+    var selectedPosition by remember { mutableStateOf<LatLng?>(null) }  // Added this line back
+
+    if (ActivityCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(
+            context, Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        myLocationEnabled = true
+        centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
+    } else {
+        // Solicitar permisos si no están otorgados
+        // Esto se debería manejar adecuadamente dependiendo de tu lógica de manejo de permisos
     }
 
     Scaffold(
@@ -38,7 +61,7 @@ fun SelectLocationScreen(navController: NavController, onLocationSelected: (Doub
                     IconButton(
                         onClick = {
                             selectedPosition?.let {
-                                onLocationSelected(it.latitude, it.longitude)
+                                onLocationSelected(it.latitude, it.longitude)  // onLocationSelected parameter now passed
                                 navController.popBackStack()
                             }
                         },
@@ -49,23 +72,30 @@ fun SelectLocationScreen(navController: NavController, onLocationSelected: (Doub
                 }
             )
         },
-        content = { innerPadding ->
-            GoogleMap(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
+
+        floatingActionButton = {
+            CenterCameraButton(
+                fusedLocationClient = fusedLocationClient,
                 cameraPositionState = cameraPositionState,
-                onMapClick = { latLng ->
-                    selectedPosition = latLng
-                }
-            ) {
-                selectedPosition?.let {
-                    Marker(
-                        state = MarkerState(position = it),
-                        title = "Ubicación Seleccionada"
-                    )
-                }
+                context = context
+            )
+        },
+        floatingActionButtonPosition = FabPosition.Start
+    ) {
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(isMyLocationEnabled = myLocationEnabled),
+            onMapClick = { latLng ->  // Added the onMapClick functionality
+                selectedPosition = latLng
+            }
+        ) {
+            selectedPosition?.let {
+                Marker(
+                    state = MarkerState(position = it),
+                    title = "Ubicación Seleccionada"
+                )
             }
         }
-    )
+    }
 }
