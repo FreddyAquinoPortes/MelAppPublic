@@ -1,5 +1,9 @@
 package com.example.melapp.Screens
 
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,16 +15,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.melapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -35,6 +39,33 @@ fun TradicionalLoginScreen(navController: NavController) {
     val auth = FirebaseAuth.getInstance()
     val firestore = FirebaseFirestore.getInstance()
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    // Estado para controlar si se han concedido los permisos de ubicación
+    var hasLocationPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    // Launcher para solicitar permisos de ubicación
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasLocationPermission = isGranted
+            if (isGranted) {
+                // Proceder con el inicio de sesión si se conceden los permisos
+                performLogin(email, password, auth, firestore, navController) { error ->
+                    errorMessage = error
+                }
+            } else {
+                errorMessage = "Se requieren permisos de ubicación para usar la aplicación."
+            }
+        }
+    )
 
     Box(
         modifier = Modifier
@@ -142,7 +173,7 @@ fun TradicionalLoginScreen(navController: NavController) {
                     .fillMaxWidth()
                     .padding(top = 10.dp)
                     .clickable {
-                        navController.navigate("passwordRecovery") // Navega a la pantalla de recuperación
+                        navController.navigate("passwordRecovery")
                     }
             )
 
@@ -158,30 +189,13 @@ fun TradicionalLoginScreen(navController: NavController) {
                             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> errorMessage = "Formato de correo incorrecto."
                             else -> {
                                 errorMessage = null
-                                auth.signInWithEmailAndPassword(email, password)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            val userId = auth.currentUser?.uid
-                                            if (userId != null) {
-                                                firestore.collection("users").document(userId).get()
-                                                    .addOnSuccessListener { document ->
-                                                        val accountState = document.getLong("account_state")
-                                                        if (accountState == 1L) {
-                                                            navController.navigate("map") // Navegar a la pantalla principal
-                                                        } else if (accountState == 0L) {
-                                                            navController.navigate("registration_success") // Redirigir a RegistrationSuccessScreen
-                                                        } else {
-                                                            errorMessage = "Estado de la cuenta no válido."
-                                                        }
-                                                    }
-                                                    .addOnFailureListener {
-                                                        errorMessage = "No se pudo obtener el estado de la cuenta."
-                                                    }
-                                            }
-                                        } else {
-                                            errorMessage = "Credenciales incorrectas."
-                                        }
+                                if (hasLocationPermission) {
+                                    performLogin(email, password, auth, firestore, navController) { error ->
+                                        errorMessage = error
                                     }
+                                } else {
+                                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                                }
                             }
                         }
                     }
@@ -213,11 +227,43 @@ fun TradicionalLoginScreen(navController: NavController) {
 
             // Texto "No tiene una cuenta? Registrarse"
             TextButton(
-                onClick = { navController.navigate("register") }, // Navega a la pantalla de registro
+                onClick = { navController.navigate("register") },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "¿No tienes una cuenta? Registrarse", color = Color(0xFF24146C))
             }
         }
     }
+}
+
+private fun performLogin(
+    email: String,
+    password: String,
+    auth: FirebaseAuth,
+    firestore: FirebaseFirestore,
+    navController: NavController,
+    onError: (String) -> Unit
+) {
+    auth.signInWithEmailAndPassword(email, password)
+        .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val userId = auth.currentUser?.uid
+                if (userId != null) {
+                    firestore.collection("users").document(userId).get()
+                        .addOnSuccessListener { document ->
+                            val accountState = document.getLong("account_state")
+                            when (accountState) {
+                                1L -> navController.navigate("map")
+                                0L -> navController.navigate("registration_success")
+                                else -> onError("Estado de la cuenta no válido.")
+                            }
+                        }
+                        .addOnFailureListener {
+                            onError("No se pudo obtener el estado de la cuenta.")
+                        }
+                }
+            } else {
+                onError("Credenciales incorrectas.")
+            }
+        }
 }
