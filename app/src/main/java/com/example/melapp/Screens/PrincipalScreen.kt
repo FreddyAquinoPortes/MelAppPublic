@@ -59,6 +59,7 @@ import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
+import com.example.melapp.ReusableComponents.SearchTopBar
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
@@ -223,66 +224,7 @@ fun centerCameraOnUser(
         }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-fun SearchTopBar() {
-    var searchText by remember { mutableStateOf(TextFieldValue("")) }
 
-    TopAppBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        title = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.LightGray, shape = RoundedCornerShape(16.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically // Asegurar que los íconos estén alineados
-            ) {
-                // Search icon
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "Search Icon",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp) // Ajustar el tamaño del ícono
-                )
-
-                // Search text field
-                TextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    placeholder = { Text("Buscar...") },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 8.dp),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        cursorColor = Color.Black,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    )
-                )
-
-
-                // Mic icon
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_mic), // Reemplaza con el drawable correcto
-                    contentDescription = "Mic",
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp) // Ajustar el tamaño del ícono
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White
-        ),
-        scrollBehavior = null // if no scroll behavior is needed
-    )
-}
 
 @Composable
 fun CategoryBar() {
