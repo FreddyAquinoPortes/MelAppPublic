@@ -58,6 +58,7 @@ import com.example.melapp.Backend.Evento
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
+import com.example.melapp.ReusableComponents.CategoryBar
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.SearchTopBar
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -93,16 +94,34 @@ fun parseLocation(locationString: String): LatLng? {
 @Composable
 fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
     val eventoState by eventoViewModel.eventoState.collectAsState()
-    var selectedEvent by remember { mutableStateOf<Evento?>(null) } // Estado para manejar el evento seleccionado
+    var selectedEvent by remember { mutableStateOf<Evento?>(null) }
+    var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
+    var filteredEvents by remember { mutableStateOf<List<Evento>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
     }
 
+    // Efecto para filtrar eventos cuando cambian las categorías seleccionadas o el estado de eventos
+    LaunchedEffect(eventoState, selectedCategories) {
+        filteredEvents = when (eventoState) {
+            is EventoState.SuccessList -> {
+                val allEvents = (eventoState as EventoState.SuccessList).data.mapNotNull {
+                    it.toObject(Evento::class.java)?.copy(id = it.id)
+                }
+                if (selectedCategories.isEmpty()) {
+                    allEvents
+                } else {
+                    allEvents.filter { it.event_category in selectedCategories }
+                }
+            }
+            else -> emptyList()
+        }
+    }
+
     val context = LocalContext.current
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
-    // Posición inicial de la cámara
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition(LatLng(40.7128, -74.0060), 12f, 0f, 0f)
     }
@@ -126,7 +145,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                     eventoViewModel = eventoViewModel,
                     onEventSelected = { evento ->
                         selectedEvent = evento
-                        // Centrar el mapa en la ubicación del evento seleccionado
                         evento.event_location?.let { location ->
                             parseLocation(location)?.let { latLng ->
                                 cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
@@ -134,7 +152,11 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                         }
                     }
                 )
-                CategoryBar() // Barra de categorías
+                CategoryBar(
+                    onCategoriesSelected = { categories ->
+                        selectedCategories = categories
+                    }
+                )
             }
         },
         bottomBar = {
@@ -170,32 +192,19 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = myLocationEnabled)
         ) {
-            when (eventoState) {
-                is EventoState.SuccessList -> {
-                    val documentos = (eventoState as EventoState.SuccessList).data
-                    documentos.forEach { documento ->
-                        val evento = documento.toObject(Evento::class.java)?.copy(id = documento.id)
-                        evento?.let {
-                            val location = parseLocation(it.event_location ?: "")
-                            location?.let { latLng ->
-                                Marker(
-                                    state = MarkerState(position = latLng),
-                                    title = it.event_name ?: "Evento sin nombre",
-                                    snippet = it.event_description ?: "Sin descripción",
-                                    onClick = {
-                                        selectedEvent = evento
-                                        true
-                                    }
-                                )
-                            }
+            // Usar filteredEvents en lugar de eventoState directamente
+            filteredEvents.forEach { evento ->
+                val location = parseLocation(evento.event_location ?: "")
+                location?.let { latLng ->
+                    Marker(
+                        state = MarkerState(position = latLng),
+                        title = evento.event_name ?: "Evento sin nombre",
+                        snippet = evento.event_description ?: "Sin descripción",
+                        onClick = {
+                            selectedEvent = evento
+                            true
                         }
-                    }
-                }
-                is EventoState.Error -> {
-                    Log.e("MapScreen", "Error: ${(eventoState as EventoState.Error).message}")
-                }
-                else -> {
-                    // Handle loading state if needed
+                    )
                 }
             }
         }
@@ -210,7 +219,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 )
             }
         }
-
     }
 }
 // Función regular (no @Composable) para centrar la cámara en la ubicación real del usuario
@@ -237,55 +245,4 @@ fun centerCameraOnUser(
 
 
 
-@Composable
-fun CategoryBar() {
-    val categories = remember { mutableStateListOf<String>() } // Estado mutable para almacenar las categorías
 
-    // Obtener las categorías de Firestore
-    LaunchedEffect(Unit) {
-        val firestore = FirebaseFirestore.getInstance()
-        firestore.collection("event_category")
-            .get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    val category = document.getString("category_name") // Asegúrate de que el campo en Firestore es 'name'
-                    if (category != null) {
-                        categories.add(category)
-                    }
-                }
-            }
-            .addOnFailureListener { exception ->
-                // Manejar error si es necesario
-            }
-    }
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-    ) {
-        items(categories.size) { index ->
-            CategoryItem(categories[index]) // Utiliza el nombre de la categoría obtenida
-        }
-    }
-}
-
-@Composable
-fun CategoryItem(category: String) {
-    val selected = remember { mutableStateOf(false) }
-
-    Button(
-        onClick = { selected.value = !selected.value },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (selected.value) Color(0xFF1A237E) else Color.White, // containerColor en vez de backgroundColor
-            contentColor = if (selected.value) Color.White else Color.Black
-        ),
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .height(40.dp),
-        shape = RoundedCornerShape(20.dp),
-        border = BorderStroke(1.dp, if (selected.value) Color(0xFF1A237E) else Color.LightGray)
-    ) {
-        Text(category)
-    }
-}
