@@ -122,7 +122,18 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     Scaffold(
         topBar = {
             Column {
-                SearchTopBar()
+                SearchTopBar(
+                    eventoViewModel = eventoViewModel,
+                    onEventSelected = { evento ->
+                        selectedEvent = evento
+                        // Centrar el mapa en la ubicación del evento seleccionado
+                        evento.event_location?.let { location ->
+                            parseLocation(location)?.let { latLng ->
+                                cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
+                            }
+                        }
+                    }
+                )
                 CategoryBar() // Barra de categorías
             }
         },

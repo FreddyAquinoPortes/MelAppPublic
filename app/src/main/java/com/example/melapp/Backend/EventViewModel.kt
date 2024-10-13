@@ -8,10 +8,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 // Mantener una sola declaración de EventoState
 sealed class EventoState {
@@ -246,7 +248,25 @@ class EventoViewModel : ViewModel() {
             }
         }
     }
+    suspend fun searchEvents(query: String): List<Evento> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val eventosCollection = firestore.collection("Event")
+                val querySnapshot = eventosCollection
+                    .whereGreaterThanOrEqualTo("event_name", query)
+                    .whereLessThanOrEqualTo("event_name", query + '\uf8ff')
+                    .get()
+                    .await()
 
+                querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(Evento::class.java)?.copy(id = document.id)
+                }
+            } catch (e: Exception) {
+                Log.e("EventoViewModel", "Error searching events: ${e.message}", e)
+                emptyList()
+            }
+        }
+    }
     // Eliminar un evento por ID
     fun eliminarEvento(eventoId: String) {
         viewModelScope.launch {
