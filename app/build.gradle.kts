@@ -97,4 +97,11 @@ dependencies {
     // Location
     implementation(libs.accompanist.permissions)
 
+    //Facebook
+    implementation(libs.google.firebase.auth.ktx)
+    implementation(libs.facebook.login)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.play.services.auth)
+
+
 }

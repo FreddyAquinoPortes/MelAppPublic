@@ -25,6 +25,7 @@ import com.example.melapp.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.material3.Icon
+import com.example.melapp.Backend.SocialSignInHelper
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -46,6 +47,12 @@ fun LoginScreen(navController: NavController) {
     ) { result ->
         googleSignInHelper.handleSignInResult(result) // Se elimina el paso del objeto User
     }
+    val socialSignInHelper = SocialSignInHelper(
+        context = context,
+        auth = FirebaseAuth.getInstance(),
+        db = FirebaseFirestore.getInstance(),
+        navController = navController
+    )
 
     Box(
         modifier = Modifier
@@ -97,7 +104,10 @@ fun LoginScreen(navController: NavController) {
             LoginOption(
                 iconResId = R.drawable.ic_facebook,
                 text = "Iniciar con Facebook",
-                backgroundColor = Color(0xFF4C6A92)
+                backgroundColor = Color(0xFF4C6A92),
+                onClick = {
+                    socialSignInHelper.startFacebookLogin()
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))

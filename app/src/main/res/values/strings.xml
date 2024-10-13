@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">MelApp</string>
     <string name="title_login_page">Mel</string>
+    <string name="facebook_app_id">1198501847925443</string>
+    <string name="fb_login_protocol_scheme">fb1198501847925443</string>
+    <string name="facebook_client_token">4d7f7f6b18bdd3881da21a900a72938b</string>
 </resources>
