@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -31,10 +32,11 @@ fun ProfileScreen(navController: NavController) {
     val user = FirebaseAuth.getInstance().currentUser
     val db = FirebaseFirestore.getInstance()
 
-    // State to hold user_name, email, and profile image URL
+    // State to hold user_name, email, profile image URL, and role
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf(user?.email ?: "") }
     var profileImageUrl by remember { mutableStateOf("") }
+    var rol by remember { mutableStateOf(0) } // Rol del usuario (0 = normal, 1 = organizador)
 
     // Fetch user data from Firestore
     LaunchedEffect(email) {
@@ -51,6 +53,7 @@ fun ProfileScreen(navController: NavController) {
 
                         username = document.getString("user_name") ?: ""
                         profileImageUrl = document.getString("profile_image") ?: ""
+                        rol = document.getLong("rol")?.toInt() ?: 0 // Obtener el rol del usuario
 
                     } else {
                         Log.d("Firestore", "No such document with email: $userEmail")
@@ -87,7 +90,6 @@ fun ProfileScreen(navController: NavController) {
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
             item {
-                // Foto de perfil y botón de editar
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -124,6 +126,7 @@ fun ProfileScreen(navController: NavController) {
                     Text(text = "Email: $email", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
 
                     Spacer(modifier = Modifier.height(16.dp))
+
 
                     // Botones en fila (Editar Perfil y Ver Eventos Guardados)
                     Row(
@@ -166,21 +169,30 @@ fun ProfileScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // Mostrar si el usuario es organizador de eventos
+                if (rol == 1) {
+                    Text(text = "Perfil de organizador",
+                        style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                        modifier = Modifier.padding(16.dp))
+                }
 
-                Button(
-                    onClick = {
-                        // Navegar a la pantalla de eventos creados por el usuario
-                        navController.navigate("event_list")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text(text = "Mis eventos")
+                // Mostrar el botón de "Mis eventos" solo si el rol es 1
+                if (rol == 1) {
+                    Button(
+                        onClick = {
+                            // Navegar a la pantalla de eventos creados por el usuario
+                            navController.navigate("event_list")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) {
+                        Text(text = "Mis eventos")
+                    }
                 }
             }
-
         }
     }
 }
+
 
