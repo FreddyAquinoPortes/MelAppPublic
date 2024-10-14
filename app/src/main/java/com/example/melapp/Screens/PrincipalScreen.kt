@@ -139,26 +139,33 @@ fun colorToHue(color: Color): Float {
 fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
     val eventoState by eventoViewModel.eventoState.collectAsState()
     var selectedEvent by remember { mutableStateOf<Evento?>(null) }
-    var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
     var filteredEvents by remember { mutableStateOf<List<Evento>>(emptyList()) }
     var categoryColors by remember { mutableStateOf<Map<String, Color>>(emptyMap()) }
+    var appliedFilters by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
+    var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
         categoryColors = getCategoryColors()
     }
 
-    // Efecto para filtrar eventos cuando cambian las categorías seleccionadas o el estado de eventos
-    LaunchedEffect(eventoState, selectedCategories) {
+    // Efecto para filtrar eventos cuando cambian el estado de eventos o los filtros aplicados
+    LaunchedEffect(eventoState, appliedFilters) {
         filteredEvents = when (eventoState) {
             is EventoState.SuccessList -> {
                 val allEvents = (eventoState as EventoState.SuccessList).data.mapNotNull {
                     it.toObject(Evento::class.java)?.copy(id = it.id)
                 }
-                if (selectedCategories.isEmpty()) {
-                    allEvents
-                } else {
-                    allEvents.filter { it.event_category in selectedCategories }
+                allEvents.filter { evento ->
+                    appliedFilters.all { (key, value) ->
+                        when (key) {
+                            "event_category" -> evento.event_category == value
+                            "event_age" -> evento.event_age == value
+                            "event_date" -> evento.event_date == value
+                            "event_price_range" -> evento.event_price_range == value
+                            else -> true
+                        }
+                    }
                 }
             }
             else -> emptyList()
@@ -184,6 +191,29 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
     }
 
+    LaunchedEffect(eventoState, appliedFilters, selectedCategories) {
+        filteredEvents = when (eventoState) {
+            is EventoState.SuccessList -> {
+                val allEvents = (eventoState as EventoState.SuccessList).data.mapNotNull {
+                    it.toObject(Evento::class.java)?.copy(id = it.id)
+                }
+                allEvents.filter { evento ->
+                    (selectedCategories.isEmpty() || evento.event_category in selectedCategories) &&
+                            appliedFilters.all { (key, value) ->
+                                when (key) {
+                                    "event_category" -> value.isEmpty() || evento.event_category == value
+                                    "event_age" -> value.isEmpty() || evento.event_age == value
+                                    "event_date" -> value.isEmpty() || evento.event_date == value
+                                    "event_price_range" -> value.isEmpty() || evento.event_price_range == value
+                                    else -> true
+                                }
+                            }
+                }
+            }
+            else -> emptyList()
+        }
+    }
+
     Scaffold(
         topBar = {
             Column {
@@ -196,6 +226,9 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                                 cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
                             }
                         }
+                    },
+                    onFiltersApplied = { filters ->
+                        appliedFilters = filters
                     }
                 )
                 CategoryBar(

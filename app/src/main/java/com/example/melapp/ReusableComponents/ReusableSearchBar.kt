@@ -26,11 +26,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchTopBar(
     eventoViewModel: EventoViewModel = viewModel(),
-    onEventSelected: (Evento) -> Unit
+    onEventSelected: (Evento) -> Unit,
+    onFiltersApplied: (Map<String, String>) -> Unit
 ) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
     var isSearching by remember { mutableStateOf(false) }
     var searchResults by remember { mutableStateOf<List<Evento>>(emptyList()) }
+    var showFilterCard by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     Column {
@@ -80,7 +82,9 @@ fun SearchTopBar(
                         painter = painterResource(id = R.drawable.ic_filter),
                         contentDescription = "Filter",
                         tint = Color.Gray,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { showFilterCard = true }
                     )
                 }
             },
@@ -111,6 +115,16 @@ fun SearchTopBar(
                     )
                 }
             }
+        }
+
+        if (showFilterCard) {
+            EventFilterCard(
+                onCloseClick = { showFilterCard = false },
+                onApplyFilters = { filters ->
+                    onFiltersApplied(filters)
+                    showFilterCard = false
+                }
+            )
         }
     }
 }
