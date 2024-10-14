@@ -60,6 +60,7 @@ import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.CategoryBar
+import com.example.melapp.ReusableComponents.EventFilterCard
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.SearchTopBar
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -143,6 +144,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     var categoryColors by remember { mutableStateOf<Map<String, Color>>(emptyMap()) }
     var appliedFilters by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
+    var showFilterCard by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
@@ -150,22 +152,24 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     }
 
     // Efecto para filtrar eventos cuando cambian el estado de eventos o los filtros aplicados
-    LaunchedEffect(eventoState, appliedFilters) {
+    LaunchedEffect(eventoState, appliedFilters, selectedCategories) {
         filteredEvents = when (eventoState) {
             is EventoState.SuccessList -> {
                 val allEvents = (eventoState as EventoState.SuccessList).data.mapNotNull {
                     it.toObject(Evento::class.java)?.copy(id = it.id)
                 }
                 allEvents.filter { evento ->
-                    appliedFilters.all { (key, value) ->
-                        when (key) {
-                            "event_category" -> evento.event_category == value
-                            "event_age" -> evento.event_age == value
-                            "event_date" -> evento.event_date == value
-                            "event_price_range" -> evento.event_price_range == value
-                            else -> true
-                        }
-                    }
+                    (selectedCategories.isEmpty() || evento.event_category in selectedCategories) &&
+                            appliedFilters.all { (key, value) ->
+                                when (key) {
+                                    "event_category" -> value.isEmpty() || evento.event_category == value
+                                    "event_age" -> value.isEmpty() || evento.event_age == value
+                                    "event_date" -> value.isEmpty() || evento.event_date == value
+                                    "event_price_min" -> value.isEmpty() || (evento.event_price_range?.toDoubleOrNull() ?: 0.0) >= value.toDoubleOrNull() ?: 0.0
+                                    "event_price_max" -> value.isEmpty() || (evento.event_price_range?.toDoubleOrNull() ?: 0.0) <= value.toDoubleOrNull() ?: Double.MAX_VALUE
+                                    else -> true
+                                }
+                            }
                 }
             }
             else -> emptyList()
@@ -191,29 +195,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
     }
 
-    LaunchedEffect(eventoState, appliedFilters, selectedCategories) {
-        filteredEvents = when (eventoState) {
-            is EventoState.SuccessList -> {
-                val allEvents = (eventoState as EventoState.SuccessList).data.mapNotNull {
-                    it.toObject(Evento::class.java)?.copy(id = it.id)
-                }
-                allEvents.filter { evento ->
-                    (selectedCategories.isEmpty() || evento.event_category in selectedCategories) &&
-                            appliedFilters.all { (key, value) ->
-                                when (key) {
-                                    "event_category" -> value.isEmpty() || evento.event_category == value
-                                    "event_age" -> value.isEmpty() || evento.event_age == value
-                                    "event_date" -> value.isEmpty() || evento.event_date == value
-                                    "event_price_range" -> value.isEmpty() || evento.event_price_range == value
-                                    else -> true
-                                }
-                            }
-                }
-            }
-            else -> emptyList()
-        }
-    }
-
     Scaffold(
         topBar = {
             Column {
@@ -227,9 +208,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                             }
                         }
                     },
-                    onFiltersApplied = { filters ->
-                        appliedFilters = filters
-                    }
+                    onFiltersApplied = { showFilterCard = true }
                 )
                 CategoryBar(
                     onCategoriesSelected = { categories ->
@@ -275,7 +254,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 val location = parseLocation(evento.event_location ?: "")
                 location?.let { latLng ->
                     val markerColor = categoryColors[evento.event_category] ?: Color.Red
-                    Log.d("MapScreen", "Category: ${evento.event_category}, Marker color: $markerColor") // Log del color
+                    Log.d("MapScreen", "Category: ${evento.event_category}, Marker color: $markerColor")
                     Marker(
                         state = MarkerState(position = latLng),
                         title = evento.event_name ?: "Evento sin nombre",
@@ -288,7 +267,6 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                     )
                 }
             }
-
         }
 
         selectedEvent?.let { evento ->
@@ -300,6 +278,17 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                         .padding(bottom = 150.dp, end = 16.dp, start = 86.dp)
                 )
             }
+        }
+
+        if (showFilterCard) {
+            EventFilterCard(
+                onCloseClick = { showFilterCard = false },
+                onApplyFilters = { filters ->
+                    appliedFilters = filters
+                    showFilterCard = false
+                },
+                initialFilters = appliedFilters
+            )
         }
     }
 }
