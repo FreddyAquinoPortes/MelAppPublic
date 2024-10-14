@@ -17,13 +17,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun EventFilterCard(
     onCloseClick: () -> Unit,
-    onApplyFilters: (Map<String, String>) -> Unit
+    onApplyFilters: (Map<String, String>) -> Unit,
+    initialFilters: Map<String, String> = emptyMap()
 ) {
-    var ageFilter by remember { mutableStateOf("") }
-    var dateFilter by remember { mutableStateOf("") }
-    var minPriceFilter by remember { mutableStateOf("") }
-    var maxPriceFilter by remember { mutableStateOf("") }
+    var ageFilter by remember { mutableStateOf(initialFilters["event_age"] ?: "") }
+    var dateFilter by remember { mutableStateOf(initialFilters["event_date"] ?: "") }
+    var minPriceFilter by remember { mutableStateOf(initialFilters["event_price_min"] ?: "") }
+    var maxPriceFilter by remember { mutableStateOf(initialFilters["event_price_max"] ?: "") }
     var ageOptions by remember { mutableStateOf(listOf<String>()) }
+    var isAgeDropdownExpanded by remember { mutableStateOf(false) }
 
     // Fetch age options from Firebase
     LaunchedEffect(Unit) {
@@ -58,25 +60,28 @@ fun EventFilterCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             ExposedDropdownMenuBox(
-                expanded = false,
-                onExpandedChange = { /* Handle expansion */ }
+                expanded = isAgeDropdownExpanded,
+                onExpandedChange = { isAgeDropdownExpanded = !isAgeDropdownExpanded }
             ) {
                 OutlinedTextField(
                     value = ageFilter,
-                    onValueChange = { /* Handle value change */ },
+                    onValueChange = { },
                     readOnly = true,
                     label = { Text("Edad") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = false) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isAgeDropdownExpanded) },
                     modifier = Modifier.fillMaxWidth().menuAnchor()
                 )
                 ExposedDropdownMenu(
-                    expanded = false,
-                    onDismissRequest = { /* Handle dismiss */ }
+                    expanded = isAgeDropdownExpanded,
+                    onDismissRequest = { isAgeDropdownExpanded = false }
                 ) {
                     ageOptions.forEach { option ->
                         DropdownMenuItem(
                             text = { Text(option) },
-                            onClick = { ageFilter = option }
+                            onClick = {
+                                ageFilter = option
+                                isAgeDropdownExpanded = false
+                            }
                         )
                     }
                 }
@@ -136,6 +141,7 @@ fun EventFilterCard(
                             "event_price_max" to maxPriceFilter
                         ).filter { it.value.isNotEmpty() }
                         onApplyFilters(filters)
+                        onCloseClick()
                     }
                 ) {
                     Text("Aplicar")
