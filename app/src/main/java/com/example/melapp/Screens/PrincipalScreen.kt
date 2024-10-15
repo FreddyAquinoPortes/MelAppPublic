@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -125,6 +126,9 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
     var showFilterCard by remember { mutableStateOf(false) }
 
+    BackHandler {
+        // No hacemos nada aquí para bloquear el botón de retroceso
+    }
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
         categoryColors = getCategoryColors()

@@ -251,22 +251,35 @@ class EventoViewModel : ViewModel() {
     suspend fun searchEvents(query: String): List<Evento> {
         return withContext(Dispatchers.IO) {
             try {
+                // Obtener todos los eventos de Firebase
                 val eventosCollection = firestore.collection("Event")
-                val querySnapshot = eventosCollection
-                    .whereGreaterThanOrEqualTo("event_name", query)
-                    .whereLessThanOrEqualTo("event_name", query + '\uf8ff')
-                    .get()
-                    .await()
+                val querySnapshot = eventosCollection.get().await()
 
-                querySnapshot.documents.mapNotNull { document ->
+                // Convertir los documentos a objetos Evento
+                val eventos = querySnapshot.documents.mapNotNull { document ->
                     document.toObject(Evento::class.java)?.copy(id = document.id)
                 }
+
+                // Filtrar los eventos que coincidan con la consulta (insensible a mayúsculas/minúsculas)
+                val filteredEvents = eventos.filter { evento ->
+                    val queryLower = query.lowercase() // Convertir la consulta a minúsculas
+                    val eventNameLower = evento.event_name?.lowercase() ?: "" // Convertir el nombre del evento a minúsculas
+
+                    // Comprobar si el nombre del evento contiene todas las palabras de la consulta
+                    queryLower.split(" ").all { queryPart ->
+                        eventNameLower.contains(queryPart)
+                    }
+                }
+
+                filteredEvents
             } catch (e: Exception) {
                 Log.e("EventoViewModel", "Error searching events: ${e.message}", e)
                 emptyList()
             }
         }
     }
+
+
     // Eliminar un evento por ID
     fun eliminarEvento(eventoId: String) {
         viewModelScope.launch {
