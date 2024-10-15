@@ -42,6 +42,7 @@ import com.example.melapp.ReusableComponents.CategoryBar
 import com.example.melapp.ReusableComponents.EventFilterCard
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.SearchTopBar
+import com.example.melapp.ReusableComponents.isPriceInRange
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -143,21 +144,18 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 }
                 allEvents.filter { evento ->
                     (selectedCategories.isEmpty() || evento.event_category in selectedCategories) &&
-                            appliedFilters.all { (key, value) ->
-                                when (key) {
-                                    "event_age" -> value.isEmpty() || evento.event_age == value
-                                    "event_date" -> value.isEmpty() || evento.event_date == value
-                                    "event_price_min" -> value.isEmpty() || (evento.event_price_range?.toDoubleOrNull() ?: 0.0) >= value.toDoubleOrNull() ?: 0.0
-                                    "event_price_max" -> value.isEmpty() || (evento.event_price_range?.toDoubleOrNull() ?: 0.0) <= value.toDoubleOrNull() ?: Double.MAX_VALUE
-                                    else -> true
-                                }
-                            }
+                            isPriceInRange(
+                                evento.event_price_range,
+                                appliedFilters["event_price_min"] ?: "",
+                                appliedFilters["event_price_max"] ?: ""
+                            ) &&
+                            (appliedFilters["event_age"]?.isEmpty() ?: true || evento.event_age == appliedFilters["event_age"]) &&
+                            (appliedFilters["event_date"]?.isEmpty() ?: true || evento.event_date == appliedFilters["event_date"])
                 }
             }
             else -> emptyList()
         }
     }
-
     val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     val cameraPositionState = rememberCameraPositionState {

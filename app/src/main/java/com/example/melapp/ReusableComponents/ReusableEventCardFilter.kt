@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -30,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.melapp.Components.DatePicker
 import com.example.melapp.R
@@ -125,18 +127,21 @@ fun EventFilterCard(
             ) {
                 OutlinedTextField(
                     value = minPriceFilter,
-                    onValueChange = { minPriceFilter = it },
+                    onValueChange = { minPriceFilter = it.filter { it.isDigit() } },
                     label = { Text("Precio mínimo") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 OutlinedTextField(
                     value = maxPriceFilter,
-                    onValueChange = { maxPriceFilter = it },
+                    onValueChange = { maxPriceFilter = it.filter { it.isDigit() } },
                     label = { Text("Precio máximo") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f)
                 )
             }
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -160,9 +165,10 @@ fun EventFilterCard(
                         val filters = mapOf(
                             "event_age" to ageFilter,
                             "event_date" to dateFilter,
-                            "event_price_min" to minPriceFilter,
-                            "event_price_max" to maxPriceFilter
+                            "event_price_min" to formatPriceForBackend(minPriceFilter),
+                            "event_price_max" to formatPriceForBackend(maxPriceFilter)
                         ).filter { it.value.isNotEmpty() }
+
                         onApplyFilters(filters)
                         showToast("Filtros aplicados correctamente")
                     }
@@ -173,3 +179,26 @@ fun EventFilterCard(
         }
     }
 }
+
+// Las funciones auxiliares permanecen iguales
+fun extractNumericPrice(price: String?): Int {
+    return price?.replace(Regex("[^0-9]"), "")?.toIntOrNull() ?: 0
+}
+
+// Función actualizada para comparar precios
+fun isPriceInRange(dbPrice: String?, minPrice: String, maxPrice: String): Boolean {
+    val dbNumericPrice = extractNumericPrice(dbPrice)
+    val minNumericPrice = extractNumericPrice(minPrice)
+    val maxNumericPrice = if (maxPrice.isEmpty()) Int.MAX_VALUE else extractNumericPrice(maxPrice)
+
+    return dbNumericPrice in minNumericPrice..maxNumericPrice
+}
+
+// Función para formatear el precio para el backend
+fun formatPriceForBackend(price: String): String {
+    val numericPrice = price.replace(Regex("[^0-9]"), "")
+    return if (numericPrice.isNotEmpty()) {
+        if (price.uppercase().endsWith("DOP")) price else "$numericPrice DOP"
+    } else ""
+}
+
