@@ -1,16 +1,38 @@
 package com.example.melapp.ReusableComponents
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.melapp.R
 import com.example.melapp.Components.DatePicker
+import com.example.melapp.R
 import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -18,7 +40,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun EventFilterCard(
     onCloseClick: () -> Unit,
     onApplyFilters: (Map<String, String>) -> Unit,
-    initialFilters: Map<String, String> = emptyMap()
+    initialFilters: Map<String, String>,
+    showToast: (String) -> Unit
 ) {
     var ageFilter by remember { mutableStateOf(initialFilters["event_age"] ?: "") }
     var dateFilter by remember { mutableStateOf(initialFilters["event_date"] ?: "") }
@@ -27,7 +50,6 @@ fun EventFilterCard(
     var ageOptions by remember { mutableStateOf(listOf<String>()) }
     var isAgeDropdownExpanded by remember { mutableStateOf(false) }
 
-    // Fetch age options from Firebase
     LaunchedEffect(Unit) {
         val db = FirebaseFirestore.getInstance()
         db.collection("Event_Age").get()
@@ -61,7 +83,7 @@ fun EventFilterCard(
 
             ExposedDropdownMenuBox(
                 expanded = isAgeDropdownExpanded,
-                onExpandedChange = { isAgeDropdownExpanded = !isAgeDropdownExpanded }
+                onExpandedChange = { isAgeDropdownExpanded = it }
             ) {
                 OutlinedTextField(
                     value = ageFilter,
@@ -69,7 +91,7 @@ fun EventFilterCard(
                     readOnly = true,
                     label = { Text("Edad") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isAgeDropdownExpanded) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
                 ExposedDropdownMenu(
                     expanded = isAgeDropdownExpanded,
@@ -128,6 +150,7 @@ fun EventFilterCard(
                         dateFilter = ""
                         minPriceFilter = ""
                         maxPriceFilter = ""
+                        showToast("Filtros limpiados")
                     }
                 ) {
                     Text("Limpiar")
@@ -141,7 +164,7 @@ fun EventFilterCard(
                             "event_price_max" to maxPriceFilter
                         ).filter { it.value.isNotEmpty() }
                         onApplyFilters(filters)
-                        onCloseClick()
+                        showToast("Filtros aplicados correctamente")
                     }
                 ) {
                     Text("Aplicar")
