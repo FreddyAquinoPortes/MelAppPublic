@@ -1,7 +1,12 @@
 package com.example.melapp.Screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -9,7 +14,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +31,7 @@ import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.google.firebase.firestore.DocumentSnapshot
+import com.example.melapp.Backend.getAddressFromLatLng
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,12 +45,16 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Detalles del Evento") },
+                title = { Text("Detalles del Evento", color = Color.White) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "Volver")
+                        Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "Volver", tint = Color.White)
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = Color.Transparent
+                )
             )
         },
         bottomBar = {
@@ -60,12 +74,22 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
                             .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = Color.White)
                     }
                 }
                 is EventoState.SuccessSingle -> {
                     val documento = (eventoState as EventoState.SuccessSingle).data
-                    DisplayEventDetails(documento)
+                    val context = LocalContext.current
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                            .verticalScroll(rememberScrollState())
+                            .padding(16.dp)
+                            .background(Color(0xFF121212))  // Fondo oscuro elegante
+                    ) {
+                        DisplayEventDetails(documento, context)
+                    }
                 }
                 is EventoState.Error -> {
                     Box(
@@ -86,7 +110,7 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
 }
 
 @Composable
-fun DisplayEventDetails(documento: DocumentSnapshot) {
+fun DisplayEventDetails(documento: DocumentSnapshot, context: Context) {
     // Mapea las claves a nombres amigables
     val fieldMappings = mapOf(
         "event_title" to "Título del Evento",
@@ -98,7 +122,7 @@ fun DisplayEventDetails(documento: DocumentSnapshot) {
         "event_number_of_attendees" to "Número de asistentes",
         "event_price_range" to "Rango de precios",
         "event_category" to "Categoría",
-        "event_thumbnail" to "Imagen del Evento",  // Este campo es especial porque será tratado como una imagen
+        "event_thumbnail" to "Imagen del Evento",
         "user_email" to "Correo electrónico",
         "event_post_date" to "Fecha de publicación",
         "event_age" to "Edad permitida",
@@ -109,38 +133,119 @@ fun DisplayEventDetails(documento: DocumentSnapshot) {
         "event_name" to "Nombre del Evento"
     )
 
-    // Carga el URL de la miniatura
-    val imageUrl = documento.getString("event_thumbnail")
+    // Obtener latitud y longitud del documento
+    val locationString = documento.getString("event_location") ?: ""
+    val latLng = parseLatLng(locationString)
+    var address = "Ubicación no disponible"
+    latLng?.let {
+        address = getAddressFromLatLng(context, it.first, it.second)
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(Color(0xFF1C1C1C))  // Fondo ligeramente más claro que el negro puro
     ) {
-        // Mostrar la imagen del evento si está disponible
+        // Imagen destacada del evento con sombras y bordes redondeados
+        val imageUrl = documento.getString("event_thumbnail")
         imageUrl?.let {
-            Image(
-                painter = rememberImagePainter(it),
-                contentDescription = "Imagen del evento",
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .padding(bottom = 16.dp),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        // Mostrar los detalles del evento con nombres amigables
-        documento.data?.forEach { (key, value) ->
-            val fieldName = fieldMappings[key] ?: key  // Si no hay un nombre amigable, usa la clave original
-            if (key != "event_thumbnail") {  // Evita mostrar el link de la imagen como texto
-                Text(
-                    text = "$fieldName: $value",
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    .height(220.dp)
+                    .padding(8.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .shadow(8.dp)
+            ) {
+                Image(
+                    painter = rememberImagePainter(it),
+                    contentDescription = "Imagen del evento",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Sección de información general del evento
+        InfoSection(title = "Información General") {
+            GeneralInfo(documento, fieldMappings)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Sección de detalles adicionales del evento
+        InfoSection(title = "Detalles del Evento") {
+            EventDetails(documento, fieldMappings, address)
+        }
+    }
+}
+
+// Sección con título y contenido
+@Composable
+fun InfoSection(title: String, content: @Composable () -> Unit) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(vertical = 8.dp)
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2E2E2E)),  // Fondo oscuro para las tarjetas
+            elevation = CardDefaults.cardElevation(8.dp)  // Elevación para una sombra sutil
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                content()
+            }
+        }
+    }
+}
+
+// Información general del evento
+@Composable
+fun GeneralInfo(documento: DocumentSnapshot, fieldMappings: Map<String, String>) {
+    val eventName = documento.getString("event_title") ?: "Sin título"
+    val eventCategory = documento.getString("event_category") ?: "Sin categoría"
+    val eventDate = documento.getString("event_date") ?: "Sin fecha"
+
+    Column {
+        EventDetailRow(label = fieldMappings["event_title"] ?: "Título", value = eventName)
+        EventDetailRow(label = fieldMappings["event_category"] ?: "Categoría", value = eventCategory)
+        EventDetailRow(label = fieldMappings["event_date"] ?: "Fecha", value = eventDate)
+    }
+}
+
+// Detalles adicionales del evento, incluyendo la ubicación convertida
+@Composable
+fun EventDetails(documento: DocumentSnapshot, fieldMappings: Map<String, String>, address: String) {
+    val startTime = documento.getString("event_start_time") ?: "Sin hora de inicio"
+    val endTime = documento.getString("event_end_time") ?: "Sin hora de fin"
+    val attendees = documento.getString("event_number_of_attendees") ?: "N/A"
+    val priceRange = documento.getString("event_price_range") ?: "Sin precio"
+
+    Column {
+        EventDetailRow(label = fieldMappings["event_start_time"] ?: "Hora de inicio", value = startTime)
+        EventDetailRow(label = fieldMappings["event_end_time"] ?: "Hora de fin", value = endTime)
+        EventDetailRow(label = fieldMappings["event_location"] ?: "Ubicación", value = address)  // Mostrar dirección en vez de lat/lng
+        EventDetailRow(label = fieldMappings["event_number_of_attendees"] ?: "Asistentes", value = attendees)
+        EventDetailRow(label = fieldMappings["event_price_range"] ?: "Precio", value = priceRange)
+    }
+}
+
+// Fila de detalle con etiqueta y valor
+@Composable
+fun EventDetailRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = "$label:", color = Color.Gray)
+        Text(text = value, color = Color.White, fontWeight = FontWeight.SemiBold)
     }
 }
