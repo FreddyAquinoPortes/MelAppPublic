@@ -3,6 +3,7 @@ package com.example.melapp.Screens
 
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -60,7 +61,7 @@ import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.ReusableTopBar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -203,7 +204,30 @@ fun EventFormScreen(
                         })
                     }
                 }
-
+            fun uploadAdditionalImages(
+                images: List<Uri>,
+                onSuccess: (List<String>) -> Unit,
+                onFailure: () -> Unit
+            ) {
+                val uploadedImageUrls = mutableListOf<String>()
+                images.forEachIndexed { index, uri ->
+                    val storageRef = FirebaseStorage.getInstance().reference.child("event_images/additional_${System.currentTimeMillis()}_$index")
+                    storageRef.putFile(uri)
+                        .addOnSuccessListener { taskSnapshot ->
+                            storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+                                uploadedImageUrls.add(downloadUri.toString())
+                                Log.d("UploadImages", "Imagen subida: $downloadUri")
+                                if (uploadedImageUrls.size == images.size) {
+                                    onSuccess(uploadedImageUrls)
+                                }
+                            }
+                        }
+                        .addOnFailureListener {
+                            onFailure()
+                            Log.e("UploadImages", "Error al subir la imagen: $uri")
+                        }
+                }
+            }
             // Estado para manejar las imágenes adicionales
             val additionalImages = remember { mutableStateOf(listOf<Uri>()) }
 
@@ -220,7 +244,7 @@ fun EventFormScreen(
             // Llamar a EventImagesSection correctamente
             EventImagesSection(
                 eventImage = eventImageUrl,         // URL de la imagen seleccionada para el evento
-                additionalImageUri = selectedAditionalImageUri,//selectedAditionalImageUri, // Pasar la URI de la imagen seleccionada aquí
+                additionalImageUri = additionalImages.value,//selectedAditionalImageUri, // Pasar la URI de la imagen seleccionada aquí
                 selectedImageUri = selectedImageUri,  // URI de la miniatura seleccionada
                 onEventImageClick = {
                     // Lógica para seleccionar la imagen del evento (lanzar picker)
@@ -437,44 +461,50 @@ fun EventFormScreen(
                             eventTitle, eventDescription, selectedDate, startTime, endTime,
                             attendeeCount, ticketUrl, latitud, longitud, cost
                         )
+
                         if (isValid) {
                             // Construir el rango de precio
                             val eventPriceRange = "$cost $selectedCurrency"
 
-                            val evento = Evento(
-                                id = eventoId,
-                                user_email = currentUser?.email ?: "",
-                                event_age = "Todas las edades",
-                                event_category = eventCategory,
-                                event_date = selectedDate,
-                                event_description = eventDescription,
-                                event_end_time = endTime,
-                                event_location = "Lat: $latitud, Lng: $longitud",
-                                event_name = eventTitle,
-                                event_number_of_attendees = attendeeCount,
-                                event_price_range = eventPriceRange,
-                                event_rating = "0",
-                                event_start_time = startTime,
-                                event_status = "pendiente",
-                                event_title = eventTitle,
-                                event_url = ticketUrl,
-                                event_verification = "pendiente",
-                                event_post_date = formattedDateTime,
-                                event_thumbnail = eventImageUrl
-                            )
+                            // Lógica para subir las imágenes adicionales
+                            uploadAdditionalImages(additionalImages.value, { uploadedUrls ->
+                                // Construir el objeto Evento con las URLs adicionales de las imágenes
+                                val evento = Evento(
+                                    id = eventoId,
+                                    user_email = currentUser?.email ?: "",
+                                    event_age = "Todas las edades",
+                                    event_category = eventCategory,
+                                    event_date = selectedDate,
+                                    event_description = eventDescription,
+                                    event_end_time = endTime,
+                                    event_location = "Lat: $latitud, Lng: $longitud",
+                                    event_name = eventTitle,
+                                    event_number_of_attendees = attendeeCount,
+                                    event_price_range = eventPriceRange,
+                                    event_rating = "0",
+                                    event_start_time = startTime,
+                                    event_status = "pendiente",
+                                    event_title = eventTitle,
+                                    event_url = ticketUrl,
+                                    event_verification = "pendiente",
+                                    event_post_date = formattedDateTime,
+                                    event_thumbnail = eventImageUrl,
+                                    event_additional_images = uploadedUrls // Agregar las imágenes adicionales
+                                )
 
-                            // Nuevo, para que elija entre crear y modificar
-                            if (eventoId == null) {
-                                // Crear un nuevo evento
-                                eventoViewModel.crearEvento(evento)
-                            } else {
-                                // Actualizar un evento existente
-                                eventoViewModel.actualizarEvento(evento)
-                            }
+                                // Nuevo, para que elija entre crear y modificar
+                                if (eventoId == null) {
+                                    eventoViewModel.crearEvento(evento)
+                                } else {
+                                    eventoViewModel.actualizarEvento(evento)
+                                }
 
-                            // Navegar de vuelta después de publicar o actualizar
-                            navController.popBackStack()
-                            showToast = true
+                                navController.popBackStack()
+                                showToast = true
+                            }, {
+                                // Manejar el error en la subida de imágenes adicionales
+                                Toast.makeText(context, "Error al subir imágenes adicionales", Toast.LENGTH_SHORT).show()
+                            })
                         } else {
                             Toast.makeText(
                                 context,
@@ -482,6 +512,7 @@ fun EventFormScreen(
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
+
                     },
                     modifier = Modifier.weight(1f)
                 ) {

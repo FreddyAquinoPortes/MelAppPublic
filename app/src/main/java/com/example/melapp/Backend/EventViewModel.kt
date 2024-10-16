@@ -50,7 +50,8 @@ data class Evento(
     val event_status: String? = null,
     var event_thumbnail: String? = null,
     val id: String? = null, // Agrega este campo para almacenar el ID del evento
-    val event_rating: String? = null
+    val event_rating: String? = null,
+    val event_additional_images: List<String>? = emptyList()
 
 )
 
@@ -204,7 +205,8 @@ class EventoViewModel : ViewModel() {
                     "event_url" to evento.event_url,
                     "event_verification" to evento.event_verification,
                     "event_post_date" to evento.event_post_date,
-                    "event_thumbnail" to (evento.event_thumbnail ?: "")
+                    "event_thumbnail" to (evento.event_thumbnail ?: ""),
+                    "event_additional_images" to evento.event_additional_images
                 )
 
                 // Usar la función de suspensión add().await()
@@ -251,7 +253,8 @@ class EventoViewModel : ViewModel() {
                     "event_url" to evento.event_url,
                     "event_verification" to evento.event_verification,
                     "event_post_date" to evento.event_post_date,
-                    "event_thumbnail" to (evento.event_thumbnail ?: "")
+                    "event_thumbnail" to (evento.event_thumbnail ?: ""),
+                    "event_additional_images" to evento.event_additional_images
                 )
 
                 // Usar la función de suspensión update().await()

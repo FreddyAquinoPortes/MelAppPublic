@@ -32,7 +32,7 @@ import com.example.melapp.R
 @Composable
 fun EventImagesSection(
     eventImage: String?,
-    additionalImageUri: Uri?,
+    additionalImageUri: List<Uri>,
     selectedImageUri: Uri?,
     onEventImageClick: () -> Unit,
     onAdditionalImagesClick: () -> Unit

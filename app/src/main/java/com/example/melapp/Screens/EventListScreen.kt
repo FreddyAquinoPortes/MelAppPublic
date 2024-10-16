@@ -55,14 +55,7 @@ fun EventListScreen(navController: NavController, eventoViewModel: EventoViewMod
                 onBackClick = { navController.popBackStack() }
             )
         },
-        bottomBar = {
-            NavigationBottomBar(
-                onProfileClick = { navController.navigate("profileScreen") },
-                onPostEventClick = { navController.navigate("map") },
-                onPublishClick = { navController.navigate("event_form") },
-                onSettingsClick = { navController.navigate("settingsScreen") }
-            )
-        },
+
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate("event_form") }) {
                 Icon(Icons.Default.Add, contentDescription = "Crear Evento")

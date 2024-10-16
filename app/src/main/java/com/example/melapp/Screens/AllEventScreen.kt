@@ -24,7 +24,9 @@ import androidx.navigation.NavController
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.Backend.toEvento
+import com.example.melapp.ReusableComponents.CategoryBar
 import com.example.melapp.ReusableComponents.EventCardDescription2
+import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.ReusableTopBar
 
 
@@ -42,6 +44,15 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
             ReusableTopBar(
                 screenTitle = "Eventos",
                 onBackClick = { navController.popBackStack() }
+            )
+
+        },
+        bottomBar = {
+            NavigationBottomBar(
+                onProfileClick = { navController.navigate("profileScreen") },
+                onPostEventClick = { navController.navigate("map") },
+                onPublishClick = { navController.navigate("all_event_screen") },
+                onSettingsClick = { navController.navigate("settingsScreen") }
             )
         },
         content = { innerPadding ->
@@ -114,6 +125,7 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
                 else -> {
                     // Manejar estados no conocidos
                 }
+
             }
         }
     )
