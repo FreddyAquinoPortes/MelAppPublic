@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.melapp.Screens.parseLocation
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
@@ -62,6 +63,12 @@ class EventoViewModel : ViewModel() {
 
     fun updateSelectedEvent(evento: Evento) {
         _selectedEvent.value = evento
+        // Actualizamos la posición de la cámara al seleccionar un evento
+        evento.event_location?.let { location ->
+            parseLocation(location)?.let { latLng ->
+                updateCameraPosition(latLng)
+            }
+        }
     }
 
     private val firestore = FirebaseFirestore.getInstance()
@@ -147,26 +154,27 @@ class EventoViewModel : ViewModel() {
         }
     }
 
-    fun obtenerEventoPorId(eventId: String, onEventLoaded: (Evento) -> Unit) {
-        firestore.collection("eventos").document(eventId).get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    // Convert the document to Evento
-                    val evento = document.toObject(Evento::class.java)
+    fun loadEventById(eventId: String) {
+        viewModelScope.launch {
+            try {
+                // Lógica para obtener el evento por ID (ejemplo usando Firestore)
+                val documentSnapshot = FirebaseFirestore.getInstance()
+                    .collection("Event")
+                    .document(eventId)
+                    .get()
+                    .await() // Suspender hasta que obtenga el evento
 
-                    // Check if evento is not null before notifying the caller
-                    if (evento != null) {
-                        onEventLoaded(evento) // Notify the caller with the loaded event
-                    } else {
-                        Log.e("EventoViewModel", "El evento es null")
-                    }
+                // Convertir el documento a un objeto Evento
+                val evento = documentSnapshot.toObject(Evento::class.java)
+                if (evento != null) {
+                    _selectedEvent.value = evento // Actualizamos el estado del evento seleccionado
                 } else {
-                    Log.e("EventoViewModel", "No existe el documento")
+                    Log.d("EventoViewModel", "Evento no encontrado")
                 }
+            } catch (e: Exception) {
+                Log.e("EventoViewModel", "Error al cargar el evento: ${e.message}")
             }
-            .addOnFailureListener { exception ->
-                Log.e("EventoViewModel", "Error obteniendo evento: ${exception.message}")
-            }
+        }
     }
 
 

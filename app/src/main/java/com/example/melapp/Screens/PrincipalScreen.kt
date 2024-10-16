@@ -45,7 +45,6 @@ import com.example.melapp.ReusableComponents.SearchTopBar
 import com.example.melapp.ReusableComponents.isPriceInRange
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -129,28 +128,18 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     var showFilterCard by remember { mutableStateOf(false) }
     val selectedEventFav by eventoViewModel.selectedEvent.collectAsState()
     val cameraPositionStateFav = rememberCameraPositionState()
+    val eventId = navController.currentBackStackEntry?.arguments?.getString("eventId")
 
     BackHandler {
         // No hacemos nada aquí para bloquear el botón de retroceso
     }
+
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
         categoryColors = getCategoryColors()
     }
 
-    LaunchedEffect(selectedEventFav) {
-        selectedEventFav?.let { evento ->
-            evento.event_location?.let { location ->
-                parseLocation(location)?.let { latLng ->
-                    cameraPositionStateFav.animate(
-                        update = CameraUpdateFactory.newLatLngZoom(latLng, 15f),
-                        durationMs = 1000
-                    )
-                }
-            }
-        }
-    }
 
     LaunchedEffect(eventoState, appliedFilters, selectedCategories) {
         filteredEvents = when (eventoState) {

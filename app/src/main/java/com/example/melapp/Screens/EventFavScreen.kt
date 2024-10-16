@@ -49,7 +49,6 @@ import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.R
 import com.example.melapp.ReusableComponents.ReusableTopBar
-import com.google.android.gms.maps.model.LatLng
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +57,6 @@ fun EventosFavoritosScreen(navController: NavController, eventoViewModel: Evento
     val eventoState by eventoViewModel.eventoState.collectAsState()
     val context = LocalContext.current
     var showDeleteDialog by remember { mutableStateOf<String?>(null) }
-    val defaultLatLng = LatLng(0.0, 0.0)
 
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerEventosFavoritosDelUsuario()
@@ -96,9 +94,7 @@ fun EventosFavoritosScreen(navController: NavController, eventoViewModel: Evento
                         }
                     } else {
                         LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding)
+                            modifier = Modifier.padding(innerPadding)
                         ) {
                             items(eventoDocuments) { document ->
                                 val evento = document.toObject(Evento::class.java)?.copy(id = document.id)
@@ -108,15 +104,7 @@ fun EventosFavoritosScreen(navController: NavController, eventoViewModel: Evento
                                         onViewDetails = {
                                             navController.navigate("eventDetails/${it.id}")
                                         },
-                                        onMapClick = {
-                                            val location = it.event_location?.let { loc -> parseLocation(loc) } ?: defaultLatLng
-                                            eventoViewModel.updateSelectedEvent(it)
-                                            eventoViewModel.updateCameraPosition(location)
-                                            navController.navigate("map")
-                                        },
-                                        onDeleteFavorite = {
-                                            showDeleteDialog = it.id
-                                        }
+                                        onDeleteFavorite = { showDeleteDialog = it.id }
                                     )
                                 }
                             }
@@ -167,7 +155,6 @@ fun EventosFavoritosScreen(navController: NavController, eventoViewModel: Evento
 fun EventoListItem(
     evento: Evento,
     onViewDetails: () -> Unit,
-    onMapClick: () -> Unit,
     onDeleteFavorite: () -> Unit
 ) {
     Card(
@@ -223,9 +210,6 @@ fun EventoListItem(
             Column {
                 IconButton(onClick = onViewDetails) {
                     Icon(painter = painterResource(R.drawable.ic_info), contentDescription = "Ver Detalles")
-                }
-                IconButton(onClick = onMapClick) {
-                    Icon(painter = painterResource(R.drawable.ic_earth), contentDescription = "Ver en el Mapa")
                 }
                 IconButton(onClick = onDeleteFavorite) {
                     Icon(painter = painterResource(R.drawable.ic_bin), contentDescription = "Eliminar de Favoritos")
