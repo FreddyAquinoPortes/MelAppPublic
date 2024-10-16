@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.melapp.Screens.AllEventScreen
 import com.example.melapp.Screens.EditProfileScreen
 import com.example.melapp.Screens.EventFormScreen
 import com.example.melapp.Screens.EventListScreen
@@ -113,6 +114,9 @@ fun AppNavigation() {
         }
         composable("fav_events") { // Nueva ruta para EventListScreen
             EventosFavoritosScreen(navController)
+        }
+        composable("all_event_screen") { // Nueva ruta para EventListScreen
+            AllEventScreen(navController)
         }
     }
 }
