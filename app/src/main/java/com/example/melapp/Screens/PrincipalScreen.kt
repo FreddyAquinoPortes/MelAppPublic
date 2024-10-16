@@ -260,7 +260,13 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                     evento = evento,
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = 150.dp, end = 16.dp, start = 86.dp)
+                        .padding(bottom = 150.dp, end = 16.dp, start = 86.dp),
+                    onCloseClick = {
+                        selectedEvent = null // Al hacer clic en la "X", la tarjeta se cierra
+                    },
+                    onSaveClick = { isSaved ->
+                        // Lógica para guardar o eliminar el evento
+                    }
                 )
             }
         }
