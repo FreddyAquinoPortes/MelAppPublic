@@ -2,6 +2,8 @@ package com.example.melapp.ReusableComponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,13 +55,13 @@ fun NavigationBottomBar(
             ) {
                 IconButton(onClick = onPublishClick) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_edit_calendar), // Aquí usas tu ícono `ic_plus`
-                        contentDescription = "Gestionar",
+                        imageVector = Icons.Default.List, // Aquí usas tu ícono `ic_plus`
+                        contentDescription = "lista",
                         tint = Color.Gray
                     )
                 }
                 Text(
-                    text = "Gestionar \neventos",
+                    text = "Lista de\neventos",
                     color = Color.Gray
                 )
             }

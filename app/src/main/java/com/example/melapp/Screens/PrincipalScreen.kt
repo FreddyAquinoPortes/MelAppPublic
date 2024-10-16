@@ -222,7 +222,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 onProfileClick = { navController.navigate("profileScreen") },
                 onPostEventClick = { navController.navigate("map") },
                 onSettingsClick = { navController.navigate("settingsScreen") },
-                onPublishClick = { navController.navigate("event_list") }
+                onPublishClick = { navController.navigate("all_event_screen") }
             )
         },
         floatingActionButton = {

@@ -94,7 +94,7 @@ fun ProfileScreen(navController: NavController) {
             NavigationBottomBar(
                 onProfileClick = { navController.navigate("profileScreen") },
                 onPostEventClick = { navController.navigate("map") },
-                onPublishClick = { navController.navigate("event_form") },
+                onPublishClick = { navController.navigate("all_event_screen") },
                 onSettingsClick = { navController.navigate("settingsScreen") }
             )
         }
