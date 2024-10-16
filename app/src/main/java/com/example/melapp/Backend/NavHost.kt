@@ -93,5 +93,8 @@ fun AppNavigation() {
         composable("event_list") { // Nueva ruta para EventListScreen
             EventListScreen(navController)
         }
+        composable("all_event_screen") { // Nueva ruta para EventListScreen
+            AllEventScreen(navController)
+        }
     }
 }
