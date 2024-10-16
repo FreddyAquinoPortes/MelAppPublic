@@ -9,7 +9,25 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.melapp.Screens.*
+import com.example.melapp.Screens.EditProfileScreen
+import com.example.melapp.Screens.EventFormScreen
+import com.example.melapp.Screens.EventListScreen
+import com.example.melapp.Screens.EventoDetailsScreen
+import com.example.melapp.Screens.EventosFavoritosScreen
+import com.example.melapp.Screens.HalfSignUpScreen
+import com.example.melapp.Screens.HelpScreen
+import com.example.melapp.Screens.HomePage
+import com.example.melapp.Screens.LoginScreen
+import com.example.melapp.Screens.MapScreen
+import com.example.melapp.Screens.PasswordRecoveryScreen
+import com.example.melapp.Screens.ProfileScreen
+import com.example.melapp.Screens.RegistrationSuccessScreen
+import com.example.melapp.Screens.ReportProblemScreen
+import com.example.melapp.Screens.SelectLocationScreen
+import com.example.melapp.Screens.SettingsScreen
+import com.example.melapp.Screens.SignUpScreen
+import com.example.melapp.Screens.SplashScreen
+import com.example.melapp.Screens.TradicionalLoginScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -92,6 +110,9 @@ fun AppNavigation() {
         }
         composable("event_list") { // Nueva ruta para EventListScreen
             EventListScreen(navController)
+        }
+        composable("fav_events") { // Nueva ruta para EventListScreen
+            EventosFavoritosScreen(navController)
         }
     }
 }

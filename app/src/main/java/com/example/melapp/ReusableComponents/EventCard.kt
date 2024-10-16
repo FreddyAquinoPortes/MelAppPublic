@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -94,7 +95,9 @@ fun EventCardDescription(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(80.dp)
-                    .padding(end = 8.dp)
+                    .align(Alignment.CenterVertically) // Centra la imagen verticalmente
+                    .padding(8.dp) // Aplica el mismo padding en todos los lados
+                    .clip(RoundedCornerShape(8.dp)) // Bordes redondeados con un radio de 8dp (puedes ajustar según tu preferencia)
             ) {
                 val painterState = painter.state
                 if (painterState is AsyncImagePainter.State.Loading || painterState is AsyncImagePainter.State.Error) {
@@ -103,6 +106,7 @@ fun EventCardDescription(
                     SubcomposeAsyncImageContent()
                 }
             }
+
 
             // Información del evento
             Column(

@@ -45,6 +45,7 @@ import com.example.melapp.ReusableComponents.SearchTopBar
 import com.example.melapp.ReusableComponents.isPriceInRange
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -126,16 +127,31 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     var appliedFilters by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var selectedCategories by remember { mutableStateOf<List<String>>(emptyList()) }
     var showFilterCard by remember { mutableStateOf(false) }
+    val selectedEventFav by eventoViewModel.selectedEvent.collectAsState()
+    val cameraPositionStateFav = rememberCameraPositionState()
 
     BackHandler {
         // No hacemos nada aquí para bloquear el botón de retroceso
     }
+
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
         categoryColors = getCategoryColors()
     }
 
-    // Efecto para filtrar eventos cuando cambian el estado de eventos o los filtros aplicados
+    LaunchedEffect(selectedEventFav) {
+        selectedEventFav?.let { evento ->
+            evento.event_location?.let { location ->
+                parseLocation(location)?.let { latLng ->
+                    cameraPositionStateFav.animate(
+                        update = CameraUpdateFactory.newLatLngZoom(latLng, 15f),
+                        durationMs = 1000
+                    )
+                }
+            }
+        }
+    }
+
     LaunchedEffect(eventoState, appliedFilters, selectedCategories) {
         filteredEvents = when (eventoState) {
             is EventoState.SuccessList -> {
@@ -156,11 +172,8 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
             else -> emptyList()
         }
     }
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition(LatLng(40.7128, -74.0060), 12f, 0f, 0f)
-    }
+    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
 
     var myLocationEnabled by remember { mutableStateOf(false) }
 
@@ -171,7 +184,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
         ) == PackageManager.PERMISSION_GRANTED
     ) {
         myLocationEnabled = true
-        centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
+        centerCameraOnUser(fusedLocationClient, cameraPositionStateFav, context)
     }
 
     Scaffold(
@@ -183,7 +196,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                         selectedEvent = evento
                         evento.event_location?.let { location ->
                             parseLocation(location)?.let { latLng ->
-                                cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 15f)
+                                cameraPositionStateFav.position = CameraPosition.fromLatLngZoom(latLng, 15f)
                             }
                         }
                     },
@@ -220,7 +233,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
             ) {
                 FloatingActionButton(
                     onClick = {
-                        centerCameraOnUser(fusedLocationClient, cameraPositionState, context)
+                        centerCameraOnUser(fusedLocationClient, cameraPositionStateFav, context)
                     },
                     containerColor = Color(0xFF1A237E),
                     contentColor = Color.White,
@@ -234,7 +247,7 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
     ) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
+            cameraPositionState = cameraPositionStateFav,
             properties = MapProperties(isMyLocationEnabled = myLocationEnabled)
         ) {
             filteredEvents.forEach { evento ->
@@ -248,7 +261,21 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                         icon = BitmapDescriptorFactory.defaultMarker(colorToHue(markerColor)),
                         onClick = {
                             selectedEvent = evento
-                            true}
+                            true
+                        }
+                    )
+                }
+            }
+
+            // Agregar un marcador especial para el evento seleccionado de favoritos
+            selectedEventFav?.let { evento ->
+                val location = parseLocation(evento.event_location ?: "")
+                location?.let { latLng ->
+                    Marker(
+                        state = MarkerState(position = latLng),
+                        title = evento.event_name ?: "Evento seleccionado",
+                        snippet = evento.event_description ?: "Sin descripción",
+                        icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
                     )
                 }
             }
@@ -270,12 +297,12 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                 )
             }
         }
+
         if (showFilterCard) {
             EventFilterCard(
                 onCloseClick = { showFilterCard = false },
                 onApplyFilters = { filters ->
                     appliedFilters = filters
-                    // No cerramos la tarjeta aquí
                     eventoViewModel.obtenerTodosLosEventos()
                 },
                 initialFilters = appliedFilters,

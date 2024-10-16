@@ -2,8 +2,12 @@
 package com.example.melapp.Backend
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -23,6 +27,7 @@ sealed class EventoState {
     data class SuccessSingle(val data: DocumentSnapshot) : EventoState() // Para un solo evento
     data class Success(val evento: Evento) : EventoState() // Para cuando obtienes un evento convertido a tu clase Evento
     data class Error(val message: String) : EventoState()
+
 }
 
 data class Evento(
@@ -52,11 +57,21 @@ class EventoViewModel : ViewModel() {
 
     private val _eventoState = MutableStateFlow<EventoState>(EventoState.Idle)
     val eventoState: StateFlow<EventoState> = _eventoState
+    private val _selectedEvent = MutableStateFlow<Evento?>(null)
+    val selectedEvent: StateFlow<Evento?> = _selectedEvent
+
+    fun updateSelectedEvent(evento: Evento) {
+        _selectedEvent.value = evento
+    }
 
     private val firestore = FirebaseFirestore.getInstance()
     private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
-
+    private val _cameraPosition = mutableStateOf<CameraPosition?>(null)
+    val cameraPosition: State<CameraPosition?> = _cameraPosition
+    fun updateCameraPosition(latLng: LatLng) {
+        _cameraPosition.value = CameraPosition.fromLatLngZoom(latLng, 15f)
+    }
     // Obtener un evento por ID
     fun obtenerEvento(eventoId: String) {
         viewModelScope.launch {
@@ -300,6 +315,82 @@ class EventoViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("EventoViewModel", "Error in eliminarEvento: ${e.message}", e)
                 _eventoState.value = EventoState.Error("Error al eliminar el evento: ${e.message}")
+            }
+        }
+    }
+    fun obtenerEventosFavoritosDelUsuario() {
+        viewModelScope.launch {
+            try {
+                _eventoState.value = EventoState.Loading
+                Log.d("EventoViewModel", "Fetching favorite events for user")
+
+                val currentUser = auth.currentUser
+                if (currentUser == null) {
+                    _eventoState.value = EventoState.Error("Usuario no autenticado")
+                    return@launch
+                }
+
+                val userEmail = currentUser.email ?: ""
+
+                // Obtener todos los documentos donde el email del usuario coincida
+                val querySnapshot = firestore.collection("event_saved")
+                    .whereEqualTo("user_email", userEmail)
+                    .get()
+                    .await()
+
+                val favoriteEventIds = querySnapshot.documents.mapNotNull { it.getString("id_event") }
+
+                // Obtenemos los DocumentSnapshot de los eventos favoritos
+                val eventoDocuments = favoriteEventIds.mapNotNull { eventId ->
+                    firestore.collection("Event").document(eventId).get().await()
+                }
+
+                Log.d("EventoViewModel", "Successfully fetched ${eventoDocuments.size} favorite events")
+                _eventoState.value = EventoState.SuccessList(eventoDocuments)
+
+            } catch (e: Exception) {
+                Log.e("EventoViewModel", "Error fetching favorite events: ${e.message}", e)
+                _eventoState.value = EventoState.Error("Error al obtener los eventos favoritos: ${e.message}")
+            }
+        }
+    }
+    fun eliminarEventoFavorito(eventoId: String) {
+        viewModelScope.launch {
+            try {
+                _eventoState.value = EventoState.Loading
+                Log.d("EventoViewModel", "Deleting favorite event with ID: $eventoId")
+
+                val currentUser = auth.currentUser
+                if (currentUser == null) {
+                    _eventoState.value = EventoState.Error("Usuario no autenticado")
+                    return@launch
+                }
+
+                val userEmail = currentUser.email ?: ""
+
+                // Buscar el documento que coincida con el id del evento y el email del usuario
+                val querySnapshot = firestore.collection("event_saved")
+                    .whereEqualTo("id_event", eventoId)
+                    .whereEqualTo("user_email", userEmail)
+                    .get()
+                    .await()
+
+                if (querySnapshot.documents.isNotEmpty()) {
+                    // Debería haber solo un documento que coincida
+                    val document = querySnapshot.documents.first()
+                    document.reference.delete().await()
+
+                    Log.d("EventoViewModel", "Favorite event deleted successfully")
+
+                    // Refrescar la lista de eventos favoritos
+                    obtenerEventosFavoritosDelUsuario()
+                } else {
+                    _eventoState.value = EventoState.Error("No se encontró el evento favorito")
+                }
+
+            } catch (e: Exception) {
+                Log.e("EventoViewModel", "Error in eliminarEventoFavorito: ${e.message}", e)
+                _eventoState.value = EventoState.Error("Error al eliminar el evento favorito: ${e.message}")
             }
         }
     }
