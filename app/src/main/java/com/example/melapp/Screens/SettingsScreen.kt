@@ -49,13 +49,13 @@ fun CollapsibleSettingsOption(
         ) {
             Text(
                 text = title,
-                color = Color(0xFF1A237E),
+                color = Color(0xFFFFFFFF),
                 fontSize = 20.sp
             )
             Icon(
                 painter = if (isExpanded) painterResource(R.drawable.ic_circle) else painterResource(R.drawable.ic_circle_down),
                 contentDescription = if (isExpanded) "Collapse" else "Expand",
-                tint = Color(0xFF1A237E)
+                tint = Color(0xFFFFFFFF)
             )
         }
 

@@ -4,23 +4,31 @@ package com.example.melapp.Screens
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.melapp.Backend.Evento
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
 import com.example.melapp.Backend.toEvento
@@ -32,20 +40,45 @@ import com.example.melapp.ReusableComponents.ReusableTopBar
 
 @Composable
 fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
+
     val eventoState by eventoViewModel.eventoState.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }  // Estado para almacenar el texto de búsqueda
+    var filteredEvents by remember { mutableStateOf(listOf<Evento>()) }  // Estado para almacenar los eventos filtrados
 
     // Llamar a obtenerTodosLosEventos() una vez que la pantalla se cargue
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
     }
 
+    // Filtrar los eventos cada vez que el estado de la búsqueda cambie
+    LaunchedEffect(searchQuery, eventoState) {
+        if (eventoState is EventoState.SuccessList) {
+            val eventos = (eventoState as EventoState.SuccessList).data.mapNotNull { it.toEvento() }
+            filteredEvents = if (searchQuery.isEmpty()) {
+                eventos  // Mostrar todos los eventos si no hay búsqueda
+            } else {
+                eventos.filter { it.event_name?.contains(searchQuery, ignoreCase = true) == true }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
-            ReusableTopBar(
-                screenTitle = "Eventos",
-                onBackClick = { navController.popBackStack() }
-            )
-
+            Column {
+                ReusableTopBar(
+                    screenTitle = "Eventos",
+                    onBackClick = { navController.popBackStack() }
+                )
+                // Barra de búsqueda
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    label = { Text("Buscar eventos...") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                )
+            }
         },
         bottomBar = {
             NavigationBottomBar(
@@ -58,7 +91,6 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
         content = { innerPadding ->
             when (eventoState) {
                 is EventoState.Loading -> {
-                    // Mostrar un indicador de carga
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -69,27 +101,24 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
                     }
                 }
                 is EventoState.SuccessList -> {
-                    // Convertir los documentos a objetos Evento
-                    val eventos = (eventoState as EventoState.SuccessList).data.mapNotNull { it.toEvento() }
-
-                    if (eventos.isEmpty()) {
-                        // Si no hay eventos, mostrar un mensaje
+                    if (filteredEvents.isEmpty()) {
+                        // Si no hay eventos filtrados, mostrar un mensaje
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No hay eventos disponibles.")
+                            Text("No se encontraron eventos.")
                         }
                     } else {
-                        // Mostrar la lista de eventos
+                        // Mostrar la lista de eventos filtrados
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .padding(innerPadding)
                         ) {
-                            items(eventos) { evento ->
+                            items(filteredEvents) { evento ->
                                 val context = LocalContext.current
                                 EventCardDescription2(
                                     evento = evento,
@@ -98,8 +127,6 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
                                         navController.navigate("eventDetails/${evento.id}")
                                     },
                                     onSaveClick = { isSaved ->
-                                        // Lógica que deseas ejecutar cuando el estado de guardado cambia
-                                        // Puedes manejar aquí la respuesta según si el evento fue guardado o eliminado
                                         if (isSaved) {
                                             Toast.makeText(context, "Evento guardado en favoritos", Toast.LENGTH_SHORT).show()
                                         } else {
@@ -112,7 +139,6 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
                     }
                 }
                 is EventoState.Error -> {
-                    // Mostrar un mensaje de error
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -125,11 +151,11 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
                 else -> {
                     // Manejar estados no conocidos
                 }
-
             }
         }
     )
 }
+
 
 
 
