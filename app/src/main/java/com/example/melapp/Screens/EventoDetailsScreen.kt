@@ -3,11 +3,24 @@ package com.example.melapp.Screens
 import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -19,19 +32,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
 import com.example.melapp.Backend.EventoState
 import com.example.melapp.Backend.EventoViewModel
-import com.example.melapp.R
-import com.example.melapp.ReusableComponents.NavigationBottomBar
-import com.google.firebase.firestore.DocumentSnapshot
 import com.example.melapp.Backend.getAddressFromLatLng
+import com.example.melapp.ReusableComponents.NavigationBottomBar
+import com.example.melapp.ReusableComponents.ReusableTopBar
+import com.google.firebase.firestore.DocumentSnapshot
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,18 +55,11 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Detalles del Evento", color = Color.White) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(painterResource(id = R.drawable.ic_arrow_back), contentDescription = "Volver", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent
-                )
+            ReusableTopBar(
+                screenTitle = "Detalles del Evento",
+                onBackClick = { navController.popBackStack() }
             )
+
         },
         bottomBar = {
             NavigationBottomBar(
@@ -86,7 +90,7 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
                             .padding(innerPadding)
                             .verticalScroll(rememberScrollState())
                             .padding(16.dp)
-                            .background(Color(0xFF121212))  // Fondo oscuro elegante
+                            .background(Color.White)
                     ) {
                         DisplayEventDetails(documento, context)
                     }
@@ -108,7 +112,6 @@ fun EventoDetailsScreen(navController: NavController, eventoId: String, eventoVi
         }
     )
 }
-
 @Composable
 fun DisplayEventDetails(documento: DocumentSnapshot, context: Context) {
     // Mapea las claves a nombres amigables
@@ -145,7 +148,7 @@ fun DisplayEventDetails(documento: DocumentSnapshot, context: Context) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-            .background(Color(0xFF1C1C1C))  // Fondo ligeramente más claro que el negro puro
+            .background(Color.White)  // Cambiado de Color(0xFF1C1C1C) a blanco
     ) {
         // Imagen destacada del evento con sombras y bordes redondeados
         val imageUrl = documento.getString("event_thumbnail")
@@ -189,14 +192,18 @@ fun InfoSection(title: String, content: @Composable () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleLarge.copy(color = Color.White),
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = Color(0xFF2E2E2E)  // Gris más oscuro para títulos
+            ),
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(vertical = 8.dp)
         )
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2E2E2E)),  // Fondo oscuro para las tarjetas
-            elevation = CardDefaults.cardElevation(8.dp)  // Elevación para una sombra sutil
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFF918BAE)  // Color de fondo de la tarjeta
+            ),
+            elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 content()
@@ -245,7 +252,18 @@ fun EventDetailRow(label: String, value: String) {
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(text = "$label:", color = Color.Gray)
-        Text(text = value, color = Color.White, fontWeight = FontWeight.SemiBold)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = Color.White  // Texto blanco para mejor contraste sobre el fondo morado
+            ),
+            fontWeight = FontWeight.Bold  // Hacerlo negrita para mayor legibilidad
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = Color.White  // Texto blanco para mejor contraste
+            )
+        )
     }
 }
