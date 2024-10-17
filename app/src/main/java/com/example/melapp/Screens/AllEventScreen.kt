@@ -40,24 +40,24 @@ import com.example.melapp.ReusableComponents.ReusableTopBar
 
 @Composable
 fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewModel = viewModel()) {
-
     val eventoState by eventoViewModel.eventoState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }  // Estado para almacenar el texto de búsqueda
     var filteredEvents by remember { mutableStateOf(listOf<Evento>()) }  // Estado para almacenar los eventos filtrados
+    var selectedCategories by remember { mutableStateOf(emptyList<String>()) }  // Estado para almacenar las categorías seleccionadas
 
     // Llamar a obtenerTodosLosEventos() una vez que la pantalla se cargue
     LaunchedEffect(Unit) {
         eventoViewModel.obtenerTodosLosEventos()
     }
 
-    // Filtrar los eventos cada vez que el estado de la búsqueda cambie
-    LaunchedEffect(searchQuery, eventoState) {
+    // Filtrar los eventos cada vez que el estado de la búsqueda o las categorías cambie
+    LaunchedEffect(searchQuery, selectedCategories, eventoState) {
         if (eventoState is EventoState.SuccessList) {
             val eventos = (eventoState as EventoState.SuccessList).data.mapNotNull { it.toEvento() }
-            filteredEvents = if (searchQuery.isEmpty()) {
-                eventos  // Mostrar todos los eventos si no hay búsqueda
-            } else {
-                eventos.filter { it.event_name?.contains(searchQuery, ignoreCase = true) == true }
+            filteredEvents = eventos.filter { evento ->
+                val matchesSearchQuery = evento.event_name?.contains(searchQuery, ignoreCase = true) == true
+                val matchesCategory = selectedCategories.isEmpty() || evento.event_category in selectedCategories
+                matchesSearchQuery && matchesCategory
             }
         }
     }
@@ -77,6 +77,10 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
+                )
+                // Barra de categorías
+                CategoryBar(
+                    onCategoriesSelected = { selectedCategories = it }
                 )
             }
         },
@@ -155,7 +159,3 @@ fun AllEventScreen(navController: NavController, eventoViewModel: EventoViewMode
         }
     )
 }
-
-
-
-
