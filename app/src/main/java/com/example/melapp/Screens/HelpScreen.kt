@@ -31,13 +31,7 @@ fun HelpScreen(navController: NavController) {
                 onBackClick = { navController.popBackStack() }
             )
         },
-        bottomBar = {
-            NavigationBottomBar(
-                onProfileClick = { /* Navigate to Profile */ },
-                onPostEventClick = { /* Navigate to Post Event */ },
-                onSettingsClick = { /* Navigate to Settings */ }
-            )
-        },
+
         content = { paddingValues ->
             LazyColumn(
                 modifier = Modifier
@@ -64,6 +58,7 @@ fun HelpScreen(navController: NavController) {
                     Spacer(modifier = Modifier.height(24.dp)) // Espacio entre secciones
                 }
 
+                //THANK YOU BEYONCE I LOV U <333
                 // Mostrar información de contacto si se presionó la opción
                 if (showContactInfo) {
                     item {
