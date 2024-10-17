@@ -1,5 +1,6 @@
 package com.example.melapp.Screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.ClickableText
@@ -19,6 +20,14 @@ import com.example.melapp.R
 import com.example.melapp.ReusableComponents.NavigationBottomBar
 import com.example.melapp.ReusableComponents.ReusableTopBar
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+
+
 
 @Composable
 fun CollapsibleSettingsOption(
@@ -27,7 +36,7 @@ fun CollapsibleSettingsOption(
     isSecondary: Boolean = false,
     isCheckbox: Boolean = false,
     selectedOption: MutableState<String?> = mutableStateOf(null),
-    onOptionClick: (() -> Unit)? = null // Nuevo parámetro para manejar clics
+    onOptionClick: (() -> Unit)? = null
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -36,6 +45,7 @@ fun CollapsibleSettingsOption(
             .fillMaxWidth()
             .padding(vertical = if (isSecondary) 16.dp else 8.dp)
     ) {
+        // Título del ajuste (por ejemplo, Idioma)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -49,32 +59,42 @@ fun CollapsibleSettingsOption(
         ) {
             Text(
                 text = title,
-                color = Color(0xFFFFFFFF),
+                color = Color(0xFFFFFFFF), // Color blanco para el título
                 fontSize = 20.sp
             )
             Icon(
                 painter = if (isExpanded) painterResource(R.drawable.ic_circle) else painterResource(R.drawable.ic_circle_down),
                 contentDescription = if (isExpanded) "Collapse" else "Expand",
-                tint = Color(0xFFFFFFFF)
+                tint = Color(0xFFFFFFFF) // Icono blanco
             )
         }
 
-        if (isExpanded && subOptions.isNotEmpty()) {
-            subOptions.forEach { option ->
-                ClickableText(
-                    text = AnnotatedString(option),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp),
-                    onClick = {
-                        // Manejar clics en cada subopción si es necesario
-                    }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+        // Subopciones desplegadas con animación
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandVertically() + fadeIn(), // Animación de entrada (despliegue y desvanecimiento)
+            exit = shrinkVertically() + fadeOut()  // Animación de salida (colapso y desvanecimiento)
+        ) {
+            Column {
+                subOptions.forEach { option ->
+                    Text(
+                        text = option,
+                        color = Color(0xFFB0BEC5), // Color gris claro para el texto de las opciones
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+                            .background(Color(0xFF424242)) // Fondo gris oscuro para las opciones
+                            .padding(8.dp), // Padding para darle espacio al texto
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
     }
 }
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,14 +139,20 @@ fun SettingsScreen(navController: NavController) {
             CollapsibleSettingsOption("Condiciones y Políticas", listOf("Términos de servicio", "Política de privacidad"))
             CollapsibleSettingsOption("Acerca de", listOf("Versión", "Licencias"))
 
-            // Implementación de Cerrar Sesión con confirmación
-            CollapsibleSettingsOption(
-                title = "Cerrar sesión",
-                subOptions = emptyList(),
-                onOptionClick = {
+            // Implementación del botón de Cerrar Sesión
+            Button(
+                onClick = {
                     showLogoutDialog = true // Mostrar el diálogo de confirmación
-                }
-            )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+                    .height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                shape = RoundedCornerShape(50.dp) // Bordes redondeados
+            ) {
+                Text(text = "Cerrar sesión", color = Color.White)
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
