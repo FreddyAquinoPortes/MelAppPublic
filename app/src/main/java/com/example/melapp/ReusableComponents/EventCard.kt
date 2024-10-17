@@ -1,6 +1,7 @@
 
 
 import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -46,7 +47,8 @@ fun EventCardDescription(
     evento: Evento,
     modifier: Modifier = Modifier,
     onCloseClick: () -> Unit, // Acción de cierre
-    onSaveClick: (Boolean) -> Unit
+    onSaveClick: (Boolean) -> Unit,
+    onCardClick: () -> Unit
 ) {
     var isSaved by remember { mutableStateOf(false) }
     val firestore = FirebaseFirestore.getInstance()
@@ -76,7 +78,8 @@ fun EventCardDescription(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable { onCardClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(8.dp)

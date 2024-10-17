@@ -282,6 +282,12 @@ fun MapScreen(navController: NavController, eventoViewModel: EventoViewModel = v
                     },
                     onSaveClick = { isSaved ->
                         // Lógica para guardar o eliminar el evento
+                    },
+                    onCardClick = {
+                        // Navegar a la pantalla de detalles del evento, pasando el ID del evento
+                        evento.id?.let { eventoId ->
+                            navController.navigate("eventDetails/$eventoId")
+                        }
                     }
                 )
             }
@@ -323,7 +329,3 @@ fun centerCameraOnUser(
             Toast.makeText(context, "Error obteniendo ubicación: ${e.message}", Toast.LENGTH_SHORT).show()
         }
 }
-
-
-
-
